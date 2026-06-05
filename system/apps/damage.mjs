@@ -80,4 +80,30 @@ export class AOVDamage {
     return
   }
 
+  static async addWound(actor, hitLocId, damage) {
+    const docCls = getDocumentClass('Item');
+    const docData = {
+      name: docCls.defaultName({
+        type: 'wound',
+        parent: actor
+      }),
+      type: 'wound',
+      system: {
+        hitLocId: hitLocId,
+        damage: damage
+      }
+    };
+    // Create the embedded document
+    const newItem = await docCls.create(docData, { parent: actor });
+
+    if (game.settings.get('aov', "actorItemCID")) {
+      let key = await game.aov.cid.guessId(newItem)
+      await newItem.update({
+        'flags.aov.cidFlag.id': key,
+        'flags.aov.cidFlag.lang': game.i18n.lang,
+        'flags.aov.cidFlag.priority': 0
+      })
+    }
+      return;
+  }
 }

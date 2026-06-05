@@ -718,6 +718,9 @@ export class AOVCheck {
       case "roll-hitloc-card":
         await COCard.COHitLoc(data)
         break
+      case "apply-damage-card":
+         await COCard.COApplyDmg(data)
+        break
       default:
         return
     }

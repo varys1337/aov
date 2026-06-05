@@ -3,6 +3,8 @@ import { AOVCIDSettings } from "./settings-cidOptions.mjs";
 import { AOVGameYearSettings } from "./settings-gameYear.mjs";
 import { AOVNPCSettings } from "./settings-npcOptions.mjs";
 import { AOVCreateSettings } from "./settings-creationOptions.mjs";
+import { AOVCombatSettings } from "./settings-combatOptions.mjs";
+
 
 export async function registerSettings() {
   //Game Year Settings Button
@@ -45,6 +47,16 @@ export async function registerSettings() {
   })
   AOVDisplaySettings.registerSettings()
 
+  //Combat Settings Button
+  game.settings.registerMenu('aov', 'combatOptions', {
+    name: 'AOV.Settings.combatOptionsHint',
+    label: 'AOV.Settings.combatOptions',
+    icon: 'fas fa-swords',
+    type: AOVCombatSettings,
+    restricted: true
+  })
+  AOVCombatSettings.registerSettings()
+
   //Chaosium ID Settings Button
   game.settings.registerMenu('aov', 'cidOptions', {
     name: 'AOV.Settings.cidOptionsHint',
@@ -54,7 +66,6 @@ export async function registerSettings() {
     restricted: true
   })
   AOVCIDSettings.registerSettings()
-
 
   //Invisible Settings
   game.settings.register('aov', 'developmentEnabled', {

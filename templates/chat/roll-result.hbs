@@ -90,17 +90,24 @@
 
   {{#if (eq state 'open')}}
     {{#each chatCard as |c key|}}
-    {{#if (eq c.rollType 'DM')}}
-      <div class="owner-only" data-partic-id="{{c.particId}}" data-partic-type="{{c.particType}}">
-        <button class='resolve cardbutton' data-preset='roll-hitloc-card' data-card={{key}} type="button">{{localize 'AOV.card.rollHitLoc'}}</button>
-      </div>
-    {{/if}}
+      {{#if (eq c.rollType 'DM')}}
+        <div class="owner-only" data-partic-id="{{c.particId}}" data-partic-type="{{c.particType}}">
+          <button class='resolve cardbutton' data-preset='roll-hitloc-card' data-card={{key}} type="button">{{localize 'AOV.card.rollHitLoc'}}</button>
+        </div>
+      {{/if}}
     {{/each}}
   {{else}}
     {{#each chatCard as |c key|}}
-      {{#unless (eq c.targetLoc "")}}
-        <div class="combat-result">{{c.targetLoc}}</div>
-      {{/unless}}
+      {{#if (eq c.rollType 'DM')}}
+        {{#unless (eq c.targetLoc "")}}
+          <div class="combat-result">{{c.targetLoc}}</div>
+        {{/unless}}
+        {{#if (eq ../state 'applyDmg')}}
+          <div class="owner-only" data-partic-id="{{c.particId}}" data-partic-type="{{c.particType}}">
+            <button class='resolve cardbutton' data-preset='apply-damage-card' data-card={{key}} type="button">{{localize 'AOV.card.applyDamage'}}</button>
+          </div>
+        {{/if}}
+      {{/if}}
     {{/each}}
   {{/if}}
 

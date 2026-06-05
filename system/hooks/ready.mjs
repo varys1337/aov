@@ -8,6 +8,9 @@ export default function Ready() {
     AOVSystemSocket.callSocket(data)
   });
 
+  Scene.prototype._onClickDocumentLink = function (event) {
+  this.view() };
+
 
   console.log("///////////////////////////////////")
   console.log("//  Age of Vikings System Ready  //")

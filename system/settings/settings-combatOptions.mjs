@@ -1,27 +1,27 @@
 const SETTINGS = {
 
-  singleColourBar: {
-    name: "AOV.Settings.singleColourBar",
-    hint: "AOV.Settings.singleColourBarHint",
-    scope: "client",
+  autoDmg: {
+    name: "AOV.Settings.autoDmg",
+    hint: "AOV.Settings.autoDmgHint",
+    scope: "world",
     config: false,
     type: Boolean,
     default: false
   },
 
-    smallScreen: {
-    name: "AOV.Settings.smallScreen",
-    hint: "AOV.Settings.smallScreen",
-    scope: "client",
+    combatToken: {
+    name: "AOV.Settings.combatToken",
+    hint: "AOV.Settings.combatTokenHint",
+    scope: "world",
     config: false,
     type: Boolean,
     default: false,
     requiresReload: true,
   },
 
-    partyHPVal: {
-    name: "AOV.Settings.partyHPVal",
-    hint: "AOV.Settings.partyHPValHint",
+    combatNarrative: {
+    name: "AOV.Settings.combatNarrative",
+    hint: "AOV.Settings.combatNarrativeHint",
     scope: "world",
     config: false,
     type: Boolean,
@@ -31,15 +31,15 @@ const SETTINGS = {
 }
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api
-export class AOVDisplaySettings extends HandlebarsApplicationMixin(ApplicationV2) {
+export class AOVCombatSettings extends HandlebarsApplicationMixin(ApplicationV2) {
   static DEFAULT_OPTIONS = {
     classes: ['aov', 'sheet', 'settings'],
-    id: 'display-settings',
+    id: 'combat-settings',
     actions: {
-      reset: AOVDisplaySettings.onResetDefaults,
+      reset: AOVCombatSettings.onResetDefaults,
     },
     form: {
-      handler: AOVDisplaySettings.formHandler,
+      handler: AOVCombatSettings.formHandler,
       closeOnSubmit: true,
       submitOnChange: false
     },
@@ -49,7 +49,7 @@ export class AOVDisplaySettings extends HandlebarsApplicationMixin(ApplicationV2
     },
     tag: 'form',
     window: {
-      title: 'AOV.Settings.displayOptions',
+      title: 'AOV.Settings.combatOptions',
       contentClasses: ["standard-form"]
     }
   }
@@ -59,13 +59,13 @@ export class AOVDisplaySettings extends HandlebarsApplicationMixin(ApplicationV2
   }
 
   static PARTS = {
-    form: { template: 'systems/aov/templates/settings/display-settings.hbs' },
+    form: { template: 'systems/aov/templates/settings/combat-settings.hbs' },
     footer: { template: 'templates/generic/form-footer.hbs' }
   }
 
 
   async _prepareContext(options) {
-    const isGM = game.user.isGM;
+
     const optSet = {}
     for (const [k, v] of Object.entries(SETTINGS)) {
       optSet[k] = {
@@ -74,7 +74,6 @@ export class AOVDisplaySettings extends HandlebarsApplicationMixin(ApplicationV2
       }
     }
     return {
-      isGM,
       optSet,
       buttons: [
         { type: "submit", icon: "fa-solid fa-save", label: "SETTINGS.Save" },

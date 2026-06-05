@@ -1,8 +1,10 @@
 
 
-.journal-entry-content, .journal-entry-page, .journal-entry-pages {
-  background-image: url('../art-assets/parchment-white.jpg');
+.journal-entry-content, form.journal-entry-page {
+  background-image: url('../art-assets/blank_page.webp');
+  background-size: cover;
   color: var(--aov-jnl-main-col);
+
 }
 
 .journal-page-header h1 {
@@ -193,6 +195,11 @@ div.css-adventure-entry.sheet {
       padding: 10px 7px 10px 7px;
       background-color: rgb(64, 101, 221);
       color: cornsilk;
+  }
+
+  .img-centre {
+    margin-left: auto;
+    margin-right: auto;
   }
 
 }

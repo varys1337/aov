@@ -21,33 +21,4 @@
 
     <br>
 
-    {{#if isGM}}
-      <div class="form-group">
-        <label class="bold">{{localize 'AOV.Settings.partyHPVal'}}</label>
-        <div class="form-fields" style="flex: 1;">
-          <input type="checkbox" {{checked optSet.partyHPVal.value}} name="partyHPVal">
-        </div>
-        <p class="settingNote">{{localize 'AOV.Settings.partyHPValHint'}}</p>
-      </div>
-      <br>
-
-      <div class="form-group">
-        <label class="bold">{{localize 'AOV.Settings.combatToken'}}</label>
-        <div class="form-fields" style="flex: 1;">
-          <input type="checkbox" {{checked optSet.combatToken.value}} name="combatToken">
-        </div>
-        <p class="settingNote">{{localize 'AOV.Settings.combatTokenHint'}}</p>
-      </div>
-      <br>
-
-      <div class="form-group">
-        <label class="bold">{{localize 'AOV.Settings.combatNarrative'}}</label>
-        <div class="form-fields" style="flex: 1;">
-          <input type="checkbox" {{checked optSet.combatNarrative.value}} name="combatNarrative">
-        </div>
-        <p class="settingNote">{{localize 'AOV.Settings.combatNarrativeHint'}}</p>
-      </div>
-      <br>
-    {{/if}}
-
   </div>

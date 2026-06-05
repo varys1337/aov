@@ -409,7 +409,8 @@ export class COCard {
         game.dice3d.showForRoll(roll, thisUser, true, null, false)
       }
       let locRR = roll.total;
-      let locName = ""
+      let locName = "";
+      let targetLocID = "";
       for (let locItem of locList) {
         if (locRR >= locItem.system.lowRoll && locRR <= locItem.system.highRoll) {
           locName = locItem.name +" (" + locItem.system.lowRoll
@@ -417,18 +418,40 @@ export class COCard {
             locName = locName + "-" + locItem.system.highRoll
           }
           locName = locName + ") " + game.i18n.localize('AOV.roll') +": " + locRR
+          targetLocID = locItem._id
         }
       }
-      chatCard.targetLoc = locName
-      chatCard.targetId = ""
-      newChatCards.push(chatCard)
+      chatCard.targetLoc = locName;
+      chatCard.targetLocID = targetLocID;
+      newChatCards.push(chatCard);
+
+      let newState = 'closed';
+      //Built in prep of "apply damage" rules
+      //if (game.settings.get('aov','autoDmg')) {newState = "applyDmg"};
       await targetMsg.update({
         'flags.aov.chatCard': newChatCards,
-        'flags.aov.state': 'closed'
-      })
-      const pushhtml = await AOVCheck.startChat(targetMsg.flags.aov)
-      await targetMsg.update({ content: pushhtml })
+        'flags.aov.state': newState
+      });
+      const pushhtml = await AOVCheck.startChat(targetMsg.flags.aov);
+      await targetMsg.update({ content: pushhtml });
     }
+  }
+
+  //Placeholder  - not ready for use yet
+  static async COApplyDmg(config) {
+    let targetMsg = await game.messages.get(config.targetChatId);
+    let chatCards = targetMsg.flags.aov.chatCard;
+    let chatCard = chatCards[0];
+    let newChatCards = [];
+    let targetActor = await AOVactorDetails._getParticipant(
+      chatCard.targetId,
+      chatCard.targetType,
+    );
+    if (!targetActor) {
+      ui.notifications.warn(game.i18n.localize('AOV.noTargetID'));
+      return;
+    }
+    //Consider all options, hit loc, parrying weapon, parry level - may get complicated
   }
 
 

@@ -1,3 +1,7 @@
+## 13.27
+- Some more journal CSS edits
+- Clicking on a scene that's linked in a journal will open the scene for the GM (rather than the config page).  The GM will still need to activate the scene.
+
 ## 13.26
 - Augmentation rolls can now include up to 5 supporting rolls.
 - Links to new repositorities updated in Update message & Game Instructions
