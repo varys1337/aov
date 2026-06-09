@@ -3,7 +3,7 @@
     "title": "Age of Vikings",
     "description": "Age of Vikings by Chaosium Inc for Foundry VTT",
 
-    "version": "13.27",
+    "version": "13.28",
     "compatibility": {
       "minimum": 13,
       "verified": "13.351"
@@ -180,7 +180,7 @@
     "background": "systems/aov/art-assets/vikings-launch_small.webp",
 
     "manifest": "https://github.com/cragstone/aov/releases/latest/download/system.json",
-    "download": "https://github.com/cragstone/aov/releases/download/13.27/aov.zip",
+    "download": "https://github.com/cragstone/aov/releases/download/13.28/aov.zip",
     "url": "https://github.com/cragstone/aov",
     "license": "LICENSE.txt",
     "readme": "README.md",

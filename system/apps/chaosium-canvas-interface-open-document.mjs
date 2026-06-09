@@ -45,6 +45,11 @@ export default class ChaosiumCanvasInterfaceOpenDocument extends ChaosiumCanvasI
         label: 'AOV.ChaosiumCanvasInterface.OpenDocument.Anchor.Title',
         hint: 'AOV.ChaosiumCanvasInterface.OpenDocument.Anchor.Hint'
       }),
+      showPlayers: new fields.BooleanField({
+        initial: false,
+        label: 'AOV.ChaosiumCanvasInterface.OpenDocument.showPlayers.Title',
+        hint: 'AOV.ChaosiumCanvasInterface.OpenDocument.showPlayers.Hint'
+      }),
       tileUuid: new fields.DocumentUUIDField({
         label: 'AOV.ChaosiumCanvasInterface.OpenDocument.Tile.Title',
         hint: 'AOV.ChaosiumCanvasInterface.OpenDocument.Tile.Hint',
@@ -90,6 +95,17 @@ export default class ChaosiumCanvasInterfaceOpenDocument extends ChaosiumCanvasI
     if (doc?.testUserPermission(game.user, CONST.DOCUMENT_OWNERSHIP_LEVELS.LIMITED)) {
       if (doc instanceof JournalEntryPage) {
         doc.parent.sheet.render(true, { pageId: doc.id, anchor: this.anchor })
+        if (this.showPlayers) {
+          if (doc.type === "image") {
+            let users = game.users.filter(u => !u.isSelf).map(u => u.id);
+            foundry.documents.collections.Journal.showImage(doc.src, {
+              users,
+              title: doc.name,
+              showTitle: false,
+              uuid: doc.uuid
+            });
+          }
+        }
       } else {
         doc.sheet.render(true)
       }

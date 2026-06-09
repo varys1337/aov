@@ -1,3 +1,6 @@
+## 13.28
+-  Added an option in CCI: Open Documents so that if an Image Page is selected you can show this to all Players without changing permissions.
+
 ## 13.27
 - Some more journal CSS edits
 - Clicking on a scene that's linked in a journal will open the scene for the GM (rather than the config page).  The GM will still need to activate the scene.

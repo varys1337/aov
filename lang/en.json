@@ -617,6 +617,10 @@
           "Title": "Optional Anchor",
           "Hint": "If loading a JournalEntryPage jump to anchor"
         },
+        "showPlayers": {
+          "Title": "Show Players",
+          "Hint": "Show to all players if this is an image page"
+        },
         "Tile": {
           "Title": "Select Tile",
           "Hint": "Select Tile that must be visible"
