@@ -1,8 +1,10 @@
 {{! Sheet Header }}
 <header class='character sheet-header draggable'>
-  <div>
-    <img class="img-centre aovline">
-  </div>
+  {{#unless system.quickstart}}
+    <div>
+      <img class="img-centre aovline">
+    </div>
+  {{/unless}}
   <div class="character-header">
 
     {{!Character Name}}
@@ -52,17 +54,18 @@
     </div>
   </div>
 
-
-  <div>
-    <img class="img-centre aovline">
-  </div>
+  {{#unless system.quickstart}}
+    <div>
+      <img class="img-centre aovline">
+    </div>
+  {{/unless}}
 
   <div class="stats-header">
     {{!Characteristics}}
     <div class="ability-grid new-row" style="min-height:130px;">
       <div class="characteristics">
         {{#each system.abilities as |ability key|}}
-        <div class="ability-cell centre bold">{{ability.label}}</div>
+        <div class="ability-cell centre bold" {{#if (eq key 'pow')}} title="{{ localize 'AOV.wyrdSpendHint'}}" data-action="wyrd"{{/if}}>{{ability.label}}</div>
         <div class="ability-cell centre bold rollable terIcon" data-action="diceroll" data-property="ability" data-characteristic="{{key}}" data-tooltip="AOV.rolls.abilityRoll">{{ability.total}}</div>
         {{/each}}
       </div>
@@ -76,23 +79,27 @@
         <span class="ability-cell centre"> / </span>
         <span class="ability-cell centre terIcon bold">{{system.hp.max}}</span>
       </div>
-      <div class="ability-cell left bold" data-tooltip="{{localize 'AOV.mp'}}">{{localize 'AOV.mpAbbr'}}</div>
-      <div class='stat-grid'>
-        <input class="ability-cell bold" type='text' name='system.mp.value' value='{{system.mp.value}}'
-          data-dtype='Number' />
-        <span class="centre"> / </span>
-        <div class="ability-cell centre terIcon bold" data-tooltip="{{localize 'AOV.maxMP' value=system.mp.max}}">{{system.mp.availMax}}</div>
-      </div>
-      <div class="ability-cell left bold" data-tooltip="{{localize 'AOV.healRate'}}">{{localize 'AOV.healRateAbbr'}}</div>
-      <div class="ability-cell centre terIcon bold">{{system.healRate}}</div>
-      <div class="ability-cell left bold" data-tooltip="{{localize 'AOV.dmgBonus'}}">{{localize 'AOV.dmgBonusAbbr'}}</div>
-      <div class="ability-cell centre terIcon bold">{{system.dmgBonus}}</div>
+      {{#unless system.quickstart}}
+        <div class="ability-cell left bold" data-tooltip="{{localize 'AOV.mp'}}">{{localize 'AOV.mpAbbr'}}</div>
+        <div class='stat-grid'>
+          <input class="ability-cell bold" type='text' name='system.mp.value' value='{{system.mp.value}}'
+            data-dtype='Number' />
+          <span class="centre"> / </span>
+          <div class="ability-cell centre terIcon bold" data-tooltip="{{localize 'AOV.maxMP' value=system.mp.max}}">{{system.mp.availMax}}</div>
+        </div>
+        <div class="ability-cell left bold" data-tooltip="{{localize 'AOV.healRate'}}">{{localize 'AOV.healRateAbbr'}}</div>
+        <div class="ability-cell centre terIcon bold">{{system.healRate}}</div>
+        <div class="ability-cell left bold" data-tooltip="{{localize 'AOV.dmgBonus'}}">{{localize 'AOV.dmgBonusAbbr'}}</div>
+        <div class="ability-cell centre terIcon bold">{{system.dmgBonus}}</div>
+      {{/unless}}
       <div class="ability-cell left bold" data-tooltip="{{localize 'AOV.mr'}}">{{localize 'AOV.mrAbbr'}}</div>
       <div class="ability-cell centre terIcon bold" data-tooltip="{{localize 'AOV.encPenalty'}} {{system.encPenaltyLabel}}">{{system.moveRate}}</div>
-      <div class="ability-cell left bold upper" data-tooltip="{{localize 'AOV.reput'}}">{{localize 'AOV.reputAbbr'}}</div>
-      <div class="ability-cell centre terIcon bold rollable" data-action="diceroll" data-property="reputation" data-tooltip="AOV.rolls.reputationRoll">{{system.reputation.total}}%</div>
-      <div class="ability-cell left bold rollable" data-tooltip="{{localize 'AOV.status'}}">{{localize 'AOV.statusAbbr'}}</div>
-      <div class="ability-cell centre terIcon bold rollable" data-action="diceroll" data-property="status" data-tooltip="AOV.rolls.statusRoll">{{system.status.total}}%</div>
+      {{#unless system.quickstart}}
+        <div class="ability-cell left bold upper" data-tooltip="{{localize 'AOV.reput'}}">{{localize 'AOV.reputAbbr'}}</div>
+        <div class="ability-cell centre terIcon bold rollable" data-action="diceroll" data-property="reputation" data-tooltip="AOV.rolls.reputationRoll">{{system.reputation.total}}%</div>
+        <div class="ability-cell left bold rollable" data-tooltip="{{localize 'AOV.status'}}">{{localize 'AOV.statusAbbr'}}</div>
+        <div class="ability-cell centre terIcon bold rollable" data-action="diceroll" data-property="status" data-tooltip="AOV.rolls.statusRoll">{{system.status.total}}%</div>
+      {{/unless}}
     </div>
 
     {{!Personal}}
@@ -216,9 +223,11 @@
 
   </div>
 
-  <div>
-    <img class="img-centre aovline">
-  </div>
+  {{#unless system.quickstart}}
+    <div>
+      <img class="img-centre aovline">
+    </div>
+  {{/unless}}
 
 
 </header>

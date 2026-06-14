@@ -29,6 +29,18 @@
     <div class='gear-name centre'>
       <input class="stat-input" name='system.hrBonus' type='number' value='{{system.hrBonus}}'  />
     </div>
+  </div>
+  <br>
 
+    {{!Quickstart Character Sheet}}
+  <div class="statBonus">
+    <div class="gear-name left new-row bold">{{localize 'AOV.quickstart'}}</div>
+    <div class='gear-name centre' data-action="toggleActor" data-property="quickstart"><a>
+      {{#if system.quickstart}}
+        <i class="fa-regular fa-square-check"></i>
+      {{else}}
+        <i class="fa-regular fa-square"></i>
+      {{/if}}
+    </a></div>
   </div>
 </section>

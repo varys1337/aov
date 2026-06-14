@@ -23,6 +23,7 @@ export class AoVCharacterSheet extends AoVActorSheet {
     tabs: { template: 'systems/aov/templates/actor/character-tab.hbs' },
     tabsSmall: { template: 'systems/aov/templates/actor/character-tab-small.hbs' },
 
+    quickstart: {template: 'systems/aov/templates/actor/character.quickstart.hbs'},
     notes: {
       template: 'systems/aov/templates/actor/character.notes.hbs',
       scrollable: [''],
@@ -70,19 +71,24 @@ export class AoVCharacterSheet extends AoVActorSheet {
 
     //Common parts to the character - this is the order they are show on the sheet
     options.parts=[]
-    if (!game.settings.get('aov','smallScreen')){
-      options.parts.push('header','tabs')
-    }
-    //GM only tabs
-    if (game.user.isGM) {
-      options.parts.push('gmTab');
-    }
-    //Last tab is at the top of the list on the character sheet
-    options.parts.push('stats','notes','history','family', 'gear', 'devotions', 'runes', 'combat', 'skills')
 
-    if (game.settings.get('aov','smallScreen')){
-      options.parts.push('tabsSmall','headerSmall')
-      options.parts.reverse()
+    if (this.actor.system.quickstart) {
+        options.parts.push('header','quickstart')
+    } else {
+      if (!game.settings.get('aov','smallScreen')){
+        options.parts.push('header','tabs')
+      }
+      //GM only tabs
+      if (game.user.isGM) {
+        options.parts.push('gmTab');
+      }
+      //Last tab is at the top of the list on the character sheet
+      options.parts.push('stats','notes','history','family', 'gear', 'devotions', 'runes', 'combat', 'skills')
+
+      if (game.settings.get('aov','smallScreen')){
+        options.parts.push('tabsSmall','headerSmall')
+        options.parts.reverse()
+      }
     }
   }
 
@@ -335,7 +341,11 @@ export class AoVCharacterSheet extends AoVActorSheet {
       } else if (itm.type === 'skill') {
         devSkills.push(itm);
         itm.isType = false;
-        if((this.actor.system.uncommon && itm.system.common) || !this.actor.system.uncommon) {
+        if(this.actor.system.quickstart) {
+          if (itm.system.category != 'cbt') {
+            skills.push(itm)
+          }
+        } else if((this.actor.system.uncommon && itm.system.common) || !this.actor.system.uncommon) {
           skills.push(itm)
         }
       } else if (itm.type === 'passion') {
@@ -364,6 +374,17 @@ export class AoVCharacterSheet extends AoVActorSheet {
       } else if (itm.type === 'weapon') {
         itm.system.damTypeLabel = game.i18n.localize('AOV.DamType.'+ itm.system.damType)
         itm.system.dbLabel = game.i18n.localize('AOV.DamMod.'+itm.system.damMod)
+        itm.system.damLabel = itm.system.damage
+        if (itm.system.damMod === "d" && this.actor.system.dmgBonus !="0") {
+          itm.system.damLabel = itm.system.damLabel + this.actor.system.dmgBonus
+        } else if (itm.system.damMod === "h") {
+          if (this.actor.system.dmgBonus !="0") {
+            let hdb = (this.actor.system.dmgBonus).split("D")
+            if (hdb[1]) {
+              itm.system.damLabel = itm.system.damLabel + hdb[0] + "D" + Number(hdb[1]/2)
+            }
+          }
+        }
         weapons.push(itm)
       } else if (itm.type === 'armour') {
         itm.system.armourLocLabel = itm.system.lowLoc
@@ -385,7 +406,7 @@ export class AoVCharacterSheet extends AoVActorSheet {
     }
 
     //Add Skill Categories
-    if(!this.actor.system.alphaSkills) {
+    if(!this.actor.system.alphaSkills && !this.actor.system.quickstart) {
       skills.push(
         { name: game.i18n.localize('AOV.skillCat.agi'), isType: true, system: { label: game.i18n.localize('AOV.skillCat.agi'), total: this.actor.system.agi, category: 'agi' } },
         { name: game.i18n.localize('AOV.skillCat.com'), isType: true, system: { label: game.i18n.localize('AOV.skillCat.com'), total: this.actor.system.com, category: 'com' } },

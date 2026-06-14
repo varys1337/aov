@@ -55,7 +55,7 @@
   <div class="stats-header-small">
     <div class="stats-grid-small">
       {{#each system.abilities as |ability key|}}
-        <div class="ability-cell bold">{{ability.label}}</div>
+        <div class="ability-cell bold" {{#if (eq key 'pow')}} title="{{ localize 'AOV.wyrdSpendHint'}}" data-action="wyrd"{{/if}}>{{ability.label}}</div>
         <div class="ability-cell centre terIcon rollable bottom-line" data-action="diceroll" data-property="ability" data-characteristic="{{key}}" data-tooltip="AOV.rolls.abilityRoll">{{ability.total}}</div>
       {{/each}}
     </div>

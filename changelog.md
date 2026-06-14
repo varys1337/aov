@@ -1,3 +1,7 @@
+## 13.29
+- Some more format changes
+- You can now spend Wyrd by double clicking on "POW" on the character sheet
+
 ## 13.28
 -  Added an option in CCI: Open Documents so that if an Image Page is selected you can show this to all Players without changing permissions.
 

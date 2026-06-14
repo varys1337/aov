@@ -1,0 +1,303 @@
+{{!--Combat Tab--}}
+<section class='character quickstart'>
+
+  {{!--Hit Locations--}}
+  <div class="skill-grid-header">
+    <div class='gear-header primBackCol skill-grid'>
+      <div class='centre' style="grid-column: 1 / span4;">{{localize 'AOV.hitLocations'}}</div>
+    </div>
+    <div class='gear-header {{#if singleColour}}primBackCol{{else}}secBackCol{{/if}} wounds-grid'>
+      <div class='new-row left'>{{localize 'TYPES.Item.wound'}}</div>
+      <div class='centre'>{{localize 'AOV.damage'}}</div>
+      <div class='centre'>{{localize 'AOV.status'}}</div>
+      <div class='centre'>
+        {{#if @root.editable}}
+        <a class='item-control item-create' data-tooltip='{{localize "AOV.createDoc" type=(localize "TYPES.Item.wound")}}'
+          data-action='createDoc' data-document-class='Item' data-type='wound'>
+          <i class='fas fa-plus'></i>
+        </a>
+        {{/if}}
+      </div>
+    </div>
+
+    {{#unless isDevelop}}
+      <ol class="charHitLoc">
+        <div class="quick-hitLocGrid">
+          {{#each hitLocs as |item id|}}
+            {{#unless (eq item.system.locType 'general')}}
+              {{#if (eq item.name 'blank')}}
+                <div></div>
+              {{else}}
+                <li class="item hitlocCell" data-item-id='{{item._id}}' data-document-class='Item'>
+                  <div class="upper rollable" data-action='viewDoc'>{{item.name}}</div>
+                  {{#if ../isLocked}}
+                    <div>{{item.system.label}}</div>
+                  {{else}}
+                    <div class='gear-controls centre'>
+                      <a class='item-delete centre' ='{{localize "AOV.deleteDoc" type=(localize "TYPES.Item.hitloc")}}'
+                        data-action="deleteDoc">
+                        <i class='fas fa-trash'></i>
+                      </a>
+                    </div>
+                  {{/if}}
+                  <div class="quick-hitLocCellAtt" data-tooltip="{{localize 'AOV.addWound'}}" data-action='addWound'>
+                    <div>{{localize 'AOV.armourPointsAbbr'}}</div>
+                    <div class="centre terIcon">{{item.system.map}}</div>
+                    <div></div>
+                    <div class="">{{localize 'AOV.hpAbbr'}}</div>
+                    <div class="terIcon">{{item.system.currHp}}</div>
+                    <div>/</div>
+                    <div class="terIcon">{{item.system.hpMax}}</div>
+                  </div>
+                </li>
+              {{/if}}
+            {{/unless}}
+          {{/each}}
+        </div>
+      </ol>
+    {{else}}
+        <ol class="charHitLoc">
+          <div class="hitLocDev">
+            {{#each devHitLocs as |item id|}}
+              {{#unless (eq item.name 'blank')}}
+                <li class="hitLocGridDev" data-item-id='{{item._id}}' data-document-class='Item'>
+                  <div class="upper rollable" data-action='viewDoc'>{{item.name}}</div>
+                  <div>{{item.system.label}}</div>
+                  <div class='gear-controls centre'>
+                    <a class='item-delete centre' data-tooltip='{{localize "AOV.deleteDoc" type=(localize "TYPES.Item.hitloc")}}'
+                      data-action="deleteDoc">
+                      <i class='fas fa-trash'></i>
+                    </a>
+                  </div>
+                </li>
+              {{/unless}}
+            {{/each}}
+          </div>
+        </ol>
+    {{/unless}}
+
+    {{!-- Wounds--}}
+    <ol class="charHitLoc">
+      <div class="woundsGrid">
+
+        {{#each wounds as |item id|}}
+        <li class="item wounds-grid" data-item-id='{{item._id}}' data-document-class='Item'>
+          <div class="rollable" data-action='viewDoc'>{{item.system.label}}</div>
+          <div class="centre skill-inline"><input class="ability-cell centre" name='system.damage'
+            type='number' value='{{item.system.damage}}' data-field="damage"/>
+          </div>
+          <div class="centre">
+            {{#unless item.system.treated}}
+              <a class="secIcon" data-tooltip="{{localize 'AOV.untreated'}}" data-action="itemToggle" data-property="treated">
+                <i class="fa-solid fa-droplet"></i>
+              </a>
+            {{/unless}}
+          </div>
+            <div class='gear-controls centre'>
+              <a class='item-delete centre' data-tooltip='{{localize "AOV.deleteDoc" type=(localize "TYPES.Item.wound")}}'
+                data-action="deleteDoc">
+                <i class='fas fa-trash'></i>
+              </a>
+            </div>
+
+        </li>
+        {{/each}}
+      </div>
+    </ol>
+  </div>
+
+  <section class="combatSection">
+    {{!--Weapons--}}
+    <ol class="charHitLoc">
+      <div class="gear-header {{#if singleColour}}primBackCol{{else}}terBackCol{{/if}} quick-weapons-list-grid">
+        <div class='new-row left'>{{localize 'TYPES.Item.weapon'}}</div>
+        <div class='centre'>%</div>
+        <div class='centre' data-tooltip="{{localize 'AOV.specDamageShow'}}">{{localize 'AOV.damage'}}</div>
+        <div class='centre'>{{localize 'AOV.range'}}</div>
+        <div class='centre'>
+          <a class='centre rollable' data-tooltip='{{localize "AOV.dodge"}}'
+                data-action="dodge">
+                <i class='fas fa-person-running'></i>
+              </a>
+        </div>
+      </div>
+
+      {{#each weapons as |item id|}}
+        <li class="item quick-weapons-list-grid" data-item-id='{{item._id}}' data-drag="true" data-document-class='Item'>
+          <div class="new-row gear-name left rollable truncate" data-tooltip='{{localize "AOV.viewDoc" type=(localize "TYPES.Item.weapon")}}'
+                data-action='viewDoc'>{{item.name}}</div>
+          <div class='gear-name centre terIcon rollable' data-action="diceroll" data-property="combat" data-skill-id="{{item._id}}" data-tooltip="AOV.rolls.combatRoll">{{item.system.total}}</div>
+          <div class='gear-name centre rollable' data-action="diceroll" data-property="damage" data-skill-id="{{item._id}}" data-tooltip="AOV.rolls.damageRoll">{{item.system.damLabel}}{{#if item.system.special}}*{{/if}}</div>
+          {{#if (eq item.system.weaponType 'missile')}}
+            <div class='gear-name centre'>{{item.system.range}}</div>
+          {{else}}
+            <div class="centre">-</div>
+          {{/if}}
+          {{#unless ../isLocked}}
+            <div class='gear-controls centre'>
+              <a class='item-delete centre' data-tooltip='{{localize "AOV.deleteDoc" type=(localize "TYPES.Item.weapon")}}'
+                data-action="deleteDoc">
+                <i class='fas fa-trash'></i>
+              </a>
+            </div>
+          {{/unless}}
+        </li>
+      {{/each}}
+      </div>
+    </ol>
+
+    <div>
+      {{! Passions}}
+      <ol class='charHitLoc'>
+        <li class='item gear-header {{#if singleColour}}primBackCol{{else}}secBackCol{{/if}} quick-passion-grid'>
+          <div class='left new-row'>{{localize 'TYPES.Item.passion'}}</div>
+          <div class='centre' data-tooltip="{{localize 'AOV.total'}}">%</div>
+          <div class='centre'></div>
+        </li>
+        {{#each passions as |item id|}}
+        <li class='item quick-passion-grid' data-item-id='{{item._id}}' data-drag='true' data-document-class='Item'>
+          <div class="new-row gear-name left rollable" data-tooltip='{{localize "AOV.viewDoc" type=(localize "TYPES.Item.passion")}}'
+            data-action='viewDoc'>{{item.name}}</div>
+          <div class='gear-name centre rollable terIcon' data-action="diceroll" data-property="passion" data-skill-id="{{item._id}}" data-tooltip="AOV.rolls.passionRoll">{{item.system.total}}</div>
+          {{#if ../isLocked}}
+            <div class='gear-name centre' data-action="itemToggle" data-property="augment"><a>
+              {{#if item.system.augment}}
+                <i data-tooltip="{{localize 'AOV.augmentUsed'}}" class="terIcon fa-solid fa-hand-holding-magic"></i>
+              {{/if}}
+            </a></div>
+          {{else}}
+            <div class='gear-controls centre'>
+              <a class='item-delete centre' data-tooltip='{{localize "AOV.deleteDoc" type=(localize "TYPES.Item.passion")}}'
+                data-action="deleteDoc">
+                <i class='fas fa-trash'></i>
+              </a>
+            </div>
+          {{/if}}
+        </li>
+        {{/each}}
+      </ol>
+
+      {{! Devotions}}
+      <ol class='charHitLoc'>
+        <li class='item gear-header primBackCol quick-devotion-grid'>
+          <div class='left'>{{localize 'TYPES.Item.devotion'}}</div>
+          <div class='centre'>{{localize 'AOV.ideals'}}</div>
+          <div class='centre' data-tooltip="{{localize 'AOV.devPoints'}}">{{localize 'AOV.devPointsAbbr'}}</div>
+        </li>
+        {{#each devotions as |item id|}}
+        <li class='item quick-devotion-grid' data-item-id='{{item._id}}' data-drag='true' data-document-class='Item'>
+          <div class="gear-name new-row left rollable" data-tooltip='{{localize "AOV.viewDoc" type=(localize "TYPES.Item.devotion")}}'
+            data-action='viewDoc'>{{item.name}}</div>
+          <div class='gear-name centre'>{{item.system.ideals}}</div>
+
+          <div class="skill-inline" style="padding-top: 5px;">
+            <select class="gear-input" data-handle-change name="system.dp" data-field="dp">
+              {{selectOptions ../dpOptions selected=item.system.dp}}
+            </select>
+          </div>
+
+          {{#unless ../isLocked}}
+          <div class='gear-controls centre'>
+            <a class='item-delete centre' data-tooltip='{{localize "AOV.deleteDoc" type=(localize "TYPES.Item.devotion")}}'
+              data-action="deleteDoc">
+              <i class='fas fa-trash'></i>
+            </a>
+          </div>
+          {{/unless}}
+        </li>
+        {{/each}}
+      </ol>
+    </div>
+
+  </section>
+
+  <section class="skillSection">
+    {{! Skills}}
+    <ol class="skill-list">
+      <div class='gear-header primBackCol skill-grid'>
+        <div class='new-row left'>{{localize 'AOV.skill'}}</div>
+        <div class='centre'></div>
+        <div class='centre' data-tooltip="{{localize 'AOV.total'}}">%</div>
+        <div class='centre'></div>
+      </div>
+      <div class='gear-header primBackCol skill-grid'>
+        <div class='new-row left'>{{localize 'AOV.skill'}}</div>
+        <div class='centre'></div>
+        <div class='centre' data-tooltip="{{localize 'AOV.total'}}">%</div>
+        <div class='centre'></div>
+      </div>
+    </ol>
+
+    <ol class='skill-list'>
+      {{#each skills as |item id|}}
+        <li class='item skill-grid' data-item-id='{{item._id}}' data-drag='true' data-document-class='Item'>
+          <div class="new-row gear-name left rollable" data-tooltip='{{localize "AOV.viewDoc" type=(localize "TYPES.Item.skill")}}'
+            data-action='viewDoc'>{{item.system.label}}</div>
+          <div></div>
+          <div class='gear-name centre rollable terIcon' data-action="diceroll" data-property="skill" data-skill-id="{{item._id}}" data-tooltip="AOV.rolls.skillRoll">{{item.system.total}}</div>
+          {{#if ../isLocked}}
+            <div class='gear-name centre' data-action="itemToggle" data-property="augment"><a>
+              {{#if item.system.augment}}
+                <i data-tooltip="{{localize 'AOV.augmentUsed'}}" class="terIcon fa-solid fa-hand-holding-magic"></i>
+              {{/if}}
+            </a></div>
+          {{else}}
+            <div class='gear-controls centre'>
+              <a class='item-toggle centre' data-tooltip='{{localize "AOV.deleteDoc" type=(localize "TYPES.Item.skill")}}'
+                data-action="deleteDoc">
+                <i class='fas fa-trash'></i>
+              </a>
+            </div>
+          {{/if}}
+        </li>
+      {{/each}}
+    </ol>
+  </section>
+
+  {{!--Equipment List--}}
+  <ol class='charHitLoc'>
+    <li class='item gear-header {{#if singleColour}}primBackCol{{else}}terBackCol{{/if}} gear-grid'>
+      <div class='left'>{{localize 'TYPES.Item.gear'}}</div>
+      <div class='centre' data-tooltip="{{localize 'AOV.encumbrance'}}">{{localize 'AOV.encumbranceAbbr'}}</div>
+      <div class='centre' data-tooltip="{{localize 'AOV.quantity'}}">{{localize 'AOV.quantityAbbr'}}</div>
+      <div></div>
+      <div class='centre'></div>
+    </li>
+    {{#each gear as |item id|}}
+    <li class='item gear-grid' data-item-id='{{item._id}}' data-drag='true' data-document-class='Item'>
+      <div class="gear-name left rollable" data-tooltip='{{localize "AOV.viewDoc" type=(localize "TYPES.Item.gear")}}'
+        data-action='viewDoc'>{{item.name}}</div>
+      <div class='gear-name terIcon centre'>{{item.system.actlEnc}}</div>
+      <div class='gear-name centre'>
+        <input class="gear-input item-quantity" name='system.quantity' type='number' value='{{item.system.quantity}}'/>
+      </div>
+      <div></div>
+      {{#unless ../isLocked}}
+      <div class='gear-controls centre'>
+        <a class='item-delete centre' data-tooltip='{{localize "AOV.deleteDoc" type=(localize "TYPES.Item.gear")}}'
+          data-action="deleteDoc">
+          <i class='fas fa-trash'></i>
+        </a>
+      </div>
+      {{/unless}}
+    </li>
+    {{/each}}
+  </ol>
+
+
+  {{#isAnd isGM isDevelop}}
+    <br>
+    <div class="statBonus">
+      <div class="gear-name left new-row bold">{{localize 'AOV.quickstart'}}</div>
+      <div class='gear-name centre' data-action="toggleActor" data-property="quickstart"><a>
+        {{#if system.quickstart}}
+          <i class="fa-regular fa-square-check"></i>
+        {{else}}
+          <i class="fa-regular fa-square"></i>
+        {{/if}}
+      </a></div>
+    </div>
+  {{/isAnd}}
+
+
+</section>

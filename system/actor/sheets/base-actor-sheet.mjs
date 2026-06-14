@@ -67,6 +67,7 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
       npcSections: this._npcSections,
       addWound: this._addWound,
       openWiki: this._openWiki,
+      wyrd: this._spendWyrd,
     }
   }
 
@@ -173,7 +174,7 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
     event.stopPropagation();
     let checkProp={}
     let prop = target.dataset.property
-    if (['locked', 'uncommon', 'alphaSkills','showRunes','beserkerOpt','beserkerStat','hitlocView','skillView','weaponView','powerView','equipView','passionView','devotionView'].includes(prop)) {
+    if (['locked', 'uncommon', 'alphaSkills','showRunes','beserkerOpt','beserkerStat','hitlocView','skillView','weaponView','powerView','equipView','passionView','devotionView','quickstart'].includes(prop)) {
       checkProp = { [`system.${prop}`]: !this.actor.system[prop] }
     } else {
       return
@@ -508,6 +509,32 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
     const url = "https://github.com/cragstone/aov/wiki";
     window.open(url, "_blank");
   }
+
+  //Spend Wyrd
+  static async _spendWyrd (event,target) {
+     if (event.detail === 2) {  //Only perform on double click
+      let data = {
+        title: game.i18n.localize('AOV.spendWyrdHint'),
+      }
+      const html = await foundry.applications.handlebars.renderTemplate('systems/aov/templates/dialog/valueInput.hbs', data);
+
+      let val = await AOVDialog.input({
+        window: { title: 'AOV.spendWyrd' },
+        content: html,
+        data,
+      })
+
+      if (!val) {return}
+      if (val.valueInp > this.actor.system.abilities.pow.total) {
+        ui.notifications.warn(game.i18n.localize('AOV.wyrdInsufficient'))
+        return
+      }
+      await (this.actor).update ({'system.abilities.pow.xp': this.actor.system.abilities.pow.xp - val.valueInp})
+          ui.notifications.warn(game.i18n.format('AOV.wyrdSpent', { points: val.valueInp }))
+    }
+  }
+
+
 
   //-------------Drag and Drop--------------
 

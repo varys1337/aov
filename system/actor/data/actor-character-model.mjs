@@ -44,6 +44,7 @@ export default class AOVCharacterModel extends AOVActorBaseModel {
     schema.vadprod = new fields.BooleanField({ initial: false });  //Can you make Vadmal Production
     schema.aging = new fields.BooleanField({ initial: false });  //Can you make Aging rolls
     schema.family = new fields.BooleanField({ initial: false });  //Can you make Family rolls
+    schema.quickstart = new fields.BooleanField({ initial: false });  //Is this a quickstart character sheet
     schema.social = new fields.StringField({ required: true, blank: true, initial:"freedman" });  //Social Rank
 
     return schema

@@ -719,3 +719,62 @@ nav.aov.characterSmall.tabs [data-tab]{
   grid-column-gap: 5px;
   padding-left: 5px;
 }
+
+.aov .quickstart {
+  padding-left: 25px;
+  padding-right: 25px;
+  overflow-y: auto;
+
+  .combatSection {
+    display: grid;
+    grid-template-columns: 313px 313px;
+    grid-column-gap: 10px;
+    padding-bottom:10px;
+
+    .quick-weapons-list-grid{
+      display: grid;
+      grid-template-columns: 105px 30px 75px 45px 30px;
+      grid-column-gap: 5px;
+      padding-left: 5px;
+    }
+
+    .quick-devotion-grid {
+      display: grid;
+      width: 323px;
+      grid-template-columns: 100px 118px 50px 30px;
+      grid-column-gap: 5px;
+      padding-left: 5px;
+    }
+
+    .quick-passion-grid {
+      display: grid;
+      width: 323px;
+      grid-template-columns: 215px 50px 30px;
+      grid-column-gap: 5px;
+      padding-left: 5px;
+    }
+  }
+
+  .skillSection {
+    padding-bottom:10px;
+  }
+  .quick-hitLocGrid {
+    display: grid;
+    background-image: var(--aov-warrior);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size:contain;
+    grid-template-columns: 100px 100px 100px;
+    grid-column-gap: 5px;
+    grid-row-gap: 5px;
+    grid-template-rows: 55px 55px 55px 55px;
+    padding-bottom:10px;
+
+    .quick-hitLocCellAtt{
+      display: grid;
+      grid-template-columns: 20px 16px 5px 20px 17px 5px 17px ;
+    }
+
+  }
+}
+

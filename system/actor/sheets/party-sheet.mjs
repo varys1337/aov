@@ -9,7 +9,7 @@ export class AoVPartySheet extends AoVActorSheet {
     classes: ['party'],
     position: {
       width: 1200,
-      height: 157,
+      height: 160,
     },
   }
 
