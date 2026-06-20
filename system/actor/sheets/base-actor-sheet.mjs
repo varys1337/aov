@@ -69,6 +69,9 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
       openWiki: this._openWiki,
       wyrd: this._spendWyrd,
       detach: this._myDetach,
+      createEffect: this._createEffect,
+      viewActiveEffect: this._viewActiveEffect,
+      toggleEffect: this._toggleEffect,
     }
   }
 
@@ -118,6 +121,42 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
 
 
   //------------ACTIONS-------------------
+
+  static async _toggleEffect (event, target) {
+    const id = target.closest('.item-edit')?.dataset?.effectId
+    if (id) {
+      const doc = this.document.effects.get(id)
+      if (doc) {
+        doc.update({
+          disabled: !doc.disabled
+        })
+      }
+    }
+  }
+
+  static async _viewActiveEffect (event, target) {
+    const id = target.closest('.item-edit')?.dataset?.effectId
+    if (id) {
+      const doc = this.document.effects.get(id)
+      if (doc) {
+        if (event.ctrlKey) {
+          const confirmation = await AOVDialog.confirm({
+            window: { title: game.i18n.format('AOV.deleteDoc', {type: game.i18n.localize('DOCUMENT.ActiveEffect')}) },
+            content: game.i18n.localize('AOV.deleteConfirm') + '<br><strong> ' + game.i18n.localize('DOCUMENT.ActiveEffect') + ': ' + doc.name + '</strong>'
+          })
+          if (confirmation) {
+            await doc.delete();
+          }
+        } else {
+          doc.sheet.render(true);
+        }
+      }
+    }
+  }
+
+  static async _createEffect (event, target) {
+    this.document.createEmbeddedDocuments('ActiveEffect', [{ name: ActiveEffect.defaultName({ parent: this.document }) }])
+  }
 
   static async _myDetach (event, target) {
     if (this.actor.type === "npc") {

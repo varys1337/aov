@@ -369,4 +369,31 @@
       </li>
     {{/each}}
   </ol>
+
+  {{!-- Active Effect Items on Actor --}}
+  {{#if actor.effects.size}}
+    <br>
+    <ol class="gear-list">
+      <div class="effects-grid gear-header {{#if singleColour}}primBackCol{{else}}terBackCol{{/if}}">
+        <div class="diff-label left">{{localize 'AOV.effect'}}</div>
+        <div class="diff-label centre">{{localize 'AOV.active'}}</div>
+        <div class="centre">
+          <a class="item-control item-create" data-tooltip="{{localize 'SIDEBAR.ACTIONS.CREATE.ActiveEffect'}}" data-action="createEffect">
+            <i class="fas fa-plus"></i>
+          </a>
+        </div>
+      </div>
+
+      {{#each actor.effects as |effect|}}
+        <li class="item item-edit effects-grid" data-effect-id="{{effect.id}}">
+          <div class="effect-source left rollable" data-tooltip="{{localize 'AOV.viewDoc' type=(localize 'DOCUMENT.ActiveEffect')}}" data-action="viewActiveEffect">{{effect.name}}</div>
+          <div class="centre" data-tooltip="{{#if effect.active}}{{localize 'AOV.active'}}{{else}}{{localize 'AOV.inactive'}}{{/if}}">
+            <a class="item-control item-create" data-action="toggleEffect">
+              <img class="aura-img{{#unless effect.active}} fade{{/unless}}" src="systems/aov/art-assets/inverse-aura.svg" height="18" width="18" />
+            </a>
+          </div>
+        </li>
+      {{/each}}
+    </ol>
+  {{/if}}
 </section>

@@ -2,40 +2,25 @@ import { AOVActiveEffect } from "../apps/active-effects.mjs"
 
 export class AOVActiveEffectSheet {
   static getItemEffectsFromSheet(document) {
-    //Changed from hasOwner to isOwned in V13
-    if (document.isOwned) {
-      return document.parent.effects.reduce((c, i) => {
-        if (i.origin === document.uuid) {
-          c.push({
-            uuid: i.uuid,
-            name: i.name
-          })
-        }
-        return c
-      }, [])
-    }
-    return document.effects.reduce((c, i) => {
+    let thisDocument = document.effects.reduce((c, i) => {
       c.push({
         uuid: i.uuid,
         name: i.name
       })
       return c
     }, [])
+    return (document.items ?? []).reduce((c, i) => {
+      for (const effect of i.effects) {
+        c.push({
+          uuid: effect.uuid,
+          name: effect.name
+        })
+      }
+      return c
+    }, thisDocument)
   }
 
   static getAutoEffect(document) {
-    if (document.parent) {
-      if (document.parent.parent?.actorLink === false && document.parent.parent.actor) {
-        return {
-          effect: document.parent.parent.actor.effects.find(e => e.origin === document.uuid && (e.flags.aov?.autoActiveEffect ?? false)),
-          document: document.parent.parent.actor,
-        }
-      }
-      return {
-        effect: document.parent.effects.find(e => e.origin === document.uuid && (e.flags.aov?.autoActiveEffect ?? false)),
-        document: document.parent,
-      }
-    }
     return {
       effect: document.effects.find(e => e.flags.aov?.autoActiveEffect ?? false),
       document: document
@@ -48,7 +33,7 @@ export class AOVActiveEffectSheet {
     const effectData = AOVActiveEffectSheet.getAutoEffect(document)
     if (effectData.effect) {
       for (const change of effectData.effect.changes) {
-        if (change.mode === CONST.ACTIVE_EFFECT_CHANGE_TYPES.ADD) {
+        if (change.type === 'add') {
           effectChanges.push({
             key: change.key,
             name: effectKeys[change.key] ?? change.key,
@@ -71,12 +56,11 @@ export class AOVActiveEffectSheet {
     let effects = []
     for (let eff of aEffects) {
       let aovAE = await fromUuid(eff.uuid)
-      let item = await fromUuid(aovAE.origin)
-      if (item) {
+      if (aovAE) {
         for (let chng of aovAE.changes) {
           effects.push({
-            id: item.id,
-            sourceName: item.name,
+            id: (this.parent instanceof Item ? aovAE.parent.id : ''),
+            sourceName: (this.parent instanceof Item ? aovAE.parent.name : aovAE.name),
             key: chng.key,
             name: game.i18n.localize((effectKeys[chng.key] ?? chng.key)),
             value: chng.value,
