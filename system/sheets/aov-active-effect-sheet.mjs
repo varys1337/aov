@@ -57,10 +57,11 @@ export class AOVActiveEffectSheet {
     for (let eff of aEffects) {
       let aovAE = await fromUuid(eff.uuid)
       if (aovAE) {
+        const container = (aovAE.parent.parent instanceof Item ? aovAE.parent.parent : aovAE.parent instanceof Item ? aovAE.parent : aovAE)
         for (let chng of aovAE.changes) {
           effects.push({
-            id: (this.parent instanceof Item ? aovAE.parent.id : ''),
-            sourceName: (this.parent instanceof Item ? aovAE.parent.name : aovAE.name),
+            id: container.id,
+            sourceName: container.name,
             key: chng.key,
             name: game.i18n.localize((effectKeys[chng.key] ?? chng.key)),
             value: chng.value,
