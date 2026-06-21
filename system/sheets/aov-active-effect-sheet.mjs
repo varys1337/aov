@@ -1,54 +1,32 @@
+import AOVDialog from "../setup/aov-dialog.mjs";
 import { AOVActiveEffect } from "../apps/active-effects.mjs"
 
 export class AOVActiveEffectSheet {
   static getItemEffectsFromSheet(document) {
-    //Changed from hasOwner to isOwned in V13
-    if (document.isOwned) {
-      return document.parent.effects.reduce((c, i) => {
-        if (i.origin === document.uuid) {
-          c.push({
-            uuid: i.uuid,
-            name: i.name
-          })
-        }
-        return c
-      }, [])
-    }
-    return document.effects.reduce((c, i) => {
+    let thisDocument = document.effects.reduce((c, i) => {
       c.push({
         uuid: i.uuid,
         name: i.name
       })
       return c
     }, [])
-  }
-
-  static getAutoEffect(document) {
-    if (document.parent) {
-      if (document.parent.parent?.actorLink === false && document.parent.parent.actor) {
-        return {
-          effect: document.parent.parent.actor.effects.find(e => e.origin === document.uuid && (e.flags.aov?.autoActiveEffect ?? false)),
-          document: document.parent.parent.actor,
-        }
+    return (document.items ?? []).reduce((c, i) => {
+      for (const effect of i.effects) {
+        c.push({
+          uuid: effect.uuid,
+          name: effect.name
+        })
       }
-      return {
-        effect: document.parent.effects.find(e => e.origin === document.uuid && (e.flags.aov?.autoActiveEffect ?? false)),
-        document: document.parent,
-      }
-    }
-    return {
-      effect: document.effects.find(e => e.flags.aov?.autoActiveEffect ?? false),
-      document: document
-    }
+      return c
+    }, thisDocument)
   }
 
   static getEffectChangesFromSheet(document) {
     const effectChanges = []
     const effectKeys = foundry.utils.duplicate(CONFIG.AOV.keysActiveEffects)
-    const effectData = AOVActiveEffectSheet.getAutoEffect(document)
-    if (effectData.effect) {
-      for (const change of effectData.effect.changes) {
-        if (change.mode === CONST.ACTIVE_EFFECT_CHANGE_TYPES.ADD) {
+    for (const effect of document.effects) {
+      for (const change of effect.system.changes) {
+        if (change.type === 'add') {
           effectChanges.push({
             key: change.key,
             name: effectKeys[change.key] ?? change.key,
@@ -57,12 +35,10 @@ export class AOVActiveEffectSheet {
             source: effect.name,
             itemSource: effect.parent.name,
           })
-          delete effectKeys[change.key]
         }
       }
     }
     return {
-      effectKeys,
       effectChanges
     }
   }
@@ -73,14 +49,6 @@ export class AOVActiveEffectSheet {
     let effects = []
     for (let eff of aEffects) {
       let aovAE = await fromUuid(eff.uuid)
-<<<<<<< Updated upstream
-      let item = await fromUuid(aovAE.origin)
-      if (item) {
-        for (let chng of aovAE.changes) {
-          effects.push({
-            id: item.id,
-            sourceName: item.name,
-=======
       if (aovAE) {
         const sourceItem = (aovAE.parent.parent instanceof Item ? aovAE.parent.parent : aovAE.parent instanceof Item ? true : false)
         const sourceName = (aovAE.parent.parent instanceof Item ? aovAE.parent.parent : aovAE.parent instanceof Item ? aovAE.parent.name : game.i18n.localize('AOV.direct'))
@@ -91,7 +59,6 @@ export class AOVActiveEffectSheet {
             sourceName: sourceName,
             effectName: aovAE.name,
             sourceItem,
->>>>>>> Stashed changes
             key: chng.key,
             name: game.i18n.localize((effectKeys[chng.key] ?? chng.key)),
             value: chng.value,
@@ -106,90 +73,31 @@ export class AOVActiveEffectSheet {
   static activateListeners(document) {
     if (game.user.isGM) {
       document.element.querySelectorAll('div[data-action="openActiveEffect"]').forEach(n => n.addEventListener("click", AOVActiveEffectSheet._onOpenActiveEffect.bind(document)))
-      document.element.querySelectorAll('div[data-action="addItemEffect"]').forEach(n => n.addEventListener("click", AOVActiveEffectSheet._onAddItemEffect.bind(document)))
-      document.element.querySelectorAll('div.active-effect-change-edit .fa-trash').forEach(n => n.addEventListener("click", AOVActiveEffectSheet._onDeleteItemEffectChange.bind(document)))
-      document.element.querySelectorAll('div.active-effect-change-edit select').forEach(n => n.addEventListener("click", AOVActiveEffectSheet._onChangeItemEffectChange.bind(document)))
-      document.element.querySelectorAll('div.active-effect-change-edit input').forEach(n => n.addEventListener("blur", AOVActiveEffectSheet._onChangeItemEffectChange.bind(document)))
+      document.element.querySelectorAll('a[data-action="createEffect"]').forEach(n => n.addEventListener("click", AOVActiveEffectSheet._onAddItemEffect.bind(document)))
     }
   }
 
   static async _onAddItemEffect(event) {
-    if (typeof event.currentTarget.dataset.key === 'string') {
-      const effectData = AOVActiveEffectSheet.getAutoEffect(this.document)
-      const newChange = {
-        key: event.currentTarget.dataset.key,
-        mode: CONST.ACTIVE_EFFECT_CHANGE_TYPES.ADD,
-        value: 0
-      }
-      if (effectData.effect) {
-        const changes = foundry.utils.duplicate(effectData.effect.changes)
-        changes.push(newChange)
-        await effectData.document.updateEmbeddedDocuments('ActiveEffect', [{
-          _id: effectData.effect.id,
-          changes: changes
-        }])
-      } else {
-        const newDoc = {
-          'flags.aov.autoActiveEffect': true,
-          name: effectData.document.name,
-          changes: [
-            newChange
-          ],
-        }
-        if (this.document.parent) {
-          newDoc.origin = this.document.uuid
-        }
-        await effectData.document.createEmbeddedDocuments('ActiveEffect', [newDoc])
-      }
-      this.render(true)
-    }
-  }
-
-  static async _onDeleteItemEffectChange(event) {
-    const key = event.currentTarget.closest('div.active-effect-change-edit')?.dataset?.key
-    if (typeof key === 'string') {
-      const effectData = AOVActiveEffectSheet.getAutoEffect(this.document)
-      if (effectData.effect) {
-        const changes = foundry.utils.duplicate(effectData.effect.changes).filter(c => c.key !== key)
-        if (changes.length) {
-          await effectData.document.updateEmbeddedDocuments('ActiveEffect', [{
-            _id: effectData.effect.id,
-            changes: changes
-          }])
-        } else {
-          await effectData.document.deleteEmbeddedDocuments('ActiveEffect', [
-            effectData.effect.id,
-          ])
-        }
-        this.render(true)
-      }
-    }
-  }
-
-  static async _onChangeItemEffectChange(event) {
-    const outer = event.currentTarget.closest('div.active-effect-change-edit')
-    const key = outer?.dataset?.key
-    if (typeof key === 'string') {
-      const effectData = AOVActiveEffectSheet.getAutoEffect(this.document)
-      if (effectData.effect) {
-        const changes = foundry.utils.duplicate(effectData.effect.changes)
-        const index = changes.findIndex(c => c.key === key)
-        if (index > -1) {
-          const value = parseInt(outer.querySelector('select').value + outer.querySelector('input').value, 10)
-          changes[index].value = value
-          await effectData.document.updateEmbeddedDocuments('ActiveEffect', [{
-            _id: effectData.effect.id,
-            changes: changes
-          }])
-        }
-      }
-    }
+    this.document.createEmbeddedDocuments('ActiveEffect', [{ name: ActiveEffect.defaultName({ parent: this.document }) }])
   }
 
   static async _onOpenActiveEffect(event) {
     const uuid = event.currentTarget.dataset.uuid
     if (uuid) {
-      (await fromUuid(uuid))?.sheet.render(true)
+      const doc = await fromUuid(uuid);
+      if (doc) {
+        if (event.ctrlKey) {
+          const confirmation = await AOVDialog.confirm({
+            window: { title: game.i18n.format('AOV.deleteDoc', {type: game.i18n.localize('DOCUMENT.ActiveEffect')}) },
+            content: game.i18n.localize('AOV.deleteConfirm') + '<br><strong> ' + game.i18n.localize('DOCUMENT.ActiveEffect') + ': ' + doc.name + '</strong>'
+          })
+          if (confirmation) {
+            await doc.delete();
+          }
+        } else {
+          doc.sheet.render(true);
+        }
+      }
     }
   }
 }

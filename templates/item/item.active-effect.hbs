@@ -1,49 +1,3 @@
-<<<<<<< Updated upstream
-<section class='item tab effects draggable {{tab.cssClass}}' data-group='primary' data-tab='effects'>
-  <div class="bold"> {{localize 'DOCUMENT.ActiveEffects'}}:</div>
-
-  {{#if isGM}}
-    <div>
-      <div class="base-grid">
-        {{#each effectKeys as |name key|}}
-          <div class="clickable-button" data-action="addItemEffect" data-key="{{key}}">{{localize name}}</div>
-        {{/each}}
-      </div>
-      <br>
-      {{#each effectChanges as |effect|}}
-        <div class="weapon-input active-effect-list active-effect-change-edit" style="align-items: center;" data-key="{{effect.key}}">
-          <div class="truncate" data-tooltip="{{localize effect.name}}">{{localize effect.name}}</div>
-          <select>
-            <option value="+">{{localize 'AOV.add'}}</option>
-            <option value="-" {{#if effect.negative}} selected="selected" {{/if}}>{{localize 'AOV.subtract'}}</option>
-          </select>
-          <input type="number" value="{{effect.value}}"/>
-          <a class="control-button"><i class="item-control fas fa-trash"></i></a>
-        </div>
-      {{/each}}
-    </div>
-    {{#if effects}}
-      <hr>
-      <div class="bold">{{localize 'AOV.manuallyEditActiveEffects'}}:</div>
-      <div class="base-grid">
-        {{#each effects as |effect|}}
-          <div class="clickable-button" data-action="openActiveEffect" data-uuid="{{effect.uuid}}">{{effect.name}}</div>
-        {{/each}}
-      </div>
-    {{/if}}
-
-  {{else}}
-    {{#each effectChanges as |effect|}}
-      <div class="weapon-input active-effect-list active-effect-change-edit" style="align-items: center;" data-key="{{effect.key}}">
-        <div class="truncate" data-tooltip="{{localize effect.name}}">{{localize effect.name}}</div>
-        {{#if effect.negative}}
-          <div>-{{effect.value}}</div>
-        {{else}}
-          <div>{{effect.value}}</div>
-        {{/if}}
-      </div>
-    {{/each}}
-=======
 <section class='item tab effects {{tab.cssClass}} {{#if isGM}}droppable{{/if}}' data-group='primary' data-tab='effects'>
     <br>
     <div class="weapon-input active-effect-list primBackCol">
@@ -78,6 +32,5 @@
         </li>
       {{/each}}
     </ol>
->>>>>>> Stashed changes
   {{/if}}
 </section>
