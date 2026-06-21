@@ -778,8 +778,10 @@ nav.aov.sheet-tabs.tabs {
 
 .aov .effects-grid {
   display: grid;
-  grid-template-columns: 240px auto 70px 50px;
+  grid-template-columns: 150px 150px auto 70px 50px;
   padding-left: 5px;
+  padding-bottom: 0px;
+  margin-bottom: 0px;
 }
 
 .aov .base-grid {
@@ -814,7 +816,9 @@ nav.aov.sheet-tabs.tabs {
 
 .aov .active-effect-list {
   display: grid;
-  grid-template-columns: 250px 100px 50px 50px;
+  grid-template-columns: 150px 200px 100px 50px;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
 }
 
 .aov .fade {

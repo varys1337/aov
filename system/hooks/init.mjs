@@ -79,11 +79,6 @@ export default function Init() {
   CID.init()
   registerSheets()
 
-  // Active Effects are never copied to the Actor,
-  // but will still apply to the Actor from within the Item
-  // if the transfer property on the Active Effect is true.
-  CONFIG.ActiveEffect.legacyTransferral = true;
-
   Hooks.on("hotbarDrop", (bar, data, slot) => {
     if (game.user) {
       createItemMacro(data, slot);

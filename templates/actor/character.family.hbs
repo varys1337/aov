@@ -63,8 +63,7 @@
     </li>
     {{#each thralls as |item id|}}
     <li class='item family-grid' data-item-id='{{item.uuid}}' data-drag='true' data-document-class='Item'>
-      <div class="new-row gear-name left rollable viewFromUuid" data-tooltip='{{localize "AOV.viewOnly"
-        type=(localize "TYPES.Item.thrall")}}'>{{item.name}}</div>
+      <div class="new-row gear-name left rollable viewFromUuid" data-tooltip='{{localize "AOV.viewOnly"}}'>{{item.name}}</div>
       <div class='gear-name centre'>{{item.genderLabel}}</div>
       <div class='gear-name centre'>{{item.farmName}}</div>
       <div class='gear-name centre'>{{item.born}}</div>
@@ -84,8 +83,7 @@
     </li>
     {{#each farms as |item id|}}
     <li class='item family-grid' data-item-id='{{item.uuid}}' data-drag='true' data-document-class='Item'>
-      <div class="new-row gear-name left rollable viewFromUuid" data-tooltip='{{localize "AOV.viewOnly"
-        type=(localize "TYPES.Actor.farm")}}'>{{item.name}}</div>
+      <div class="new-row gear-name left rollable viewFromUuid" data-tooltip='{{localize "AOV.viewOnly"}}'>{{item.name}}</div>
       <div class='gear-name centre'>{{item.size}}</div>
       <div class='gear-name centre'>{{item.farmType}}</div>
       <div class='gear-name centre'>{{item.value}}</div>

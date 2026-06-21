@@ -4,11 +4,13 @@ import { AOVActiveEffectSheet } from "../../sheets/aov-active-effect-sheet.mjs"
 
 export class AoVGearSheet extends AoVItemSheet {
   constructor(options = {}) {
-    super(options)
+    super(options);
+    this.#dragDrop = this.#createDragDropHandlers();
   }
 
   static DEFAULT_OPTIONS = {
     classes: ['gear'],
+    dragDrop: [{ dragSelector: '[data-drag]', dropSelector: '.droppable' }],
   }
 
   static PARTS = {
@@ -114,12 +116,80 @@ export class AoVGearSheet extends AoVItemSheet {
 
   //Activate event listeners using the prepared sheet HTML
   _onRender(context, _options) {
+    this.#dragDrop.forEach((d) => d.bind(this.element))
     AOVActiveEffectSheet.activateListeners(this)
   }
 
 
   //-----------------------ACTIONS-----------------------------------
 
+  // DragDrop
+  //
+  //
+
+  _canDragStart(selector) {
+    // game.user fetches the current user
+    return this.isEditable;
+  }
+
+  _canDragDrop(selector) {
+    // game.user fetches the current user
+    return this.isEditable;
+  }
+
+
+  _onDragStart(event) {
+    const li = event.currentTarget;
+    if ('link' in event.target.dataset) return;
+
+    let dragData = null;
+
+    // Active Effect
+    if (li.dataset.effectId) {
+      const effect = this.item.effects.get(li.dataset.effectId);
+      dragData = effect.toDragData();
+    }
+
+    if (!dragData) return;
+
+    // Set data transfer
+    event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
+  }
+
+  _onDragOver(event) {}
+
+
+
+   async _onDropItem(event, data) {
+    if (!this.item.isOwner) return false;
+  }
+
+   async _onDropFolder(event, data) {
+    if (!this.item.isOwner) return [];
+  }
+
+   get dragDrop() {
+    return this.#dragDrop;
+  }
+
+  // This is marked as private because there's no real need
+  // for subclasses or external hooks to mess with it directly
+  #dragDrop;
+
+   #createDragDropHandlers() {
+    return this.options.dragDrop.map((d) => {
+      d.permissions = {
+        dragstart: this._canDragStart.bind(this),
+        drop: this._canDragDrop.bind(this),
+      };
+      d.callbacks = {
+        dragstart: this._onDragStart.bind(this),
+        dragover: this._onDragOver.bind(this),
+        drop: this._onDrop.bind(this),
+      };
+      return new foundry.applications.ux.DragDrop.implementation(d);
+    });
+  }
 
 
 

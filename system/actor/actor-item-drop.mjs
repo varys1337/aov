@@ -338,7 +338,6 @@ export class AOVActorItemDrop {
 
   //Activities from adding a History
   static async _dropHistory(itm, actor) {
-    console.log(itm)
     let newItems = []
     let updateItems = []
     let brief = "<p><strong>" + itm.name + "</strong></p><p>" + itm.system.description+ "</p>"

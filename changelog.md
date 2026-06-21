@@ -1,6 +1,7 @@
 ## 14.1
 - Updated system for Foundry V14
 - CCI updated (thanks to James B)
+- Active effects updated (again, massive thanks to James B)
 
 ## 13.29
 - Some more format changes

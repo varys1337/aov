@@ -185,7 +185,7 @@ export class AOVSelectLists {
     return options;
   }
 
-  //Effect Options
+  //Effect Options - For Use on Runes
   static async effectOptions() {
     let options = {
       "none": game.i18n.localize("AOV.noneSelected")

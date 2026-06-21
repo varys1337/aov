@@ -53,7 +53,6 @@ export class AoVCombatTracker extends (foundry.applications?.sidebar?.tabs?.Comb
   async adjustInit(event) {
     const { combatantId } = event.target.closest("[data-combatant-id]")?.dataset ?? {};
     const combatant = this.viewed?.combatants.get(combatantId);
-    console.log(combatant)
     if ( !combatant ) return;
     let value = await AoVCombatTracker.adjDex(combatant.name, combatant.initiative)
     if (value) {

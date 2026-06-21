@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 <section class='item tab effects draggable {{tab.cssClass}}' data-group='primary' data-tab='effects'>
   <div class="bold"> {{localize 'DOCUMENT.ActiveEffects'}}:</div>
 
@@ -42,5 +43,41 @@
         {{/if}}
       </div>
     {{/each}}
+=======
+<section class='item tab effects {{tab.cssClass}} {{#if isGM}}droppable{{/if}}' data-group='primary' data-tab='effects'>
+    <br>
+    <div class="weapon-input active-effect-list primBackCol">
+      <div class="truncate bold">{{localize 'AOV.effectName'}}</div>
+      <div class="truncate bold">{{localize 'AOV.effect'}}</div>
+      <div class="centre truncate bold">{{localize 'AOV.amount'}}</div>
+    </div>
+    {{#each effectChanges as |effect|}}
+      <div class="weapon-input active-effect-list" style="align-items: center;" data-key="{{effect.key}}">
+        <div class="truncate">{{localize effect.source}}</div>
+        <div class="truncate" data-tooltip="{{effect.name}}">{{localize effect.name}}</div>
+        {{#if effect.negative}}
+          <div class="centre">-{{effect.value}}</div>
+        {{else}}
+          <div class="centre">{{effect.value}}</div>
+        {{/if}}
+      </div>
+    {{/each}}
+  {{#if isGM}}
+    <br>
+    <div class="active-effect-list primBackCol">
+     <div class="truncate bold">{{localize 'AOV.effectActor'}}</div>
+     <div></div>
+      <a class="centre item-control item-create" style="flex: 0 0 auto;" data-tooltip="{{localize 'SIDEBAR.ACTIONS.CREATE.ActiveEffect'}}" data-action="createEffect">
+        <i class="fas fa-plus"></i>
+      </a>
+    </div>
+    <ol class="gear-list">
+      {{#each effects as |effect|}}
+        <li class="item item-edit active-effect-list">
+          <div class="effect-source left rollable" data-tooltip="{{localize 'AOV.viewDoc' type=(localize 'DOCUMENT.ActiveEffect')}}" data-action="openActiveEffect" data-uuid="{{effect.uuid}}">{{effect.name}}</div>
+        </li>
+      {{/each}}
+    </ol>
+>>>>>>> Stashed changes
   {{/if}}
 </section>

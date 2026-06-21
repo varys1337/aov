@@ -159,7 +159,8 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
   static async _viewDoc(event, target) {
     const doc = this._getEmbeddedDocument(target);
     if(!doc) {return}
-    if (event.ctrlKey) {
+    let preventDel = target.dataset.preventdel ?? 'false'
+    if (event.ctrlKey && preventDel !='true') {
       if (['armour','devotion','family','gear','history','npcpower','passion','rune','runescript','seidur','skill','weapon'].includes(doc.type)) {
           const confirmation = await AOVDialog.confirm({
             window: { title: game.i18n.format("AOV.deleteDoc", {type: game.i18n.localize('TYPES.Item.'+doc.type)}) },

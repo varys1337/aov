@@ -109,6 +109,7 @@
     "died": "Died",
     "diedBirth": "Child died at birth",
     "diedHint": "Your ancester died in this event",
+    "direct": "Direct Effect",
     "dispPriority": "Display Priority",
     "distFeatures": "Distictive Features",
     "distFeaturesAbbr": "Features",
@@ -121,6 +122,9 @@
     "dropHere": "Drop {itemType} here",
 
     "effect": "Effect",
+    "effectActor": "Direct Effects",
+    "effectActorHint": "Effects on Actor, rather than via an Item",
+    "effectName": "Effect Name",
     "effects": "Effects",
     "effectsShort": "Eff",
     "encHint": "Current/Max Encumbrance. Penalty:",
@@ -404,7 +408,7 @@
     "viewBaseStat": "View NPC Base Stats",
     "viewDoc": "Click to view {type}, hold CTRL to delete it",
     "viewNotes": "View NPC Notes",
-    "viewOnly": "Click to view {type}",
+    "viewOnly": "Click to view document",
     "viewStat": "View NPC Details",
 
     "weapons": "Weapons",

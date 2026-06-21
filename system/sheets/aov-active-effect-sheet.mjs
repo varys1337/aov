@@ -53,7 +53,9 @@ export class AOVActiveEffectSheet {
             key: change.key,
             name: effectKeys[change.key] ?? change.key,
             negative: (change.value < 0),
-            value: Math.abs(change.value)
+            value: Math.abs(change.value),
+            source: effect.name,
+            itemSource: effect.parent.name,
           })
           delete effectKeys[change.key]
         }
@@ -71,12 +73,25 @@ export class AOVActiveEffectSheet {
     let effects = []
     for (let eff of aEffects) {
       let aovAE = await fromUuid(eff.uuid)
+<<<<<<< Updated upstream
       let item = await fromUuid(aovAE.origin)
       if (item) {
         for (let chng of aovAE.changes) {
           effects.push({
             id: item.id,
             sourceName: item.name,
+=======
+      if (aovAE) {
+        const sourceItem = (aovAE.parent.parent instanceof Item ? aovAE.parent.parent : aovAE.parent instanceof Item ? true : false)
+        const sourceName = (aovAE.parent.parent instanceof Item ? aovAE.parent.parent : aovAE.parent instanceof Item ? aovAE.parent.name : game.i18n.localize('AOV.direct'))
+        const container = (aovAE.parent.parent instanceof Item ? aovAE.parent.parent : aovAE.parent instanceof Item ? aovAE.parent : aovAE)
+        for (let chng of aovAE.changes) {
+          effects.push({
+            id: container.id,
+            sourceName: sourceName,
+            effectName: aovAE.name,
+            sourceItem,
+>>>>>>> Stashed changes
             key: chng.key,
             name: game.i18n.localize((effectKeys[chng.key] ?? chng.key)),
             value: chng.value,
