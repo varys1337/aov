@@ -81,38 +81,38 @@ export default function Init() {
 
   Hooks.on("hotbarDrop", (bar, data, slot) => {
     if (game.user) {
-      createItemMacro(data, slot);
-      return false;
+      return createItemMacro(data, slot);
     }
   });
 
 }
 
 //  Hotbar Macros
-async function createItemMacro(data, slot) {
+function createItemMacro(data, slot) {
   // First, determine if this is a valid owned item.
-  if (data.type !== "Item") return;
+  if (data.type !== "Item") return true;
   if (!data.uuid.includes("Actor.") && !data.uuid.includes("Token.")) {
-    return ui.notifications.warn(game.i18n.localize("AOV.noMacroItemOwner"));
+    ui.notifications.warn(game.i18n.localize("AOV.noMacroItemOwner"));
+    return false;
   }
   // If it is, retrieve it based on the uuid.
-  const item = await Item.fromDropData(data);
-
-  // Create the macro command using the uuid.
-  const command = `game.aov.rollItemMacro("${data.uuid}");`;
-  let macro = game.macros.find(
-    (m) => m.name === item.name && m.command === command,
-  );
-  if (!macro) {
-    macro = await Macro.create({
-      name: item.name,
-      type: "script",
-      img: item.img,
-      command: command,
-      flags: { "aov.itemMacro": true },
-    });
-  }
-  game.user.assignHotbarMacro(macro, slot);
+  Item.fromDropData(data).then(async (item) => {
+    // Create the macro command using the uuid.
+    const command = `game.aov.rollItemMacro("${data.uuid}");`;
+    let macro = game.macros.find(
+      (m) => m.name === item.name && m.command === command,
+    );
+    if (!macro) {
+      macro = await Macro.create({
+        name: item.name,
+        type: "script",
+        img: item.img,
+        command: command,
+        flags: { "aov.itemMacro": true },
+      });
+    }
+    game.user.assignHotbarMacro(macro, slot);
+  })
   return false;
 }
 
