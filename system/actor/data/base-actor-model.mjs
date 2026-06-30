@@ -24,8 +24,8 @@ export default class AOVActorBaseModel extends AOVDataModel {
       effects: new fields.NumberField({ ...requiredInteger, initial: 0 }),
     });
     schema.hp = new fields.SchemaField({
-      value: new fields.NumberField({ nullable: true, initial: null, integer: true }),
-      max: new fields.NumberField({ nullable: true, initial: null, integer: true }),
+      value: new fields.NumberField({ ...requiredInteger, initial: 0 }),
+      max: new fields.NumberField({ ...requiredInteger, initial: 0}),
       bonus: new fields.NumberField({ ...requiredInteger, initial: 0 }),
       effects: new fields.NumberField({ ...requiredInteger, initial: 0 })
     });
@@ -68,6 +68,5 @@ export default class AOVActorBaseModel extends AOVDataModel {
     }, {}));
     return schema;
   }
-
 
 }

@@ -179,6 +179,7 @@
     },
 
     "primaryTokenAttribute": "hp",
+    "secondaryTokenAttribute": "",
 
     "socket": true,
 

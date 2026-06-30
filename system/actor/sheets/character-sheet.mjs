@@ -581,7 +581,7 @@ export class AoVCharacterSheet extends AoVActorSheet {
       await item.update({ [field]: newVal });
       this.render(true)
       return
-      }
+    }
     await item.update({ [field]: newVal });
   }
 

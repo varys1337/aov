@@ -453,5 +453,4 @@ export class AOVDamage {
     }
     let msg = await ChatMessage.create(chatData);
   }
-
 }

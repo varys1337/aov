@@ -3,7 +3,7 @@ import { AoVActorSheet } from "./base-actor-sheet.mjs"
 import { AOVActiveEffect } from '../../apps/active-effects.mjs';
 import { AOVActiveEffectSheet } from '../../sheets/aov-active-effect-sheet.mjs'
 import { AOVActor } from '../actor.mjs';
-
+import { AOVDamage } from '../../apps/damage.mjs';
 
 export class AoVNPCSheet extends AoVActorSheet {
   constructor(options = {}) {

@@ -21,9 +21,9 @@
     "animals": "Animals",
     "areas": "Areas of Power",
     "armourOverride": "Bestow Armor",
-    "armourPoints": "Armour Points",
+    "armourPoints": "Armor Points",
     "armourPointsAbbr": "AP",
-    "armourType": "Armour Type",
+    "armourType": "Armor Type",
     "askGender": "Please select the gender",
     "askHistory": "Who does the history relate to",
     "assignDice": "Assign rolled dice to stats",
@@ -1423,7 +1423,7 @@
       "ship": "Ship"
     },
     "Item": {
-      "armour": "Armour",
+      "armour": "Armor",
       "devotion": "Devotion",
       "family": "Family",
       "gear": "Equipment",
