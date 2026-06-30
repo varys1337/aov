@@ -41,7 +41,7 @@ export class AOVActor extends Actor {
   }
 
   //Prepare Character specific data
-  async _prepareCharacterData(actorData) {
+  _prepareCharacterData(actorData) {
     if (actorData.type !== 'character') return;
     const systemData = actorData.system;
     systemData.speciesID = ""
@@ -51,11 +51,11 @@ export class AOVActor extends Actor {
     systemData.lockedMP = 0
     let totDam = 0
     let birthYr = game.settings.get('aov','gameYear')-10
-    let familyList = await actorData.items.filter(itm=>itm.type === 'family').filter(dItm=>dItm.system.depend).filter(fItm=>!fItm.system.died)
-    let children = (await familyList.filter(itm=>itm.system.born > birthYr)).length
+    let familyList = actorData.items.filter(itm=>itm.type === 'family').filter(dItm=>dItm.system.depend).filter(fItm=>!fItm.system.died)
+    let children = familyList.filter(itm=>itm.system.born > birthYr).length
     systemData.dependents = familyList.length - children + Math.floor(children/2)
-    await this._prepStats(actorData)
-    await this._prepDerivedStats(actorData)
+    this._prepStats(actorData)
+    this._prepDerivedStats(actorData)
 
     //Set Species ID
     let actSpecies = actorData.items.filter(itm =>itm.type==='species')[0]
@@ -108,7 +108,7 @@ export class AOVActor extends Actor {
       } else if (itm.type === 'passion') {
         itm.system.total = Number(itm.system.base ?? 0) + Number(itm.system.home ?? 0) + Number(itm.system.history ?? 0) + Number(itm.system.family ?? 0) + Number(itm.system.xp ?? 0);
       } else if (itm.type === 'wound') {
-        let loc = await actorData.items.get(itm.system.hitLocId)
+        let loc = actorData.items.get(itm.system.hitLocId)
         if (loc) {itm.system.label = loc.name ?? ""}
         totDam = totDam + itm.system.damage
       } else if (['gear','weapon','armour'].includes(itm.type)) {
@@ -125,7 +125,7 @@ export class AOVActor extends Actor {
         }
         systemData.actualEnc += (itm.system.actlEnc ?? 0)
       } else if (itm.type === 'runescript') {
-        let runedetails = await AOVActor.runeMPCost (itm)
+        let runedetails = AOVActor.runeMPCost (itm)
         itm.system.mpCost = runedetails.cost;
         itm.system.maxEff = runedetails.maxEff;
         itm.system.effective = runedetails.effective;
@@ -133,7 +133,7 @@ export class AOVActor extends Actor {
           systemData.lockedMP = systemData.lockedMP + itm.system.mpCost
         }
       } else if (itm.type === 'seidur') {
-        let seidurdetails = await AOVActor.seidurMPCost(itm)
+        let seidurdetails = AOVActor.seidurMPCost(itm)
         if (itm.system.prepared) {
           systemData.lockedMP = systemData.lockedMP + seidurdetails.mpLocked
         }
@@ -146,7 +146,7 @@ export class AOVActor extends Actor {
 
 
     //Go through items a second time to calculate a second round of values
-    let armourList = await actorData.items.filter(i => i.type === 'armour').filter(j => j.system.equipStatus === 1)
+    let armourList = actorData.items.filter(i => i.type === 'armour').filter(j => j.system.equipStatus === 1)
     let totalDmg = 0
     for (let itm of actorData.items) {
       //Go through Hit Locations and calc AP, Max HP, and current HP
@@ -180,7 +180,7 @@ export class AOVActor extends Actor {
       }
       //Go through Weapons and calc best score from weapon skill and half the category score
       if (itm.type === 'weapon'){
-        let weaponSkill = await actorData.items.filter(i=>i.flags.aov?.cidFlag?.id === itm.system.skillCID)
+        let weaponSkill = actorData.items.filter(i=>i.flags.aov?.cidFlag?.id === itm.system.skillCID)
         let weaponScore = 0
         if (weaponSkill.length > 0) {
           weaponScore = weaponSkill[0].system.total
@@ -196,7 +196,7 @@ export class AOVActor extends Actor {
       if (itm.type === 'devotion') {
         itm.system.dpMax = 0
         if (itm.system.skills.length>0) {
-          let worshipSkill = await actorData.items.filter(i=>i.flags.aov?.cidFlag?.id === itm.system.skills[0].cid)
+          let worshipSkill = actorData.items.filter(i=>i.flags.aov?.cidFlag?.id === itm.system.skills[0].cid)
           if(worshipSkill) {
             let worshipSkillVal = worshipSkill[0].system.total
             if (worshipSkillVal >= 60) {
@@ -212,19 +212,19 @@ export class AOVActor extends Actor {
     }
 
     //Calculate ENC penalites
-    await this._eNCPenalty (actorData)
+    this._eNCPenalty (actorData)
 
-    //Check to see if Actor is in a visible party and if so re-render the party sheet
-    await this._updateParty(actorData)
+    //Check to see if Actor is in a visible party and if so re-render the party sheet, function is asynchronous but does not alter actorData
+    this._updateParty(actorData)
   }
 
   //Prepare NPC specific data
-  async _prepareNPCData(actorData) {
+  _prepareNPCData(actorData) {
     if (actorData.type !== 'npc') return;
     const systemData = actorData.system;
     systemData.actualEnc = 0
-    await this._prepStats(actorData)
-    await this._prepDerivedStats(actorData)
+    this._prepStats(actorData)
+    this._prepDerivedStats(actorData)
 
     let totalDmg = 0
     for (let itm of actorData.items) {
@@ -611,7 +611,7 @@ _eNCPenalty (actorData) {
   }
 
   //Runescript Magic Point Cost
-  static async runeMPCost (runescript) {
+  static runeMPCost (runescript) {
     let runes = 0
       for (let [key, rune] of Object.entries(runescript.system.runes)) {
         if (!['none',''].includes(rune)) {
@@ -628,7 +628,7 @@ _eNCPenalty (actorData) {
   }
 
   //Seidur Spell Magic Point Cost
-  static async seidurMPCost (seidur)
+  static seidurMPCost (seidur)
  {let cost = 0
   if (seidur.system.dimension >0 ) {
     cost = cost + Math.max(((seidur.system.dimension-1)*3),1)
@@ -747,18 +747,13 @@ _eNCPenalty (actorData) {
 
   //Rerender Party Sheet if actor is in it
   async _updateParty(actorData) {
-    let parties = await game.actors.filter(actr=>actr.type==='party').filter(actr=>actr.sheet.rendered)
-    if (parties.length === 0) return
-    for (let party of parties) {
-      let update = false
-      for (let member of party.system.members) {
-        if (member.uuid === actorData.uuid) {
-          update = true
-        }
-        if (update) {
-          await party.render()
-        }
+    try {
+      const parties = game.actors.filter(actr=>actr.type==='party' && actr.sheet.rendered && actr.system.members.find(m => m.uuid === actorData.uuid))
+      for (const party of parties) {
+        await party.render()
       }
+    } catch (e) {
+      // Called before sheet is ready
     }
   }
 

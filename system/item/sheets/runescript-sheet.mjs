@@ -32,7 +32,7 @@ export class AoVRuneScriptSheet extends AoVItemSheet {
     } else {
       context.runeList = {}
     }
-    let runedetails = await AOVActor.runeMPCost (this.item)
+    let runedetails = AOVActor.runeMPCost (this.item)
     context.system.mpCost = runedetails.cost;
     context.system.maxEff = runedetails.maxEff;
     context.system.effective = runedetails.effective;

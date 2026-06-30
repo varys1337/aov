@@ -30,7 +30,7 @@ export class AoVSeidurSheet extends AoVItemSheet {
     context.distanceList = await AOVSelectLists.distanceList();
     context.durationList = await AOVSelectLists.durationList();
     context.dimensionList = await AOVSelectLists.dimensionList();
-    let seidurdetails = await AOVActor.seidurMPCost (this.item);
+    let seidurdetails = AOVActor.seidurMPCost (this.item);
     context.mpCost = seidurdetails.cost;
     context.mpLocked = seidurdetails.mpLocked;
     context.castTime = seidurdetails.castTime;
