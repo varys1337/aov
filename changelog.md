@@ -1,3 +1,6 @@
+## 14.2
+- Fixed an error with Active Effects for NPCs stopping the NPC sheet being opened.
+
 ## 14.1
 - Updated system for Foundry V14
 - CCI updated (thanks to James B)
