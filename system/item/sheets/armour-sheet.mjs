@@ -1,7 +1,7 @@
 import { AoVItemSheet } from "./base-item-sheet.mjs"
 import { AOVSelectLists } from "../../apps/select-lists.mjs"
 import { AOVActiveEffectSheet } from "../../sheets/aov-active-effect-sheet.mjs"
-
+//
 export class AoVArmourSheet extends AoVItemSheet {
   constructor(options = {}) {
     super(options)

@@ -18,7 +18,7 @@ export class AoVHitLocSheet extends AoVItemSheet {
     tabs: { template: 'systems/aov/templates/generic/tab-navigation.hbs' },
     details: { template: 'systems/aov/templates/item/hitloc.detail.hbs' },
     description: { template: 'systems/aov/templates/item/item.description.hbs' },
-    effects: {template: 'systems/aov/templates/item/item.active-effect.hbs'},
+    effects: { template: 'systems/aov/templates/item/item.active-effect.hbs' },
     gmTab: { template: 'systems/aov/templates/item/item.gmtab.hbs' }
   }
 
@@ -87,9 +87,9 @@ export class AoVHitLocSheet extends AoVItemSheet {
           tab.label += 'details';
           break;
         case 'effects':
-            tab.id = 'effects';
-            tab.label += 'effects';
-            break;
+          tab.id = 'effects';
+          tab.label += 'effects';
+          break;
         case 'description':
           tab.id = 'description';
           tab.label += 'description';
@@ -108,9 +108,9 @@ export class AoVHitLocSheet extends AoVItemSheet {
   _configureRenderOptions(options) {
     super._configureRenderOptions(options);
     //Only show GM tab if you are GM
-    options.parts = ['header', 'tabs', 'details','effects','description'];
+    options.parts = ['header', 'tabs', 'details', 'effects', 'description'];
     if (game.user.isGM) {
-        options.parts.push('gmTab');
+      options.parts.push('gmTab');
     }
   }
 
@@ -158,27 +158,27 @@ export class AoVHitLocSheet extends AoVItemSheet {
     event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
   }
 
-  _onDragOver(event) {}
+  _onDragOver(event) { }
 
   //Handle the dropping of ActiveEffect data onto an Item Sheet
   async _onDropActiveEffect(event, effect) {
     let newEffect = effect.toObject();
     newEffect.transfer = true
     const item = this.document;
-    if ( !this.isEditable || !item.isOwner || (item === effect.parent) ) return null;
-    const result = await ActiveEffect.implementation.create(newEffect, {parent: item});
+    if (!this.isEditable || !item.isOwner || (item === effect.parent)) return null;
+    const result = await ActiveEffect.implementation.create(newEffect, { parent: item });
     return result ?? null;
   }
 
-   async _onDropItem(event, data) {
+  async _onDropItem(event, data) {
     if (!this.item.isOwner) return false;
   }
 
-   async _onDropFolder(event, data) {
+  async _onDropFolder(event, data) {
     if (!this.item.isOwner) return [];
   }
 
-   get dragDrop() {
+  get dragDrop() {
     return this.#dragDrop;
   }
 
@@ -186,7 +186,7 @@ export class AoVHitLocSheet extends AoVItemSheet {
   // for subclasses or external hooks to mess with it directly
   #dragDrop;
 
-   #createDragDropHandlers() {
+  #createDragDropHandlers() {
     return this.options.dragDrop.map((d) => {
       d.permissions = {
         dragstart: this._canDragStart.bind(this),
@@ -200,5 +200,4 @@ export class AoVHitLocSheet extends AoVItemSheet {
       return new foundry.applications.ux.DragDrop.implementation(d);
     });
   }
-
 }

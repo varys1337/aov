@@ -41,32 +41,33 @@ export class CIDEditor extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   static addCIDSheetHeaderButton (application, element) {
-    if (typeof application.options.actions.cid !== 'undefined') return
-    application.options.actions.cid = {
-      handler: (event, element) => {
-        event.preventDefault()
-        event.stopPropagation()
-        if (event.detail > 1) return // Ignore repeated clicks
-        if (event.button === 2 && (application.document.flags.aov?.cidFlag?.id ?? false)) {
-          game.clipboard.copyPlainText(application.document.flags.aov.cidFlag.id)
-          ui.notifications.info('AOV.WhatCopiedClipboard', { format: { what: game.i18n.localize('AOV.CIDFlag.key') }, console: false })
-        } else {
-          new CIDEditor({ document: application.document }, {}).render(true, { focus: true })
-        }
-      },
-      buttons: [0, 2]
-    }
-    const copyUuid = element.querySelector('button.header-control.fa-solid.fa-passport')
-    if (copyUuid) {
-      const button = document.createElement('button')
-      button.type = 'button'
-      button.classList = 'header-control fa-solid fa-fingerprint icon'
-      if (!(application.document.flags.aov?.cidFlag?.id ?? false)) {
-        button.classList.add('invalid-cid')
+    if (!element.querySelector("button.header-control.fa-solid.fa-fingerprint")) {
+      application.options.actions.cid = {
+        handler: (event, element) => {
+          event.preventDefault()
+          event.stopPropagation()
+          if (event.detail > 1) return // Ignore repeated clicks
+          if (event.button === 2 && (application.document.flags.aov?.cidFlag?.id ?? false)) {
+            game.clipboard.copyPlainText(application.document.flags.aov.cidFlag.id)
+            ui.notifications.info('AOV.WhatCopiedClipboard', { format: { what: game.i18n.localize('AOV.CIDFlag.key') }, console: false })
+          } else {
+            new CIDEditor({ document: application.document }, {}).render(true, { focus: true })
+          }
+        },
+        buttons: [0, 2]
       }
-      button.dataset.action = 'cid'
-      button.dataset.tooltip = 'AOV.CIDFlag.id'
-      copyUuid.after(button)
+      const copyUuid = element.querySelector('button.header-control.fa-solid.fa-passport')
+      if (copyUuid) {
+        const button = document.createElement('button')
+        button.type = 'button'
+        button.classList = 'header-control fa-solid fa-fingerprint icon'
+        if (!(application.document.flags.aov?.cidFlag?.id ?? false)) {
+          button.classList.add('invalid-cid')
+        }
+        button.dataset.action = 'cid'
+        button.dataset.tooltip = 'AOV.CIDFlag.id'
+        copyUuid.after(button)
+      }
     }
   }
 

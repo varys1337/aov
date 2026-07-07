@@ -1,3 +1,6 @@
+## 14.5
+- Roll Table CID button should stop disappearing
+
 ## 14.4
 - Stat variants for NPCs now rolling properly
 - You can now have Active Effects that impact Passions in the same way they impact Skills
