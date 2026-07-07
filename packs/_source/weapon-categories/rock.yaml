@@ -1,0 +1,26 @@
+_key: '!items!irN7BNvg0HUQBa4l'
+_id: irN7BNvg0HUQBa4l
+name: Rock
+type: weaponcat
+folder: null
+img: systems/aov/art-assets/master-of-arms.svg
+_stats:
+  coreVersion: '13.346'
+  createdTime: 1751569087470
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1754457953076
+  systemId: aov
+  systemVersion: '13.6'
+effects: []
+flags:
+  aov:
+    cidFlag:
+      id: i.weaponcat.rock
+      lang: en
+      priority: 0
+ownership:
+  default: 0
+sort: 0
+system: {}

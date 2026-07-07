@@ -1,6 +1,9 @@
-import ChaosiumCanvasInterface from "./chaosium-canvas-interface.mjs";
+import ChaosiumCanvasInterface from './chaosium-canvas-interface.mjs'
 
 export default class ChaosiumCanvasInterfacePlaySound extends ChaosiumCanvasInterface {
+  /**
+   *
+   */
   static get actionToggles () {
     const buttons = super.actionToggles
     buttons[ChaosiumCanvasInterface.actionToggle.On] = 'AOV.ChaosiumCanvasInterface.PlaySound.Action.Play'
@@ -8,10 +11,16 @@ export default class ChaosiumCanvasInterfacePlaySound extends ChaosiumCanvasInte
     return buttons
   }
 
+  /**
+   *
+   */
   static get icon () {
     return 'fa-solid fa-music'
   }
 
+  /**
+   *
+   */
   static defineSchema () {
     const fields = foundry.data.fields
     return {
@@ -41,6 +50,10 @@ export default class ChaosiumCanvasInterfacePlaySound extends ChaosiumCanvasInte
     }
   }
 
+  /**
+   *
+   * @param source
+   */
   static migrateData (source) {
     if (typeof source.toggle !== 'undefined' && typeof source.action === 'undefined') {
       source.action = (source.toggle ? ChaosiumCanvasInterface.actionToggle.On : ChaosiumCanvasInterface.actionToggle.Off)
@@ -48,10 +61,16 @@ export default class ChaosiumCanvasInterfacePlaySound extends ChaosiumCanvasInte
     return source
   }
 
+  /**
+   *
+   */
   async _handleMouseOverEvent () {
     return game.user.isGM
   }
 
+  /**
+   *
+   */
   async #handleClickEvent () {
     let toggle = false
     switch (this.action) {
@@ -94,12 +113,18 @@ export default class ChaosiumCanvasInterfacePlaySound extends ChaosiumCanvasInte
     }
   }
 
+  /**
+   *
+   */
   async _handleLeftClickEvent () {
     if ((this.playlistUuid || this.soundUuid) && this.triggerButton === ChaosiumCanvasInterface.triggerButton.Left) {
       this.#handleClickEvent()
     }
   }
 
+  /**
+   *
+   */
   async _handleRightClickEvent () {
     if ((this.playlistUuid || this.soundUuid) && this.triggerButton === ChaosiumCanvasInterface.triggerButton.Right) {
       this.#handleClickEvent()

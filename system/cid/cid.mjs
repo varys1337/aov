@@ -2,7 +2,10 @@
 import { AOVUtilities } from '../apps/utilities.mjs'
 
 export class CID {
-  static init() {
+  /**
+   *
+   */
+  static init () {
     CONFIG.Actor.compendiumIndexFields.push('flags.aov.cidFlag')
     // CONFIG.Cards.compendiumIndexFields.push('flags.aov.cidFlag')
     CONFIG.Item.compendiumIndexFields.push('flags.aov.cidFlag')
@@ -14,6 +17,9 @@ export class CID {
     game.aov.cid = CID
   }
 
+  /**
+   *
+   */
   static #newProgressBar () {
     /* // FoundryVTT V12 */
     if (foundry.utils.isNewerVersion(game.version, '13')) {
@@ -23,6 +29,12 @@ export class CID {
     return true
   }
 
+  /**
+   *
+   * @param bar
+   * @param current
+   * @param max
+   */
   static #setProgressBar (bar, current, max) {
     /* // FoundryVTT V12 */
     if (bar === true) {
@@ -66,6 +78,7 @@ export class CID {
   /**
    * Get CID type.subtype.partial-name(-removed)
    * @param key
+   * @param id
    * @returns string
    */
   static guessGroupFromKey (id) {
@@ -91,9 +104,13 @@ export class CID {
    * Returns all items with matching CIDs and language
    * ui.notifications.warn for missing keys
    * @param itemList array of CIDs
+   * @param itemList.itemList
    * @param lang the language to match against ('en', 'es', ...)
+   * @param itemList.lang
    * @param langFallback should the system fall back to en incase there is no translation
+   * @param itemList.langFallback
    * @param showLoading Show loading bar
+   * @param itemList.showLoading
    * @returns array
    */
   static async expandItemArray ({ itemList, lang = game.i18n.lang, langFallback = true, showLoading = false } = {}) {
@@ -192,14 +209,20 @@ export class CID {
    * Returns all documents with an CID matching the regex and matching the document type and language.
    * Empty array return for no matches
    * @param cidRegExp regex used on the CID
+   * @param cidRegExp.cidRegExp
    * @param type the first part of the wanted CID, for example 'i', 'a', 'je'
+   * @param cidRegExp.type
    * @param lang the language to match against ('en', 'es', ...)
+   * @param cidRegExp.lang
    * @param langFallback should the system fall back to en incase there is no translation
+   * @param cidRegExp.langFallback
    * @param scope defines where it will look:
    * **all**: find in both world & compendia,
    * **world**: only search in world,
    * **compendiums**: only search in compendiums
+   * @param cidRegExp.scope
    * @param showLoading Show loading bar
+   * @param cidRegExp.showLoading
    * @returns array
    */
   static async fromCIDRegexAll ({ cidRegExp, type, lang = game.i18n.lang, langFallback = true, scope = 'all', showLoading = false } = {}) {
@@ -223,13 +246,18 @@ export class CID {
    * Returns all documents with a CID and language.
    * Empty array return for no matches
    * @param cid a single cid
+   * @param cid.cid
    * @param lang the language to match against ('en', 'es', ...)
+   * @param cid.lang
    * @param langFallback should the system fall back to en incase there is no translation
+   * @param cid.langFallback
    * @param scope defines where it will look:
    * **all**: find in both world & compendia,
    * **world**: only search in world,
    * **compendiums**: only search in compendiums
+   * @param cid.scope
    * @param showLoading Show loading bar
+   * @param cid.showLoading
    * @returns array
    */
   static async fromCIDAll ({ cid, lang = game.i18n.lang, langFallback = true, scope = 'all', showLoading = false } = {}) {
@@ -250,10 +278,15 @@ export class CID {
    * Gets only the highest priority documents for each CID that matches the RegExp and language
    * Empty array return for no matches
    * @param cidRegExp regex used on the CID
+   * @param cidRegExp.cidRegExp
    * @param type the first part of the wanted CID, for example 'i', 'a', 'je'
+   * @param cidRegExp.type
    * @param lang the language to match against ("en", "es", ...)
+   * @param cidRegExp.lang
    * @param langFallback should the system fall back to en incase there is no translation
+   * @param cidRegExp.langFallback
    * @param showLoading Show loading bar
+   * @param cidRegExp.showLoading
    */
   static async fromCIDRegexBest ({ cidRegExp, type, lang = game.i18n.lang, langFallback = true, showLoading = false } = {}) {
     let progressBar = false
@@ -297,9 +330,13 @@ export class CID {
   /**
    * Gets only the highest priority document for CID that matches the language
    * @param cid string CID
+   * @param cid.cid
    * @param lang the language to match against ("en", "es", ...)
+   * @param cid.lang
    * @param langFallback should the system fall back to en incase there is no translation
+   * @param cid.langFallback
    * @param showLoading Show loading bar
+   * @param cid.showLoading
    */
   static fromCIDBest ({ cid, lang = game.i18n.lang, langFallback = true, showLoading = false } = {}) {
     if (!cid || typeof cid !== 'string') {
@@ -314,16 +351,24 @@ export class CID {
    * Returns all documents or indexes with an CID matching the regex and matching the document type and language.
    * Empty array return for no matches
    * @param cidRegExp regex used on the CID
+   * @param cidRegExp.cidRegExp
    * @param type the first part of the wanted CID, for example 'i', 'a', 'je'
+   * @param cidRegExp.type
    * @param lang the language to match against ('en', 'es', ...)
+   * @param cidRegExp.lang
    * @param langFallback should the system fall back to en incase there is no translation
+   * @param cidRegExp.langFallback
    * @param progressBar If true show v12 progress bar, if not false show v13 progress bar
+   * @param cidRegExp.progressBar
    * @param progressCurrent Current Progress
+   * @param cidRegExp.progressCurrent
    * @param progressMax Max Progress
+   * @param cidRegExp.progressMax
    * @param scope defines where it will look:
    * **all**: find in both world & compendia,
    * **world**: only search in world,
    * **compendiums**: only search in compendiums
+   * @param cidRegExp.scope
    * @returns array
    */
   static async #getDataFromScopes ({ cidRegExp, type, lang, langFallback, progressBar, progressCurrent, progressMax, scope = 'all' } = {}) {
@@ -346,12 +391,19 @@ export class CID {
    * Get a list of all documents matching the CID regex and language from the world.
    * The document list is sorted with the highest priority first.
    * @param cidRegExp regex used on the CID
+   * @param cidRegExp.cidRegExp
    * @param type the first part of the wanted CID, for example 'i', 'a', 'je'
+   * @param cidRegExp.type
    * @param lang the language to match against ('en', 'es', ...)
+   * @param cidRegExp.lang
    * @param langFallback should the system fall back to en incase there is no translation
+   * @param cidRegExp.langFallback
    * @param progressBar If true show v12 progress bar, if not false show v13 progress bar
+   * @param cidRegExp.progressBar
    * @param progressCurrent Current Progress
+   * @param cidRegExp.progressCurrent
    * @param progressMax Max Progress
+   * @param cidRegExp.progressMax
    * @returns array
    */
   static async #docsFromWorld ({ cidRegExp, type, lang, langFallback, progressBar, progressCurrent, progressMax } = {}) {
@@ -385,12 +437,19 @@ export class CID {
   /**
    * Get a list of all indexes matching the CID regex and language from the compendiums.
    * @param cidRegExp regex used on the CID
+   * @param cidRegExp.cidRegExp
    * @param type the first part of the wanted CID, for example 'i', 'a', 'je'
+   * @param cidRegExp.type
    * @param lang the language to match against ('en', 'es', ...)
+   * @param cidRegExp.lang
    * @param langFallback should the system fall back to en incase there is no translation
+   * @param cidRegExp.langFallback
    * @param progressBar If true show v12 progress bar, if not false show v13 progress bar
+   * @param cidRegExp.progressBar
    * @param progressCurrent Current Progress
+   * @param cidRegExp.progressCurrent
    * @param progressMax Max Progress
+   * @param cidRegExp.progressMax
    * @returns array
    */
   static async #indexesFromCompendia ({ cidRegExp, type, lang, langFallback, progressBar, progressCurrent, progressMax }) {
@@ -424,6 +483,8 @@ export class CID {
 
   /**
    * Sort a list of document on CID priority - the highest first.
+   * @param a
+   * @param b
    * @example
    * aListOfDocuments.sort(CID.compareCIDPrio)
    */
@@ -457,6 +518,9 @@ export class CID {
     return gameProperty
   }
 
+  /**
+   *
+   */
   static get gamePropertyLookup () {
     return {
       a: 'actors',
@@ -485,6 +549,9 @@ export class CID {
     return documentType
   }
 
+  /**
+   *
+   */
   static get documentNameLookup () {
     return {
       a: Actor,
@@ -500,6 +567,10 @@ export class CID {
 
   /**
    * Replace indexes with their documents
+   * @param candidates
+   * @param progressBar
+   * @param progressCurrent
+   * @param progressMax
    */
   static async #onlyDocuments (candidates, progressBar, progressCurrent, progressMax) {
     const len = candidates.length
@@ -518,6 +589,8 @@ export class CID {
   /**
    * Filter an array of index or documents.
    * If a CID has a version lang then remove the en versions
+   * @param indexes
+   * @param lang
    */
   static #filterByLanguage (indexes, lang) {
     const ids = indexes.reduce((c, i) => {

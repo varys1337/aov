@@ -1,0 +1,43 @@
+_key: '!items!8aarWvBIppPnlInI'
+_id: 8aarWvBIppPnlInI
+name: Area Lore Own (Specify)
+type: skill
+folder: null
+img: systems/aov/art-assets/anvil.svg
+_stats:
+  coreVersion: '13.348'
+  createdTime: 1751569087452
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1757317392884
+  systemId: aov
+  systemVersion: '13.12'
+effects: []
+flags:
+  aov:
+    cidFlag:
+      id: i.skill.area-lore-own
+      lang: en
+      priority: 0
+ownership:
+  default: 0
+sort: 0
+system:
+  base: 20
+  baseVal: fixed
+  category: knw
+  common: true
+  description: ''
+  effects: 0
+  gmNotes: ''
+  home: 0
+  mainName: Area Lore Own
+  noXP: false
+  pers: 0
+  specSkill: true
+  specialisation: Specify
+  weaponCat: ''
+  weaponType: ''
+  xp: 0
+  xpCheck: false

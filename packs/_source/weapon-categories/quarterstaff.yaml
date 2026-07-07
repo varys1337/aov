@@ -1,0 +1,26 @@
+_key: '!items!AuOO8xg5J5Fy61kr'
+_id: AuOO8xg5J5Fy61kr
+name: Quarterstaff
+type: weaponcat
+folder: null
+img: systems/aov/art-assets/master-of-arms.svg
+_stats:
+  coreVersion: '13.346'
+  createdTime: 1751569087470
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1754457948404
+  systemId: aov
+  systemVersion: '13.6'
+effects: []
+flags:
+  aov:
+    cidFlag:
+      id: i.weaponcat.quarterstaff
+      lang: en
+      priority: 5
+ownership:
+  default: 0
+sort: 0
+system: {}

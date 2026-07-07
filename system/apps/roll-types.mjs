@@ -1,12 +1,18 @@
-import { RollType, AOVCheck, CardType } from "../apps/checks.mjs";
-import { isCtrlKey } from "../apps/helper.mjs";
+import { RollType, AOVCheck, CardType } from '../apps/checks.mjs'
+import { isCtrlKey } from '../apps/helper.mjs'
 
 export class AOVRollType {
 
   //Determine Roll Type
-  static async _onDetermineCheck (event, detail,actor) {
-    let ctrlKey = isCtrlKey(event ?? false);
-    let cardType = CardType.UNOPPOSED;
+  /**
+   *
+   * @param event
+   * @param detail
+   * @param actor
+   */
+  static async _onDetermineCheck (event, detail, actor) {
+    let ctrlKey = isCtrlKey(event ?? false)
+    let cardType = CardType.UNOPPOSED
     let rollType = RollType.CHARACTERISTIC
     let characteristic = false
     let skillId = false

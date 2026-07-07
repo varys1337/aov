@@ -1,20 +1,24 @@
-const { api, sheets } = foundry.applications;
-import { CIDEditor } from "../../cid/cid-editor.mjs";
-import { AOVActorItemDrop } from "../actor-item-drop.mjs";
-import { AOVActor } from "../actor.mjs";
-import { AOVRollType } from "../../apps/roll-types.mjs";
-import { AOVCheck } from "../../apps/checks.mjs";
-import AOVDialog from "../../setup/aov-dialog.mjs"
-import { COCard } from "../../chat/combat-chat.mjs";
-import { AOVCharCreate } from "../charCreate.mjs";
-import { AOVCharDevelop } from "../charDevelop.mjs";
-import { AOVDamage } from "../../apps/damage.mjs";
-import { AOVActiveEffectSheet } from "../../sheets/aov-active-effect-sheet.mjs";
+const { api, sheets } = foundry.applications
+import { CIDEditor } from '../../cid/cid-editor.mjs'
+import { AOVActorItemDrop } from '../actor-item-drop.mjs'
+import { AOVActor } from '../actor.mjs'
+import { AOVRollType } from '../../apps/roll-types.mjs'
+import { AOVCheck } from '../../apps/checks.mjs'
+import AOVDialog from '../../setup/aov-dialog.mjs'
+import { COCard } from '../../chat/combat-chat.mjs'
+import { AOVCharCreate } from '../charCreate.mjs'
+import { AOVCharDevelop } from '../charDevelop.mjs'
+import { AOVDamage } from '../../apps/damage.mjs'
+import { AOVActiveEffectSheet } from '../../sheets/aov-active-effect-sheet.mjs'
 
 export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSheetV2) {
-  constructor(options = {}) {
-    super(options);
-    this._dragDrop = this._createDragDropHandlers();
+  /**
+   *
+   * @param options
+   */
+  constructor (options = {}) {
+    super(options)
+    this._dragDrop = this._createDragDropHandlers()
   }
 
   static DEFAULT_OPTIONS = {
@@ -24,12 +28,12 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
       height: 800
     },
     window: {
-      resizable: true,
+      resizable: true
     },
-    tag: "form",
+    tag: 'form',
     dragDrop: [{ dragSelector: '[data-drag]', dropSelector: null }],
     form: {
-      submitOnChange: true,
+      submitOnChange: true
     },
     actions: {
       onEditImage: this._onEditImage,
@@ -76,32 +80,40 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
       toggleEffect: this._toggleEffect,
       clearEffects: this._clearEffects,
       triggerEffects: this._triggerEffects,
-      rollHitLoc: this._rollHitLoc,
+      rollHitLoc: this._rollHitLoc
     }
   }
 
 
 
   //Add CID Editor Button as seperate icon on the Window header
-  async _renderFrame(options) {
-    const frame = await super._renderFrame(options);
+  /**
+   *
+   * @param options
+   */
+  async _renderFrame (options) {
+    const frame = await super._renderFrame(options)
     //define CID button
-    const sheetCID = this.actor.flags?.aov?.cidFlag;
-    const noId = (typeof sheetCID === 'undefined' || typeof sheetCID.id === 'undefined' || sheetCID.id === '');
+    const sheetCID = this.actor.flags?.aov?.cidFlag
+    const noId = (typeof sheetCID === 'undefined' || typeof sheetCID.id === 'undefined' || sheetCID.id === '')
     //add button
-    const label = game.i18n.localize("AOV.CIDFlag.id");
+    const label = game.i18n.localize('AOV.CIDFlag.id')
     const cidEditor = `<button type="button" class="header-control icon fa-solid fa-fingerprint ${noId ? 'edit-cid-warning' : 'edit-cid-exisiting'}"
-        data-action="editCid" data-tooltip="${label}" aria-label="${label}"></button>`;
-    let el = this.window.close;
+        data-action="editCid" data-tooltip="${label}" aria-label="${label}"></button>`
+    let el = this.window.close
     while (el.previousElementSibling.localName === 'button') {
-      el = el.previousElementSibling;
+      el = el.previousElementSibling
     }
-    el.insertAdjacentHTML("beforebegin", cidEditor);
-    return frame;
+    el.insertAdjacentHTML('beforebegin', cidEditor)
+    return frame
   }
 
 
-  async _prepareContext(options) {
+  /**
+   *
+   * @param options
+   */
+  async _prepareContext (options) {
     return {
       editable: this.isEditable,
       owner: this.document.isOwner,
@@ -115,19 +127,24 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
       isLocked: this.actor.system.locked,
       isLinked: this.actor.prototypeToken?.actorLink === true,
       isSynth: this.actor.isToken,
-      singleColour: game.settings.get('aov','singleColourBar'),
-      isDevelop: game.settings.get('aov','developmentEnabled'),
-      isCreate: game.settings.get('aov','createEnabled'),
-      isVictory: game.settings.get('aov','victoryEnabled'),
-      isSelectGender: game.settings.get('aov','binaryGender'),
-      showLogo: game.settings.get('aov','showLogo'),
-    };
+      singleColour: game.settings.get('aov', 'singleColourBar'),
+      isDevelop: game.settings.get('aov', 'developmentEnabled'),
+      isCreate: game.settings.get('aov', 'createEnabled'),
+      isVictory: game.settings.get('aov', 'victoryEnabled'),
+      isSelectGender: game.settings.get('aov', 'binaryGender'),
+      showLogo: game.settings.get('aov', 'showLogo')
+    }
   }
 
 
   //------------ACTIONS-------------------
 
   //Toggle Acvtive Effect
+  /**
+   *
+   * @param event
+   * @param target
+   */
   static async _toggleEffect (event, target) {
     const id = target.closest('.item-edit')?.dataset?.effectId
     if (id) {
@@ -141,6 +158,11 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
   }
 
   //View Active Effect
+  /**
+   *
+   * @param event
+   * @param target
+   */
   static async _viewActiveEffect (event, target) {
     const id = target.closest('.item-edit')?.dataset?.effectId
     if (id) {
@@ -148,35 +170,50 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
       if (doc) {
         if (event.ctrlKey) {
           const confirmation = await AOVDialog.confirm({
-            window: { title: game.i18n.format('AOV.deleteDoc', {type: game.i18n.localize('DOCUMENT.ActiveEffect')}) },
+            window: { title: game.i18n.format('AOV.deleteDoc', { type: game.i18n.localize('DOCUMENT.ActiveEffect') }) },
             content: game.i18n.localize('AOV.deleteConfirm') + '<br><strong> ' + game.i18n.localize('DOCUMENT.ActiveEffect') + ': ' + doc.name + '</strong>'
           })
           if (confirmation) {
-            await doc.delete();
+            await doc.delete()
           }
         } else {
-          doc.sheet.render(true);
+          doc.sheet.render(true)
         }
       }
     }
   }
 
   //Create a Direct Active Effect
+  /**
+   *
+   * @param event
+   * @param target
+   */
   static async _createEffect (event, target) {
     this.document.createEmbeddedDocuments('ActiveEffect', [{ name: ActiveEffect.defaultName({ parent: this.document }) }])
   }
 
   //Clear All Direct Effects
-  static async _clearEffects (event,target) {
+  /**
+   *
+   * @param event
+   * @param target
+   */
+  static async _clearEffects (event, target) {
     if (event.detail === 2) {  //Only perform on double click
       const docs = (this.document.effects).map((itm) => {
-        return itm.id;
-      });
+        return itm.id
+      })
       await ActiveEffect.deleteDocuments(docs, { parent: this.document })
     }
   }
 
   //Trigger One Shot Active Effect _ WORK IN PROGRESS
+  /**
+   *
+   * @param event
+   * @param target
+   */
   static async _triggerEffects (event, target) {
     const uuid = target.closest('.item-edit')?.dataset?.effUuid
     const counter = target.closest('.item-edit')?.dataset?.counter
@@ -186,35 +223,40 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
         let effects = doc.system.changes
         let effect = effects[counter]
         if (effect) {
-          let confirm = false;
+          let confirm = false
           switch(effect.key) {
             case 'system.healing':
               confirm = await AOVDamage.effectHealing(effect, this.document)
-              break;
+              break
             case 'system.injure' :
               confirm = await AOVDamage.effectDamage(effect, this.document)
-              break;
+              break
             case 'system.damageObject' :
               confirm = await AOVDamage.damageObject(effect, this.document)
-              break;
+              break
             default:
               ui.notifications.warn(game.i18n.localize('AOV.aeNotRecognised'))
               return
           }
           if (confirm) {
-              // Delete the active effect as it's a one-shot
-              await AOVActiveEffectSheet._deleteChange(uuid, counter)
+            // Delete the active effect as it's a one-shot
+            await AOVActiveEffectSheet._deleteChange(uuid, counter)
           }
         }
       }
     }
   }
 
+  /**
+   *
+   * @param event
+   * @param target
+   */
   static async _myDetach (event, target) {
-    if (this.actor.type === "npc") {
+    if (this.actor.type === 'npc') {
       if (!this.actor.systemnoteView) {
-        await this.actor.update({'system.noteView' : true});
-        this.render["notes"]
+        await this.actor.update({ 'system.noteView' : true })
+        this.render['notes']
       }
     }
     let myWin= await this.detachWindow()
@@ -223,80 +265,108 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
 
 
   // Change Image
-  static async _onEditImage(event, target) {
-    const attr = target.dataset.edit;
-    const current = foundry.utils.getProperty(this.document, attr);
+  /**
+   *
+   * @param event
+   * @param target
+   */
+  static async _onEditImage (event, target) {
+    const attr = target.dataset.edit
+    const current = foundry.utils.getProperty(this.document, attr)
     const { img } = this.document.constructor.getDefaultArtwork?.(this.document.toObject()) ??
-      {};
+      {}
     const fp = new foundry.applications.apps.FilePicker({
       current,
       type: 'image',
       redirectToRoot: img ? [img] : [],
       callback: (path) => {
-        this.document.update({ [attr]: path });
+        this.document.update({ [attr]: path })
       },
       top: this.position.top + 39,
-      left: this.position.left + 9,
-    });
-    return fp.browse();
+      left: this.position.left + 9
+    })
+    return fp.browse()
   }
 
   // Handle editCid action
-  static _onEditCid(event) {
-    event.stopPropagation(); // Don't trigger other events
-    if (event.detail > 1) return; // Ignore repeated clicks
+  /**
+   *
+   * @param event
+   */
+  static _onEditCid (event) {
+    event.stopPropagation() // Don't trigger other events
+    if (event.detail > 1) return // Ignore repeated clicks
     new CIDEditor({ document: this.document }, {}).render(true, { focus: true })
   }
 
   // View Embedded Document
-  static async _viewDoc(event, target) {
-    const doc = this._getEmbeddedDocument(target);
+  /**
+   *
+   * @param event
+   * @param target
+   */
+  static async _viewDoc (event, target) {
+    const doc = this._getEmbeddedDocument(target)
     if(!doc) {return}
     let preventDel = target.dataset.preventdel ?? 'false'
     if (event.ctrlKey && preventDel !='true') {
-      if (['armour','devotion','family','gear','history','npcpower','passion','rune','runescript','seidur','skill','weapon'].includes(doc.type)) {
-          const confirmation = await AOVDialog.confirm({
-            window: { title: game.i18n.format("AOV.deleteDoc", {type: game.i18n.localize('TYPES.Item.'+doc.type)}) },
+      if (['armour', 'devotion', 'family', 'gear', 'history', 'npcpower', 'passion', 'rune', 'runescript', 'seidur', 'skill', 'weapon'].includes(doc.type)) {
+        const confirmation = await AOVDialog.confirm({
+          window: { title: game.i18n.format('AOV.deleteDoc', { type: game.i18n.localize('TYPES.Item.'+doc.type) }) },
 
-            content: game.i18n.localize("AOV.deleteConfirm") + "<br><strong> " + game.i18n.localize('TYPES.Item.'+doc.type) +": " + doc.name + "</strong>"
-          })
-          if (confirmation) {
-            await doc.delete();
-          }
-          return
+          content: game.i18n.localize('AOV.deleteConfirm') + '<br><strong> ' + game.i18n.localize('TYPES.Item.'+doc.type) +': ' + doc.name + '</strong>'
+        })
+        if (confirmation) {
+          await doc.delete()
         }
+        return
+      }
     } else {
-      doc.sheet.render(true);
+      doc.sheet.render(true)
     }
   }
 
-  static async _deleteDoc(event, target) {
+  /**
+   *
+   * @param event
+   * @param target
+   */
+  static async _deleteDoc (event, target) {
     if (event.detail === 2) {  //Only perform on double click
-      const doc = this._getEmbeddedDocument(target);
-      await doc.delete();
+      const doc = this._getEmbeddedDocument(target)
+      await doc.delete()
     }
   }
 
   //Get Embedded Document
-  _getEmbeddedDocument(target) {
-    const docRow = target.closest('li[data-document-class]');
+  /**
+   *
+   * @param target
+   */
+  _getEmbeddedDocument (target) {
+    const docRow = target.closest('li[data-document-class]')
     if (docRow.dataset.documentClass === 'Item') {
-      return this.actor.items.get(docRow.dataset.itemId);
+      return this.actor.items.get(docRow.dataset.itemId)
     } else if (docRow.dataset.documentClass === 'ActiveEffect') {
       const parent =
         docRow.dataset.parentId === this.actor.id
           ? this.actor
-          : this.actor.items.get(docRow?.dataset.parentId);
-      return parent.effects.get(docRow?.dataset.effectId);
-    } else return console.warn('Could not find document class');
+          : this.actor.items.get(docRow?.dataset.parentId)
+      return parent.effects.get(docRow?.dataset.effectId)
+    } else return console.warn('Could not find document class')
   }
 
   //Toggle aspects of the actor
-  static _toggleActor(event,target) {
-    event.stopPropagation();
+  /**
+   *
+   * @param event
+   * @param target
+   */
+  static _toggleActor (event, target) {
+    event.stopPropagation()
     let checkProp={}
     let prop = target.dataset.property
-    if (['locked', 'uncommon', 'alphaSkills','showRunes','beserkerOpt','beserkerStat','hitlocView','skillView','weaponView','powerView','equipView','passionView','devotionView','effectView','quickstart'].includes(prop)) {
+    if (['locked', 'uncommon', 'alphaSkills', 'showRunes', 'beserkerOpt', 'beserkerStat', 'hitlocView', 'skillView', 'weaponView', 'powerView', 'equipView', 'passionView', 'devotionView', 'effectView', 'quickstart'].includes(prop)) {
       checkProp = { [`system.${prop}`]: !this.actor.system[prop] }
     } else {
       return
@@ -306,47 +376,57 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
 
 
   //Toggle an item
-  static _itemToggle(event, target) {
-    event.stopImmediatePropagation();
-    let checkProp = {};
-    const prop = target.dataset.property;
-    const itemId = target.closest(".item").dataset.itemId;
-    const item = this.actor.items.get(itemId);
-    if (['xpCheck',"treated","prepared","depend",'augment'].includes(prop)) {
+  /**
+   *
+   * @param event
+   * @param target
+   */
+  static _itemToggle (event, target) {
+    event.stopImmediatePropagation()
+    let checkProp = {}
+    const prop = target.dataset.property
+    const itemId = target.closest('.item').dataset.itemId
+    const item = this.actor.items.get(itemId)
+    if (['xpCheck', 'treated', 'prepared', 'depend', 'augment'].includes(prop)) {
       checkProp = { [`system.${prop}`]: !item.system[prop] }
     } else if (prop === 'equipStatus') {
       let newVal = item.system.equipStatus + 1
       if (newVal > 3) { newVal = 1 }
       checkProp = { 'system.equipStatus': newVal }
     } else { return }
-    item.update(checkProp);
+    item.update(checkProp)
   }
 
   //Create an Embedded Document
-  static async _createDoc(event, target) {
-    const docCls = getDocumentClass(target.dataset.documentClass);
+  /**
+   *
+   * @param event
+   * @param target
+   */
+  static async _createDoc (event, target) {
+    const docCls = getDocumentClass(target.dataset.documentClass)
     const docData = {
       name: docCls.defaultName({
         type: target.dataset.type,
-        parent: this.actor,
-      }),
-    };
+        parent: this.actor
+      })
+    }
     // Loop through the dataset and add it to our docData
     for (const [dataKey, value] of Object.entries(target.dataset)) {
       // Ignore data attributes that are reserved for action handling
-      if (['action', 'documentClass'].includes(dataKey)) continue;
-      foundry.utils.setProperty(docData, dataKey, value);
+      if (['action', 'documentClass'].includes(dataKey)) continue
+      foundry.utils.setProperty(docData, dataKey, value)
     }
     // Create the embedded document
-    const newItem = await docCls.create(docData, { parent: this.actor });
+    const newItem = await docCls.create(docData, { parent: this.actor })
 
     //And in certain circumstances render the new item sheet
-    if (['gear','wound','family','thrall'].includes(newItem.type)) {
-      newItem.sheet.render(true);
+    if (['gear', 'wound', 'family', 'thrall'].includes(newItem.type)) {
+      newItem.sheet.render(true)
     }
 
     //Add default CID to the item
-    if (game.settings.get('aov', "actorItemCID")) {
+    if (game.settings.get('aov', 'actorItemCID')) {
       let key = await game.aov.cid.guessId(newItem)
       await newItem.update({
         'flags.aov.cidFlag.id': key,
@@ -359,74 +439,117 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
           color: (key ? 'orange' : 'red')
         })
       }
-      newItem.sheet.render();
+      newItem.sheet.render()
     }
   }
 
   //Roll Random Stats
-  static async _randomStats(event, target){
+  /**
+   *
+   * @param event
+   * @param target
+   */
+  static async _randomStats (event, target){
     await this.actor.rollCharacteristicsValue()
   }
 
   //Roll Average Stats
-  static async _averageStats(event, target){
+  /**
+   *
+   * @param event
+   * @param target
+   */
+  static async _averageStats (event, target){
     await this.actor.averageCharacteristicsValue()
   }
 
   //Recalc Base Skill Scores
-  static async _recalcBase() {
+  /**
+   *
+   */
+  static async _recalcBase () {
     if (this.actor.type !='character') {return}
-    let skillList = await this.actor.items.filter(itm=>itm.type ==='skill').filter(nItm=> nItm.system.baseVal !='fixed')
-      for (let skill of skillList) {
-        let base = await AOVActorItemDrop._AOVcalcBase(skill, this.actor);
-        await skill.update({'system.base': base})
-      }
+    let skillList = await this.actor.items.filter(itm => itm.type ==='skill').filter(nItm => nItm.system.baseVal !='fixed')
+    for (let skill of skillList) {
+      let base = await AOVActorItemDrop._AOVcalcBase(skill, this.actor)
+      await skill.update({ 'system.base': base })
     }
+  }
 
   //Dice Check
-  static async _diceroll(event,target) {
+  /**
+   *
+   * @param event
+   * @param target
+   */
+  static async _diceroll (event, target) {
     await AOVRollType._onDetermineCheck(event, target.dataset, this.document)
   }
 
   //Dodge - add Dodge roll to Combat
-  static async _dodge(event,target) {
-    let skillId = this.actor.items.filter(i=>i.flags.aov?.cidFlag?.id === 'i.skill.dodge')
+  /**
+   *
+   * @param event
+   * @param target
+   */
+  static async _dodge (event, target) {
+    let skillId = this.actor.items.filter(i => i.flags.aov?.cidFlag?.id === 'i.skill.dodge')
     if (!skillId || skillId.length<1) {
       ui.notifications.warn(game.i18n.localize('AOV.card.noDodge'))
       return
     }
-          AOVCheck._trigger({
-              rollType: "SK",
-              cardType: "CO",
-              shiftKey: false,
-              skillId: skillId[0]._id,
-              itemId: skillId[0]._id,
-              event,
-              actor: this.actor,
-              characteristic: false
-          })
+    AOVCheck._trigger({
+      rollType: 'SK',
+      cardType: 'CO',
+      shiftKey: false,
+      skillId: skillId[0]._id,
+      itemId: skillId[0]._id,
+      event,
+      actor: this.actor,
+      characteristic: false
+    })
   }
 
   //Reset Species
-  static async _resetSpecies(event, target) {
+  /**
+   *
+   * @param event
+   * @param target
+   */
+  static async _resetSpecies (event, target) {
     if (event.detail === 2) {  //Only perform on double click
       AOVCharCreate.resetSpecies(target, this.actor)
     }
   }
 
   //Reset Homeland
-  static async _resetHomeland(event, target) {
+  /**
+   *
+   * @param event
+   * @param target
+   */
+  static async _resetHomeland (event, target) {
     if (event.detail === 2) {  //Only perform on double click
       AOVCharCreate.resetHomeland(target, this.actor)
     }
   }
 
   //Roll Character Name
+  /**
+   *
+   * @param event
+   * @param target
+   */
   static async _rollName (event, target) {
     AOVCharCreate.characName (this.actor, target)
   }
 
   //Roll Stats for Character
+  /**
+   *
+   * @param event
+   * @param target
+   */
   static async _rollStats (event, target) {
     let type = target.dataset.type
     switch (type) {
@@ -445,26 +568,51 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
   }
 
   //Roll Personality
-  static async _rollPersonality(event, target) {
+  /**
+   *
+   * @param event
+   * @param target
+   */
+  static async _rollPersonality (event, target) {
     AOVCharCreate.rollPersonality(this.actor)
   }
 
   //Select Personal Skills
+  /**
+   *
+   * @param event
+   * @param target
+   */
   static async _persSkills (event, target) {
     AOVCharCreate.persSkills(this.actor)
   }
 
   //Select Devotions
+  /**
+   *
+   * @param event
+   * @param target
+   */
   static async _devotions (event, target) {
     AOVCharCreate.devotions(this.actor)
   }
 
   //Create Family
+  /**
+   *
+   * @param event
+   * @param target
+   */
   static async _family (event, target) {
     AOVCharCreate.family(this.actor)
   }
 
   //Create Farm
+  /**
+   *
+   * @param event
+   * @param target
+   */
   static async _farm (event, target) {
     if (game.user.isGM) {
       AOVCharCreate.farm(this.actor)
@@ -484,22 +632,42 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
   }
 
   //Choose Weapons
-  static async _weapons(event, target) {
+  /**
+   *
+   * @param event
+   * @param target
+   */
+  static async _weapons (event, target) {
     AOVCharCreate.selectWeapons(this.actor)
   }
 
   //Roll Distinctive Features
-  static async _features (event,target) {
+  /**
+   *
+   * @param event
+   * @param target
+   */
+  static async _features (event, target) {
     AOVCharCreate.features(this.actor)
   }
 
   //Roll Family History
-  static async _history (event,target) {
+  /**
+   *
+   * @param event
+   * @param target
+   */
+  static async _history (event, target) {
     AOVCharCreate.history(this.actor)
   }
 
   //Reset Family History
-  static async _resethistory (event,target) {
+  /**
+   *
+   * @param event
+   * @param target
+   */
+  static async _resethistory (event, target) {
     if (event.detail === 2) {  //Only perform on double click
       const confirm = await AOVDialog.confirm({
         window: { title: game.i18n.localize('AOV.confirm') },
@@ -512,6 +680,11 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
   }
 
   //Experience Rolls
+  /**
+   *
+   * @param event
+   * @param target
+   */
   static async _expRoll (event, target) {
     if (this.actor.system.expImprov) {
       AOVCharDevelop.expRolls(this.actor)
@@ -519,20 +692,35 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
   }
 
   //Training Roll
+  /**
+   *
+   * @param event
+   * @param target
+   */
   static async _trainingRoll (event, target) {
     if (this.actor.system.improv) {
-      AOVCharDevelop.trainingRoll(this.actor,'training')
+      AOVCharDevelop.trainingRoll(this.actor, 'training')
     }
   }
 
   //Research Roll
+  /**
+   *
+   * @param event
+   * @param target
+   */
   static async _researchRoll (event, target) {
     if (this.actor.system.improv) {
-      AOVCharDevelop.trainingRoll(this.actor,'research')
+      AOVCharDevelop.trainingRoll(this.actor, 'research')
     }
   }
 
   //Characteristic Improvement Roll
+  /**
+   *
+   * @param event
+   * @param target
+   */
   static async _statImpRoll (event, target) {
     if (this.actor.system.improv) {
       AOVCharDevelop.statImpRoll(this.actor)
@@ -540,6 +728,11 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
   }
 
   //Worship Rolls
+  /**
+   *
+   * @param event
+   * @param target
+   */
   static async _worship (event, target) {
     if (this.actor.system.worship) {
       AOVCharDevelop.worshipRoll(this.actor)
@@ -547,6 +740,11 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
   }
 
   //Farm Circumstance Rolls
+  /**
+   *
+   * @param event
+   * @param target
+   */
   static async _farming (event, target) {
     if (this.actor.system.farming) {
       AOVCharDevelop.farmCircRoll(this.actor)
@@ -554,6 +752,11 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
   }
 
   //Vadmal Production
+  /**
+   *
+   * @param event
+   * @param target
+   */
   static async _vadprod (event, target) {
     if (this.actor.system.vadprod) {
       AOVCharDevelop.vadprod(this.actor)
@@ -561,6 +764,11 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
   }
 
   //Aging
+  /**
+   *
+   * @param event
+   * @param target
+   */
   static async _aging (event, target) {
     if (this.actor.system.aging) {
       AOVCharDevelop.aging(this.actor)
@@ -568,6 +776,11 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
   }
 
   //Family Rolls
+  /**
+   *
+   * @param event
+   * @param target
+   */
   static async _familyroll (event, target) {
     if (this.actor.system.family) {
       AOVCharDevelop.family(this.actor)
@@ -575,6 +788,11 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
   }
 
   //Expand-Collapse NPC sections
+  /**
+   *
+   * @param event
+   * @param target
+   */
   static async _npcSections (event, target) {
     let prop = target.dataset.property
     let status = true
@@ -589,14 +807,19 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
       'system.equipView': status,
       'system.passionView': status,
       'system.devotionView': status,
-      'system.effectView': status,
+      'system.effectView': status
     })
   }
 
   //Add a Wound from a hit location
+  /**
+   *
+   * @param event
+   * @param target
+   */
   static async _addWound (event, target) {
-    const hitLocId = target.closest('li').dataset.itemId;
-    const docCls = getDocumentClass('Item');
+    const hitLocId = target.closest('li').dataset.itemId
+    const docCls = getDocumentClass('Item')
     const docData = {
       name: docCls.defaultName({
         type: 'wound',
@@ -606,17 +829,17 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
       system: {
         hitLocId: hitLocId
       }
-    };
+    }
     // Loop through the dataset and add it to our docData
     for (const [dataKey, value] of Object.entries(target.dataset)) {
       // Ignore data attributes that are reserved for action handling
-      if (['action', 'documentClass'].includes(dataKey)) continue;
-      foundry.utils.setProperty(docData, dataKey, value);
+      if (['action', 'documentClass'].includes(dataKey)) continue
+      foundry.utils.setProperty(docData, dataKey, value)
     }
     // Create the embedded document
-    const newItem = await docCls.create(docData, { parent: this.actor });
+    const newItem = await docCls.create(docData, { parent: this.actor })
 
-    if (game.settings.get('aov', "actorItemCID")) {
+    if (game.settings.get('aov', 'actorItemCID')) {
       let key = await game.aov.cid.guessId(newItem)
       await newItem.update({
         'flags.aov.cidFlag.id': key,
@@ -624,27 +847,37 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
         'flags.aov.cidFlag.priority': 0
       })
     }
-      newItem.sheet.render(true);
+    newItem.sheet.render(true)
   }
 
   //Open Wiki in web-browser
+  /**
+   *
+   * @param event
+   * @param target
+   */
   static async _openWiki (event, target) {
-    const url = "https://github.com/cragstone/aov/wiki";
-    window.open(url, "_blank");
+    const url = 'https://github.com/cragstone/aov/wiki'
+    window.open(url, '_blank')
   }
 
   //Spend Wyrd
-  static async _spendWyrd (event,target) {
-     if (event.detail === 2) {  //Only perform on double click
+  /**
+   *
+   * @param event
+   * @param target
+   */
+  static async _spendWyrd (event, target) {
+    if (event.detail === 2) {  //Only perform on double click
       let data = {
-        title: game.i18n.localize('AOV.spendWyrdHint'),
+        title: game.i18n.localize('AOV.spendWyrdHint')
       }
-      const html = await foundry.applications.handlebars.renderTemplate('systems/aov/templates/dialog/valueInput.hbs', data);
+      const html = await foundry.applications.handlebars.renderTemplate('systems/aov/templates/dialog/valueInput.hbs', data)
 
       let val = await AOVDialog.input({
         window: { title: 'AOV.spendWyrd' },
         content: html,
-        data,
+        data
       })
 
       if (!val) {return}
@@ -652,159 +885,219 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
         ui.notifications.warn(game.i18n.localize('AOV.wyrdInsufficient'))
         return
       }
-      await (this.actor).update ({'system.abilities.pow.xp': this.actor.system.abilities.pow.xp - val.valueInp})
-          ui.notifications.warn(game.i18n.format('AOV.wyrdSpent', { points: val.valueInp }))
+      await (this.actor).update ({ 'system.abilities.pow.xp': this.actor.system.abilities.pow.xp - val.valueInp })
+      ui.notifications.warn(game.i18n.format('AOV.wyrdSpent', { points: val.valueInp }))
     }
   }
 
   //Roll Hit Location
-  static async _rollHitLoc(event, target) {
+  /**
+   *
+   * @param event
+   * @param target
+   */
+  static async _rollHitLoc (event, target) {
     await AOVDamage.rollHitLoc(this.document)
   }
 
   //-------------Drag and Drop--------------
 
   // Define whether a user is able to begin a dragstart workflow for a given drag selector
-  _canDragStart(selector) {
-    return this.isEditable;
+  /**
+   *
+   * @param selector
+   */
+  _canDragStart (selector) {
+    return this.isEditable
   }
 
   //Define whether a user is able to conclude a drag-and-drop workflow for a given drop selector
-  _canDragDrop(selector) {
-    return this.isEditable;
+  /**
+   *
+   * @param selector
+   */
+  _canDragDrop (selector) {
+    return this.isEditable
   }
 
   //Callback actions which occur at the beginning of a drag start workflow.
-  _onDragStart(event) {
-    const docRow = event.currentTarget.closest('li');
-    if ('link' in event.target.dataset) return;
+  /**
+   *
+   * @param event
+   */
+  _onDragStart (event) {
+    const docRow = event.currentTarget.closest('li')
+    if ('link' in event.target.dataset) return
     // Chained operation
-    let dragData = this._getEmbeddedDocument(docRow)?.toDragData();
-    if (!dragData) return;
+    let dragData = this._getEmbeddedDocument(docRow)?.toDragData()
+    if (!dragData) return
     // Set data transfer
-    event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
+    event.dataTransfer.setData('text/plain', JSON.stringify(dragData))
   }
 
   //Callback actions which occur when a dragged element is over a drop target.
-  _onDragOver(event) { }
+  /**
+   *
+   * @param event
+   */
+  _onDragOver (event) { }
 
   //Callback actions which occur when a dragged element is dropped on a target.
-  async _onDrop(event) {
-    const data = foundry.applications.ux.TextEditor.implementation.getDragEventData(event);
-    const actor = this.actor;
-    const allowed = Hooks.call('dropActorSheetData', actor, this, data);
-    if (allowed === false) return;
+  /**
+   *
+   * @param event
+   */
+  async _onDrop (event) {
+    const data = foundry.applications.ux.TextEditor.implementation.getDragEventData(event)
+    const actor = this.actor
+    const allowed = Hooks.call('dropActorSheetData', actor, this, data)
+    if (allowed === false) return
 
     // Handle different data types
     switch (data.type) {
       case 'ActiveEffect':
-        return this._onDropActiveEffect(event, data);
+        return this._onDropActiveEffect(event, data)
       case 'Actor':
-        return this._onDropActor(event, data);
+        return this._onDropActor(event, data)
       case 'Item':
-        return this._onDropItem(event, data);
+        return this._onDropItem(event, data)
       case 'Folder':
-        return this._onDropFolder(event, data);
+        return this._onDropFolder(event, data)
     }
   }
 
   //Handle the dropping of ActiveEffect data onto an Actor Sheet
-  async _onDropActiveEffect(event, data) {
-    const aeCls = getDocumentClass('ActiveEffect');
-    const effect = await aeCls.fromDropData(data);
-    if (!this.actor.isOwner || !effect) return false;
-    if (this.actor.type === 'party') return false;
-    return aeCls.create(effect, { parent: this.actor });
+  /**
+   *
+   * @param event
+   * @param data
+   */
+  async _onDropActiveEffect (event, data) {
+    const aeCls = getDocumentClass('ActiveEffect')
+    const effect = await aeCls.fromDropData(data)
+    if (!this.actor.isOwner || !effect) return false
+    if (this.actor.type === 'party') return false
+    return aeCls.create(effect, { parent: this.actor })
   }
 
   //Handle dropping of an Actor data onto another Actor sheet
-  async _onDropActor(event, data) {
-    if (!this.actor.isOwner) return false;
-    await this.DropActor(data);
+  /**
+   *
+   * @param event
+   * @param data
+   */
+  async _onDropActor (event, data) {
+    if (!this.actor.isOwner) return false
+    await this.DropActor(data)
   }
 
   //Handle dropping of an item reference or item data onto an Actor Sheet
-  async _onDropItem(event, data) {
-    if (!this.actor.isOwner) return false;
+  /**
+   *
+   * @param event
+   * @param data
+   */
+  async _onDropItem (event, data) {
+    if (!this.actor.isOwner) return false
     if (this.actor.type === 'party') {
-        ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.cantAddItems', { actorType: game.i18n.localize('TYPES.Actor.'+ this.actor.type) }))
-      return false;
+      ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.cantAddItems', { actorType: game.i18n.localize('TYPES.Actor.'+ this.actor.type) }))
+      return false
     }
-    const item = await Item.implementation.fromDropData(data);
+    const item = await Item.implementation.fromDropData(data)
     // Handle item sorting within the same Actor
     if (this.actor.uuid === item.parent?.uuid)
-      return this._onSortItem(event, item);
+      return this._onSortItem(event, item)
     // Create the owned item
-    return this._onDropItemCreate(item, event);
+    return this._onDropItemCreate(item, event)
   }
 
   //Handle dropping of a Folder on an Actor Sheet.
-  async _onDropFolder(event, data) {
-    if (!this.actor.isOwner) return [];
-    if (this.actor.type === 'party') return false;
-    const folder = await Folder.implementation.fromDropData(data);
-    if (folder.type !== 'Item') return [];
+  /**
+   *
+   * @param event
+   * @param data
+   */
+  async _onDropFolder (event, data) {
+    if (!this.actor.isOwner) return []
+    if (this.actor.type === 'party') return false
+    const folder = await Folder.implementation.fromDropData(data)
+    if (folder.type !== 'Item') return []
     const droppedItemData = await Promise.all(
       folder.contents.map(async (item) => {
-        if (!(document instanceof Item)) item = await fromUuid(item.uuid);
-        return item;
+        if (!(document instanceof Item)) item = await fromUuid(item.uuid)
+        return item
       })
-    );
-    return this._onDropItemCreate(droppedItemData, event);
+    )
+    return this._onDropItemCreate(droppedItemData, event)
   }
 
   //Handle the final creation of dropped Item data on the Actor.
-  async _onDropItemCreate(itemData, event) {
+  /**
+   *
+   * @param itemData
+   * @param event
+   */
+  async _onDropItemCreate (itemData, event) {
     itemData = await AOVActorItemDrop._AOVonDropItemCreate(itemData, this.actor)
-    const list = await this.actor.createEmbeddedDocuments('Item', itemData);
-    return list;
+    const list = await this.actor.createEmbeddedDocuments('Item', itemData)
+    return list
   }
 
   //Returns an array of DragDrop instances
-  get dragDrop() {
-    return this._dragDrop;
+  /**
+   *
+   */
+  get dragDrop () {
+    return this._dragDrop
   }
 
-  _dragDrop;
+  _dragDrop
 
   //Create drag-and-drop workflow handlers for this Application
-  _createDragDropHandlers() {
+  /**
+   *
+   */
+  _createDragDropHandlers () {
     return this.options.dragDrop.map((d) => {
       d.permissions = {
         dragstart: this._canDragStart.bind(this),
-        drop: this._canDragDrop.bind(this),
-      };
+        drop: this._canDragDrop.bind(this)
+      }
       d.callbacks = {
         dragstart: this._onDragStart.bind(this),
         dragover: this._onDragOver.bind(this),
-        drop: this._onDrop.bind(this),
-      };
-      return new foundry.applications.ux.DragDrop(d);
-    });
+        drop: this._onDrop.bind(this)
+      }
+      return new foundry.applications.ux.DragDrop(d)
+    })
   }
 
   //Drop Actor on to an Actor Sheet
-  async DropActor(data) {
+  /**
+   *
+   * @param data
+   */
+  async DropActor (data) {
     let newActor = await fromUuid(data.uuid)
     if (!newActor) {return}
     if (this.actor.type === 'character' && newActor.type === 'farm') {
       const farms = this.actor.system.farms ? foundry.utils.duplicate(this.actor.system.farms) : []
       //Check farm is not in farms list
       if (farms.find(el => el.uuid === newActor.uuid)) {
-        ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.dupItem', { itemName: (newActor.name +"(" + newActor.uuid +")") }));
+        ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.dupItem', { itemName: (newActor.name +'(' + newActor.uuid +')') }))
         return
       }
-      farms.push({uuid:newActor.uuid})
-      await this.actor.update({'system.farms': farms})
+      farms.push({ uuid:newActor.uuid })
+      await this.actor.update({ 'system.farms': farms })
     } else if (this.actor.type === 'party' && (['character'].includes(newActor.type))) {
       const members = this.actor.system.members ? foundry.utils.duplicate(this.actor.system.members) : []
       //Check member is not in members list
       if (members.find(el => el.uuid === newActor.uuid)) {
-        ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.dupItem', { itemName: (newActor.name +"(" + newActor.uuid +")") }));
+        ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.dupItem', { itemName: (newActor.name +'(' + newActor.uuid +')') }))
         return
       }
-      members.push({uuid:newActor.uuid})
-      await this.actor.update({'system.members': members})
+      members.push({ uuid:newActor.uuid })
+      await this.actor.update({ 'system.members': members })
     } else {
       ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.cantDropActor', { itemType: game.i18n.localize('TYPES.Actor.'+ newActor.type), actorType: game.i18n.localize('TYPES.Actor.'+ this.actor.type) }))
       return

@@ -1,0 +1,26 @@
+_key: '!items!m5MpAN9SvMWITZuX'
+_id: m5MpAN9SvMWITZuX
+name: Fist
+type: weaponcat
+folder: null
+img: systems/aov/art-assets/master-of-arms.svg
+_stats:
+  coreVersion: '13.346'
+  createdTime: 1751569087471
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1754457928164
+  systemId: aov
+  systemVersion: '13.6'
+effects: []
+flags:
+  aov:
+    cidFlag:
+      id: i.weaponcat.fist
+      lang: en
+      priority: 0
+ownership:
+  default: 0
+sort: 0
+system: {}

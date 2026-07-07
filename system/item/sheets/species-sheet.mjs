@@ -1,8 +1,12 @@
-import { AoVItemSheet } from "./base-item-sheet.mjs"
-import { AOVUtilities } from "../../apps/utilities.mjs"
+import { AoVItemSheet } from './base-item-sheet.mjs'
+import { AOVUtilities } from '../../apps/utilities.mjs'
 
 export class AoVSpeciesSheet extends AoVItemSheet {
-  constructor(options = {}) {
+  /**
+   *
+   * @param options
+   */
+  constructor (options = {}) {
     super(options)
     this.#dragDrop = this.#createDragDropHandlers()
   }
@@ -12,7 +16,7 @@ export class AoVSpeciesSheet extends AoVItemSheet {
     dragDrop: [{ dragSelector: '[data-drag]', dropSelector: '.droppable' }],
     position: {
       height: 640
-    },
+    }
   }
 
   static PARTS = {
@@ -23,27 +27,31 @@ export class AoVSpeciesSheet extends AoVItemSheet {
     gmTab: { template: 'systems/aov/templates/item/item.gmtab.hbs' }
   }
 
-  async _prepareContext(options) {
+  /**
+   *
+   * @param options
+   */
+  async _prepareContext (options) {
     let context = await super._prepareContext(options)
-    context.tabs = this._getTabs(options.parts);
-    const hitLocs = [];
+    context.tabs = this._getTabs(options.parts)
+    const hitLocs = []
     context.hasLocs = false
     for (let hitLoc of context.system.hitlocs) {
       context.hasLocs = true
       let tempLoc = (await game.aov.cid.fromCIDBest({ cid: hitLoc.cid }))[0]
       if (tempLoc) {
-        hitLocs.push({ uuid: hitLoc.uuid, cid: hitLoc.cid, name: tempLoc.name, rank: hitLoc.rank})
+        hitLocs.push({ uuid: hitLoc.uuid, cid: hitLoc.cid, name: tempLoc.name, rank: hitLoc.rank })
       } else {
-        hitLocs.push({ uuid: hitLoc.uuid, cid: hitLoc.cid, name: game.i18n.localize("AOV.invalid"), rank: hitLoc.rank})
+        hitLocs.push({ uuid: hitLoc.uuid, cid: hitLoc.cid, name: game.i18n.localize('AOV.invalid'), rank: hitLoc.rank })
       }
     }
 
     hitLocs.sort(function (a, b) {
-      let x = a.rank;
-      let y = b.rank;
+      let x = a.rank
+      let y = b.rank
       if (x < y) { return 1 };
       if (x > y) { return -1 };
-      return 0;
+      return 0
     })
 
     context.hitLocs = hitLocs
@@ -51,86 +59,99 @@ export class AoVSpeciesSheet extends AoVItemSheet {
   }
 
   /** @override */
-  async _preparePartContext(partId, context) {
+  async _preparePartContext (partId, context) {
     switch (partId) {
       case 'details':
-        context.tab = context.tabs[partId];
-        break;
+        context.tab = context.tabs[partId]
+        break
       case 'description':
-        context.tab = context.tabs[partId];
+        context.tab = context.tabs[partId]
         context.enrichedDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
           this.item.system.description,
           {
             secrets: this.document.isOwner,
             rollData: this.document.getRollData(),
-            relativeTo: this.document,
+            relativeTo: this.document
           }
-        );
-        break;
+        )
+        break
       case 'gmTab':
-        context.tab = context.tabs[partId];
+        context.tab = context.tabs[partId]
         context.enrichedGMNotes = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
           this.item.system.gmNotes,
           {
             secrets: this.document.isOwner,
             rollData: this.document.getRollData(),
-            relativeTo: this.document,
+            relativeTo: this.document
           }
-        );
-        break;
+        )
+        break
     }
-    return context;
+    return context
   }
 
-  _getTabs(parts) {
-    const tabGroup = 'primary';
+  /**
+   *
+   * @param parts
+   */
+  _getTabs (parts) {
+    const tabGroup = 'primary'
     //Default tab
-    if (!this.tabGroups[tabGroup]) this.tabGroups[tabGroup] = 'details';
+    if (!this.tabGroups[tabGroup]) this.tabGroups[tabGroup] = 'details'
     return parts.reduce((tabs, partId) => {
       const tab = {
         cssClass: '',
         group: tabGroup,
         id: '',
         icon: '',
-        label: 'AOV.',
-      };
+        label: 'AOV.'
+      }
       switch (partId) {
         case 'header':
         case 'tabs':
-          return tabs;
+          return tabs
         case 'details':
-          tab.id = 'details';
-          tab.label += 'details';
-          break;
+          tab.id = 'details'
+          tab.label += 'details'
+          break
         case 'description':
-          tab.id = 'description';
-          tab.label += 'description';
-          break;
+          tab.id = 'description'
+          tab.label += 'description'
+          break
         case 'gmTab':
-          tab.id = 'gmTab';
-          tab.label += 'gmTab';
-          break;
+          tab.id = 'gmTab'
+          tab.label += 'gmTab'
+          break
       }
-      if (this.tabGroups[tabGroup] === tab.id) tab.cssClass = 'active';
-      tabs[partId] = tab;
-      return tabs;
-    }, {});
+      if (this.tabGroups[tabGroup] === tab.id) tab.cssClass = 'active'
+      tabs[partId] = tab
+      return tabs
+    }, {})
   }
 
-  _configureRenderOptions(options) {
-    super._configureRenderOptions(options);
+  /**
+   *
+   * @param options
+   */
+  _configureRenderOptions (options) {
+    super._configureRenderOptions(options)
     //Only show GM tab if you are GM
-    options.parts = ['header', 'tabs', 'details','description'];
+    options.parts = ['header', 'tabs', 'details', 'description']
     if (game.user.isGM) {
-        options.parts.push('gmTab');
+      options.parts.push('gmTab')
     }
   }
 
   //Activate event listeners using the prepared sheet HTML
-  _onRender(context, options) {
+  /**
+   *
+   * @param context
+   * @param options
+   */
+  _onRender (context, options) {
     this.#dragDrop.forEach((d) => d.bind(this.element))
-    this.element.querySelectorAll('.item-delete').forEach(n => n.addEventListener("dblclick", this.#onItemDelete.bind(this)))
-    this.element.querySelectorAll('.item-view').forEach(n => n.addEventListener("click", this.#onItemView.bind(this)))
+    this.element.querySelectorAll('.item-delete').forEach(n => n.addEventListener('dblclick', this.#onItemDelete.bind(this)))
+    this.element.querySelectorAll('.item-view').forEach(n => n.addEventListener('click', this.#onItemView.bind(this)))
   }
 
   //-----------------------ACTIONS-----------------------------------
@@ -138,7 +159,13 @@ export class AoVSpeciesSheet extends AoVItemSheet {
 
 
   //Allow for a hitlocation being dragged and dropped on to the species sheet
-  async _onDrop(event, type = 'hitloc', collectionName = 'hitlocs') {
+  /**
+   *
+   * @param event
+   * @param type
+   * @param collectionName
+   */
+  async _onDrop (event, type = 'hitloc', collectionName = 'hitlocs') {
     event.preventDefault()
     event.stopPropagation()
 
@@ -155,7 +182,7 @@ export class AoVSpeciesSheet extends AoVItemSheet {
 
       //Dropping in Hit Locaiton list - check the item doesn't already exist
       if (collection.find(el => el.cid === item.flags.aov.cidFlag.id)) {
-        ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.dupItem', { itemName: (item.name +"(" + item.flags.aov.cidFlag.id +")") }));
+        ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.dupItem', { itemName: (item.name +'(' + item.flags.aov.cidFlag.id +')') }))
         continue
       }
       collection.push({ uuid: item.uuid, cid: item.flags.aov.cidFlag.id, rank: item.system.lowRoll })
@@ -166,9 +193,14 @@ export class AoVSpeciesSheet extends AoVItemSheet {
   }
 
   //Delete's a hitloc in the main  list
-  async #onItemDelete(event, collectionName = 'hitlocs') {
-    event.preventDefault();
-    event.stopImmediatePropagation();
+  /**
+   *
+   * @param event
+   * @param collectionName
+   */
+  async #onItemDelete (event, collectionName = 'hitlocs') {
+    event.preventDefault()
+    event.stopImmediatePropagation()
     const item = $(event.currentTarget).closest('.item')
     const itemId = item.data('item-id')
     const itemIndex = this.item.system[collectionName].findIndex(i => (itemId && i.uuid === itemId))
@@ -181,7 +213,11 @@ export class AoVSpeciesSheet extends AoVItemSheet {
 
 
   //View a hitloc from the main list
-  async #onItemView(event) {
+  /**
+   *
+   * @param event
+   */
+  async #onItemView (event) {
     const item = $(event.currentTarget).closest('.item')
     const cid = item.data('cid')
     let tempItem = (await game.aov.cid.fromCIDBest({ cid: cid }))[0]
@@ -190,72 +226,104 @@ export class AoVSpeciesSheet extends AoVItemSheet {
 
 
 
- // DragDrop
- //
- //
+  // DragDrop
+  //
+  //
 
-  _canDragStart(selector) {
+  /**
+   *
+   * @param selector
+   */
+  _canDragStart (selector) {
     // game.user fetches the current user
-    return this.isEditable;
+    return this.isEditable
   }
 
-  _canDragDrop(selector) {
+  /**
+   *
+   * @param selector
+   */
+  _canDragDrop (selector) {
     // game.user fetches the current user
-    return this.isEditable;
+    return this.isEditable
   }
 
 
-  _onDragStart(event) {
-    const li = event.currentTarget;
-    if ('link' in event.target.dataset) return;
+  /**
+   *
+   * @param event
+   */
+  _onDragStart (event) {
+    const li = event.currentTarget
+    if ('link' in event.target.dataset) return
 
-    let dragData = null;
+    let dragData = null
 
     // Active Effect
     if (li.dataset.effectId) {
-      const effect = this.item.effects.get(li.dataset.effectId);
-      dragData = effect.toDragData();
+      const effect = this.item.effects.get(li.dataset.effectId)
+      dragData = effect.toDragData()
     }
 
-    if (!dragData) return;
+    if (!dragData) return
 
     // Set data transfer
-    event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
+    event.dataTransfer.setData('text/plain', JSON.stringify(dragData))
   }
 
-  _onDragOver(event) {}
+  /**
+   *
+   * @param event
+   */
+  _onDragOver (event) {}
 
 
 
-   async _onDropItem(event, data) {
-    if (!this.item.isOwner) return false;
+  /**
+   *
+   * @param event
+   * @param data
+   */
+  async _onDropItem (event, data) {
+    if (!this.item.isOwner) return false
   }
 
-   async _onDropFolder(event, data) {
-    if (!this.item.isOwner) return [];
+  /**
+   *
+   * @param event
+   * @param data
+   */
+  async _onDropFolder (event, data) {
+    if (!this.item.isOwner) return []
   }
 
-   get dragDrop() {
-    return this.#dragDrop;
+  /**
+   *
+   */
+  get dragDrop () {
+    return this.#dragDrop
   }
 
   // This is marked as private because there's no real need
   // for subclasses or external hooks to mess with it directly
-  #dragDrop;
+  #dragDrop
 
-   #createDragDropHandlers() {
+  /**
+   *
+   */
+  #createDragDropHandlers () {
     return this.options.dragDrop.map((d) => {
       d.permissions = {
         dragstart: this._canDragStart.bind(this),
-        drop: this._canDragDrop.bind(this),
-      };
+        drop: this._canDragDrop.bind(this)
+      }
       d.callbacks = {
         dragstart: this._onDragStart.bind(this),
         dragover: this._onDragOver.bind(this),
-        drop: this._onDrop.bind(this),
-      };
-      return new foundry.applications.ux.DragDrop.implementation(d);
-    });
+        drop: this._onDrop.bind(this)
+      }
+      return new foundry.applications.ux.DragDrop.implementation(d)
+    })
   }
 
 }

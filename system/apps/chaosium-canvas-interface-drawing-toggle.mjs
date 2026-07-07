@@ -1,6 +1,9 @@
-import ChaosiumCanvasInterface from "./chaosium-canvas-interface.mjs";
+import ChaosiumCanvasInterface from './chaosium-canvas-interface.mjs'
 
 export default class ChaosiumCanvasInterfaceDrawingToggle extends ChaosiumCanvasInterface {
+  /**
+   *
+   */
   static get PERMISSIONS () {
     return {
       [CONST.DOCUMENT_OWNERSHIP_LEVELS.INHERIT]: 'OWNERSHIP.INHERIT',
@@ -11,22 +14,34 @@ export default class ChaosiumCanvasInterfaceDrawingToggle extends ChaosiumCanvas
     }
   }
 
+  /**
+   *
+   */
   static get icon () {
     return 'fa-solid fa-pencil'
   }
 
+  /**
+   *
+   */
   static get triggerButtons () {
     const buttons = super.triggerButtons
     buttons[ChaosiumCanvasInterfaceDrawingToggle.triggerButton.Both] = 'AOV.ChaosiumCanvasInterface.Buttons.Both'
     return buttons
   }
 
+  /**
+   *
+   */
   static get triggerButton () {
     const button = super.triggerButton
     button.Both = 20
     return button
   }
 
+  /**
+   *
+   */
   static defineSchema () {
     const fields = foundry.data.fields
     return {
@@ -127,10 +142,14 @@ export default class ChaosiumCanvasInterfaceDrawingToggle extends ChaosiumCanvas
         initial: ChaosiumCanvasInterface.triggerButton.Left,
         label: 'AOV.ChaosiumCanvasInterface.DrawingToggle.TriggerAsButton.Title',
         hint: 'AOV.ChaosiumCanvasInterface.DrawingToggle.TriggerAsButton.Hint'
-      }),
+      })
     }
   }
 
+  /**
+   *
+   * @param source
+   */
   static migrateData (source) {
     if (typeof source.triggerButton === 'undefined' && source.regionUuids?.length) {
       source.triggerButton = ChaosiumCanvasInterfaceDrawingToggle.triggerButton.Both
@@ -141,10 +160,17 @@ export default class ChaosiumCanvasInterfaceDrawingToggle extends ChaosiumCanvas
     return source
   }
 
+  /**
+   *
+   */
   async _handleMouseOverEvent () {
     return game.user.isGM
   }
 
+  /**
+   *
+   * @param button
+   */
   async #handleClickEvent (button) {
     let toggle = false
     switch (this.action) {
@@ -210,12 +236,18 @@ export default class ChaosiumCanvasInterfaceDrawingToggle extends ChaosiumCanvas
     }
   }
 
+  /**
+   *
+   */
   async _handleLeftClickEvent () {
     if ([ChaosiumCanvasInterfaceDrawingToggle.triggerButton.Both, ChaosiumCanvasInterface.triggerButton.Left].includes(this.triggerButton)) {
       this.#handleClickEvent(ChaosiumCanvasInterface.triggerButton.Left)
     }
   }
 
+  /**
+   *
+   */
   async _handleRightClickEvent () {
     if ([ChaosiumCanvasInterfaceDrawingToggle.triggerButton.Both, ChaosiumCanvasInterface.triggerButton.Right].includes(this.triggerButton)) {
       this.#handleClickEvent(ChaosiumCanvasInterface.triggerButton.Right)

@@ -1,0 +1,35 @@
+_key: '!items!3HuBls4Fgo5xmrl3'
+_id: 3HuBls4Fgo5xmrl3
+name: Left Arm
+type: hitloc
+folder: null
+img: systems/aov/art-assets/arm-bandage.svg
+_stats:
+  coreVersion: '13.346'
+  createdTime: 1751569087437
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1754457579885
+  systemId: aov
+  systemVersion: '13.6'
+effects: []
+flags:
+  aov:
+    cidFlag:
+      id: i.hitloc.left-arm
+      lang: en
+      priority: 0
+ownership:
+  default: 0
+sort: 0
+system:
+  description: ''
+  gmNotes: ''
+  gridPos: 6
+  highRoll: 18
+  hpMod: -1
+  locType: limb
+  lowRoll: 16
+  npcAP: 0
+  npcDmg: 0

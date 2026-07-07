@@ -3,38 +3,48 @@ export class AOVactorDetails {
   //
   // Get token/actor ID and type
   //
-  static async _getParticipantId(token,actor){
-    let particId = ""
-    let particType = ""
-    let particName = ""
+  /**
+   *
+   * @param token
+   * @param actor
+   */
+  static async _getParticipantId (token, actor){
+    let particId = ''
+    let particType = ''
+    let particName = ''
     if (!token){
       particId = actor.id
-      particType = "actor"
+      particType = 'actor'
       particName = actor.name
     } else {
-      let tokenId = token.uuid.split(".")[3]
+      let tokenId = token.uuid.split('.')[3]
       if (game.actors.tokens[tokenId]) {
         particId = tokenId
-        particType = "token"
+        particType = 'token'
         particName = token.name
       } else {
         particId = token.actor.id
-        particType = "actor"
+        particType = 'actor'
         particName = token.actor.name
       }
     }  
-    let partic = ({particId, particType, particName})
-    return partic;
+    let partic = ({ particId, particType, particName })
+    return partic
   }
 
 
   //
   //Get actor from ID & type
   //
-  static async _getParticipant(particId, particType) {
-    let actor="";
-    if (particType === "token") {
-      actor = game.actors.tokens[particId];
+  /**
+   *
+   * @param particId
+   * @param particType
+   */
+  static async _getParticipant (particId, particType) {
+    let actor=''
+    if (particType === 'token') {
+      actor = game.actors.tokens[particId]
     } else {
       actor = game.actors.get(particId) 
     }
@@ -45,28 +55,36 @@ export class AOVactorDetails {
   //
   //Get Id of target of attack etc
   //
-  static async _getTargetId() {
-    let targetId = "";
-    let targetType = "none";
-    let targetName = "Dummy";
+  /**
+   *
+   */
+  static async _getTargetId () {
+    let targetId = ''
+    let targetType = 'none'
+    let targetName = 'Dummy'
     if (game.user.targets.size > 0) {  
       let target = Array.from(game.user.targets)
       targetName = target[0].document.name
       if (target[0].document.actorLink) {
-        targetId = target[0].document.actorId;
-        targetType = "actor";
+        targetId = target[0].document.actorId
+        targetType = 'actor'
       } else {
-        targetId = target[0].id;
-        targetType = "token";
+        targetId = target[0].id
+        targetType = 'token'
       }
     }
-    let result =({targetId, targetType, targetName});
-    return result;
+    let result =({ targetId, targetType, targetName })
+    return result
   }
 
 
   //Get Actor Image for Id  
-  static async getParticImg (particId,particType) {
+  /**
+   *
+   * @param particId
+   * @param particType
+   */
+  static async getParticImg (particId, particType) {
     if (!particId || !particType) return null
     const actor = await AOVactorDetails._getParticipant(particId, particType)
     return actor.img

@@ -1,6 +1,9 @@
-import ChaosiumCanvasInterface from "./chaosium-canvas-interface.mjs";
+import ChaosiumCanvasInterface from './chaosium-canvas-interface.mjs'
 
 export default class ChaosiumCanvasInterfaceMapPinToggle extends ChaosiumCanvasInterface {
+  /**
+   *
+   */
   static get PERMISSIONS () {
     return {
       [CONST.DOCUMENT_OWNERSHIP_LEVELS.INHERIT]: 'OWNERSHIP.INHERIT',
@@ -11,10 +14,16 @@ export default class ChaosiumCanvasInterfaceMapPinToggle extends ChaosiumCanvasI
     }
   }
 
+  /**
+   *
+   */
   static get icon () {
     return 'fa-solid fa-map-pin'
   }
 
+  /**
+   *
+   */
   static defineSchema () {
     const fields = foundry.data.fields
     return {
@@ -65,6 +74,10 @@ export default class ChaosiumCanvasInterfaceMapPinToggle extends ChaosiumCanvasI
     }
   }
 
+  /**
+   *
+   * @param source
+   */
   static migrateData (source) {
     if (typeof source.toggle !== 'undefined' && typeof source.action === 'undefined') {
       source.action = (source.toggle ? ChaosiumCanvasInterface.actionToggle.On : ChaosiumCanvasInterface.actionToggle.Off)
@@ -72,10 +85,16 @@ export default class ChaosiumCanvasInterfaceMapPinToggle extends ChaosiumCanvasI
     return source
   }
 
+  /**
+   *
+   */
   async _handleMouseOverEvent () {
     return game.user.isGM
   }
 
+  /**
+   *
+   */
   async #handleClickEvent () {
     game.socket.emit('system.aov', { type: 'toggleMapNotes', toggle: true })
     game.settings.set('core', foundry.canvas.layers.NotesLayer.TOGGLE_SETTING, true)
@@ -114,12 +133,18 @@ export default class ChaosiumCanvasInterfaceMapPinToggle extends ChaosiumCanvasI
     }
   }
 
+  /**
+   *
+   */
   async _handleLeftClickEvent () {
     if (this.triggerButton === ChaosiumCanvasInterface.triggerButton.Left) {
       this.#handleClickEvent()
     }
   }
 
+  /**
+   *
+   */
   async _handleRightClickEvent () {
     if (this.triggerButton === ChaosiumCanvasInterface.triggerButton.Right) {
       this.#handleClickEvent()

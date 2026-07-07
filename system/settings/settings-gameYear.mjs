@@ -1,20 +1,20 @@
 const SETTINGS = {
   gameYear: {
-    name: "AOV.Settings.gameYear",
-    hint: "AOV.Settings.gameYearHint",
-    scope: "world",
+    name: 'AOV.Settings.gameYear',
+    hint: 'AOV.Settings.gameYearHint',
+    scope: 'world',
     config: false,
     type: Number,
     default: 977
   },
 
   omens: {
-    name: "AOV.Settings.omens",
-    hint: "AOV.Settings.omensHint",
-    scope: "world",
+    name: 'AOV.Settings.omens',
+    hint: 'AOV.Settings.omensHint',
+    scope: 'world',
     config: false,
     type: String,
-    default: "normal"
+    default: 'normal'
   }
 
 }
@@ -25,7 +25,7 @@ export class AOVGameYearSettings extends HandlebarsApplicationMixin(ApplicationV
     classes: ['aov', 'sheet', 'settings'],
     id: 'gameYear-settings',
     actions: {
-      reset: AOVGameYearSettings.onResetDefaults,
+      reset: AOVGameYearSettings.onResetDefaults
     },
     form: {
       handler: AOVGameYearSettings.formHandler,
@@ -34,17 +34,20 @@ export class AOVGameYearSettings extends HandlebarsApplicationMixin(ApplicationV
     },
     position: {
       width: 550,
-      height: 'auto',
+      height: 'auto'
     },
     tag: 'form',
     window: {
       title: 'AOV.Settings.gameYearSettings',
-      contentClasses: ["standard-form"]
+      contentClasses: ['standard-form']
     }
   }
 
-  get title() {
-    return `${game.i18n.localize(this.options.window.title)}`;
+  /**
+   *
+   */
+  get title () {
+    return `${game.i18n.localize(this.options.window.title)}`
   }
 
   static PARTS = {
@@ -53,7 +56,11 @@ export class AOVGameYearSettings extends HandlebarsApplicationMixin(ApplicationV
   }
 
 
-  async _prepareContext(options) {
+  /**
+   *
+   * @param options
+   */
+  async _prepareContext (options) {
 
     const optSet = {}
     for (const [k, v] of Object.entries(SETTINGS)) {
@@ -67,29 +74,36 @@ export class AOVGameYearSettings extends HandlebarsApplicationMixin(ApplicationV
 
 
     optSet.omensList = {
-      "cursed": game.i18n.localize("AOV.Omens.cursed"),
-      "illfavoured": game.i18n.localize("AOV.Omens.illfavoured"),
-      "normal": game.i18n.localize("AOV.Omens.normal"),
-      "good": game.i18n.localize("AOV.Omens.good"),
-      "blessed": game.i18n.localize("AOV.Omens.blessed")
+      'cursed': game.i18n.localize('AOV.Omens.cursed'),
+      'illfavoured': game.i18n.localize('AOV.Omens.illfavoured'),
+      'normal': game.i18n.localize('AOV.Omens.normal'),
+      'good': game.i18n.localize('AOV.Omens.good'),
+      'blessed': game.i18n.localize('AOV.Omens.blessed')
     }
 
     return {
       optSet,
       buttons: [
-        { type: "submit", icon: "fa-solid fa-save", label: "SETTINGS.Save" },
-        { type: "reset", action: "reset", icon: "fa-solid fa-undo", label: "SETTINGS.Reset" },
+        { type: 'submit', icon: 'fa-solid fa-save', label: 'SETTINGS.Save' },
+        { type: 'reset', action: 'reset', icon: 'fa-solid fa-undo', label: 'SETTINGS.Reset' }
       ]
     }
   }
 
-  static registerSettings() {
+  /**
+   *
+   */
+  static registerSettings () {
     for (const [k, v] of Object.entries(SETTINGS)) {
       game.settings.register('aov', k, v)
     }
   }
 
-  static async onResetDefaults(event) {
+  /**
+   *
+   * @param event
+   */
+  static async onResetDefaults (event) {
     event.preventDefault()
     for await (const [k, v] of Object.entries(SETTINGS)) {
       await game.settings.set('aov', k, v?.default)
@@ -97,11 +111,17 @@ export class AOVGameYearSettings extends HandlebarsApplicationMixin(ApplicationV
     return this.render()
   }
 
-  static async formHandler(event, form, formData) {
+  /**
+   *
+   * @param event
+   * @param form
+   * @param formData
+   */
+  static async formHandler (event, form, formData) {
     const settings = foundry.utils.expandObject(formData.object)
     await Promise.all(
       Object.entries(settings)
-        .map(([key, value]) => game.settings.set("aov", key, value))
+        .map(([key, value]) => game.settings.set('aov', key, value))
     )
   }
 

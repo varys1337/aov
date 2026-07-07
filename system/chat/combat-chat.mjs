@@ -1,12 +1,16 @@
-import { RollType, AOVCheck, CardType } from "../apps/checks.mjs"
-import { OPCard } from "./opposed-chat.mjs"
-import AOVDialog from "../setup/aov-dialog.mjs"
+import { RollType, AOVCheck, CardType } from '../apps/checks.mjs'
+import { OPCard } from './opposed-chat.mjs'
+import AOVDialog from '../setup/aov-dialog.mjs'
 import { AOVactorDetails } from '../apps/actor-details.mjs'
-import { AOVDamage } from "../apps/damage.mjs"
+import { AOVDamage } from '../apps/damage.mjs'
 
 export class COCard {
 
-  static async COResolve(config) {
+  /**
+   *
+   * @param config
+   */
+  static async COResolve (config) {
     let targetMsg = await game.messages.get(config.targetChatId)
     let chatCards = targetMsg.flags.aov.chatCard
     let cardType = targetMsg.flags.aov.cardType
@@ -32,15 +36,15 @@ export class COCard {
 
     //Go through each roll, calc revised Targetscore and roll results
     let newchatCards = []
-    let card = ""
-    let successLevelLabel = ""
+    let card = ''
+    let successLevelLabel = ''
     let counter = -1
     for (let i of chatCards) {
       counter ++
       i.targetAdj = targetAdj
       let revisedtargetScore = i.targetScore + targetAdj
       let rollResult = 100
-      let diceRolled = ""
+      let diceRolled = ''
       let resultLevel = 1
       if (i.combatAction != 'none') {
         let roll = new Roll(chatCards[0].rollFormula)
@@ -50,12 +54,12 @@ export class COCard {
         for (let diceRoll = 0; diceRoll < roll.dice.length; diceRoll++) {
           for (let thisDice = 0; thisDice < roll.dice[diceRoll].values.length; thisDice++) {
             if (thisDice != 0 || diceRoll != 0) {
-              diceRolled = diceRolled + ", "
+              diceRolled = diceRolled + ', '
             }
             diceRolled = diceRolled + roll.dice[diceRoll].values[thisDice]
           }
         }
-          resultLevel = await AOVCheck.successLevel({
+        resultLevel = await AOVCheck.successLevel({
           targetScore: revisedtargetScore,
           rollResult: rollResult,
           cardType,
@@ -80,8 +84,8 @@ export class COCard {
       i.resultLevel = resultLevel
       i.resultLabel = game.i18n.localize('AOV.resultLevel.' + i.resultLevel)
       await OPCard.showDiceRoll(i)
-      i.targetId = ""
-      i.targetType = ""
+      i.targetId = ''
+      i.targetType = ''
       //If there is more than 1 participant then set the other party as the target
       if (chatCards.length > 1) {
         if (counter === 0) {
@@ -100,7 +104,7 @@ export class COCard {
 
     //Work out overall Success Level
     if (newchatCards.length > 1) {
-      successLevelLabel = game.i18n.localize('AOV.COResult.' + newchatCards[1].rollType + "." + newchatCards[0].resultLevel + newchatCards[1].resultLevel)
+      successLevelLabel = game.i18n.localize('AOV.COResult.' + newchatCards[1].rollType + '.' + newchatCards[0].resultLevel + newchatCards[1].resultLevel)
     }
     let combatResult = await COCard.combatResult(newchatCards)
     newchatCards[0].successLevel = combatResult.damageLvl0
@@ -121,7 +125,7 @@ export class COCard {
       'flags.aov.chatCard': newchatCards,
       'flags.aov.state': 'closed',
       'flags.aov.successLevelLabel': successLevelLabel,
-      'flags.aov.successLevelLabelVisible': game.settings.get('aov','combatNarrative'),
+      'flags.aov.successLevelLabelVisible': game.settings.get('aov', 'combatNarrative')
     })
     const pushhtml = await AOVCheck.startChat(targetMsg.flags.aov)
     await targetMsg.update({ content: pushhtml })
@@ -134,42 +138,46 @@ export class COCard {
   // wpnDam 0 = target weapon takes no damage, 1 = 1HP if dam done > HP, 2 = Damage Done -weaponHP, 3 = Damage Done
   // arnourBlock = target's armour absorps damage true/false
   // damageCF = excess damage after weapon is sent on to hit location
-  static async combatResult(chatCards) {
-    let resultData = ""
+  /**
+   *
+   * @param chatCards
+   */
+  static async combatResult (chatCards) {
+    let resultData = ''
     if (chatCards.length < 2) {
       if (chatCards[0].resultLevel < 2) {
         resultData =
-        {
-          rollDamage0: false,
-          damageLvl0: 1,
-          wpnBlock0: false,
-          wpnDam0: 0,
-          armourBlock0: false,
-          damageCF0: false,
-          rollDamage1: false,
-          damageLvl1: 1,
-          wpnBlock1: false,
-          wpnDam1: 0,
-          armourBlock1: false,
-          damageCF1: false,
+          {
+            rollDamage0: false,
+            damageLvl0: 1,
+            wpnBlock0: false,
+            wpnDam0: 0,
+            armourBlock0: false,
+            damageCF0: false,
+            rollDamage1: false,
+            damageLvl1: 1,
+            wpnBlock1: false,
+            wpnDam1: 0,
+            armourBlock1: false,
+            damageCF1: false
 
-        }
+          }
       } else {
         resultData =
-        {
-          rollDamage0: true,
-          damageLvl0: chatCards[0].resultLevel,
-          wpnBlock0: false,
-          wpnDam0: 0,
-          armourBlock0: false,
-          damageCF0: false,
-          rollDamage1: false,
-          damageLvl1: 1,
-          wpnBlock1: false,
-          wpnDam1: 0,
-          armourBlock1: false,
-          damageCF1: false,
-        }
+          {
+            rollDamage0: true,
+            damageLvl0: chatCards[0].resultLevel,
+            wpnBlock0: false,
+            wpnDam0: 0,
+            armourBlock0: false,
+            damageCF0: false,
+            rollDamage1: false,
+            damageLvl1: 1,
+            wpnBlock1: false,
+            wpnDam1: 0,
+            armourBlock1: false,
+            damageCF1: false
+          }
       }
       return resultData
     }
@@ -177,254 +185,258 @@ export class COCard {
     let result = chatCards[1].rollType + chatCards[0].resultLevel + chatCards[1].resultLevel
 
     switch (result) {
-      case "WP41":
-      case "WP40":
-      case "SK42":
-      case "SK41":
-      case "SK40":
-      resultData =
-        {
-          rollDamage0: true,
-          damageLvl0: 4,
-          wpnBlock0: false,
-          wpnDam0: 0,
-          armourBlock0: false,
-          damageCF0: true,
-          rollDamage1: false,
-          damageLvl1: 1,
-          wpnBlock1: false,
-          wpnDam1: 0,
-          armourBlock1: true,
-          damageCF1: false,
-        }
-        break;
-      case "WP42":
+      case 'WP41':
+      case 'WP40':
+      case 'SK42':
+      case 'SK41':
+      case 'SK40':
         resultData =
-        {
-          rollDamage0: true,
-          damageLvl0: 3,
-          wpnBlock0: true,
-          wpnDam0: 3,
-          armourBlock0: false,
-          damageCF0: true,
-          rollDamage1: false,
-          damageLvl1: 1,
-          wpnBlock1: false,
-          wpnDam1: 0,
-          armourBlock1: true,
-          damageCF1: false,
-        }
-        break;
-      case "WP32":
+          {
+            rollDamage0: true,
+            damageLvl0: 4,
+            wpnBlock0: false,
+            wpnDam0: 0,
+            armourBlock0: false,
+            damageCF0: true,
+            rollDamage1: false,
+            damageLvl1: 1,
+            wpnBlock1: false,
+            wpnDam1: 0,
+            armourBlock1: true,
+            damageCF1: false
+          }
+        break
+      case 'WP42':
         resultData =
-        {
-          rollDamage0: true,
-          damageLvl0: 3,
-          wpnBlock0: true,
-          wpnDam0: 2,
-          armourBlock0: true,
-          damageCF0: true,
-          rollDamage1: false,
-          damageLvl1: 1,
-          wpnBlock1: false,
-          wpnDam1: 0,
-          armourBlock1: true,
-          damageCF1: false,
-        }
-        break;
-      case "WP43":
+          {
+            rollDamage0: true,
+            damageLvl0: 3,
+            wpnBlock0: true,
+            wpnDam0: 3,
+            armourBlock0: false,
+            damageCF0: true,
+            rollDamage1: false,
+            damageLvl1: 1,
+            wpnBlock1: false,
+            wpnDam1: 0,
+            armourBlock1: true,
+            damageCF1: false
+          }
+        break
+      case 'WP32':
         resultData =
-        {
-          rollDamage0: true,
-          damageLvl0: 3,
-          wpnBlock0: true,
-          wpnDam0: 1,
-          armourBlock0: false,
-          damageCF0: true,
-          rollDamage1: false,
-          damageLvl1: 1,
-          wpnBlock1: false,
-          wpnDam1: 0,
-          armourBlock1: true,
-          damageCF1: false,
-        }
-        break;
-      case "WP31":
-      case "SK43":
-      case "SK32":
-      case "SK31":
-      case "SK30":
+          {
+            rollDamage0: true,
+            damageLvl0: 3,
+            wpnBlock0: true,
+            wpnDam0: 2,
+            armourBlock0: true,
+            damageCF0: true,
+            rollDamage1: false,
+            damageLvl1: 1,
+            wpnBlock1: false,
+            wpnDam1: 0,
+            armourBlock1: true,
+            damageCF1: false
+          }
+        break
+      case 'WP43':
         resultData =
-        {
-          rollDamage0: true,
-          damageLvl0: 3,
-          wpnBlock0: false,
-          wpnDam0: 0,
-          armourBlock0: true,
-          damageCF0: true,
-          rollDamage1: false,
-          damageLvl1: 1,
-          wpnBlock1: false,
-          wpnDam1: 0,
-          armourBlock1: true,
-          damageCF1: false,
-        }
-        break;
-      case "WP30":
-      resultData =
-        {
-          rollDamage0: true,
-          damageLvl0: 3,
-          wpnBlock0: false,
-          wpnDam0: 0,
-          armourBlock0: false,
-          damageCF0: true,
-          rollDamage1: false,
-          damageLvl1: 1,
-          wpnBlock1: false,
-          wpnDam1: 0,
-          armourBlock1: true,
-          damageCF1: false,
-        }
-        break;
-      case "WP44":
-      case "WP33":
-      case "WP22":
+          {
+            rollDamage0: true,
+            damageLvl0: 3,
+            wpnBlock0: true,
+            wpnDam0: 1,
+            armourBlock0: false,
+            damageCF0: true,
+            rollDamage1: false,
+            damageLvl1: 1,
+            wpnBlock1: false,
+            wpnDam1: 0,
+            armourBlock1: true,
+            damageCF1: false
+          }
+        break
+      case 'WP31':
+      case 'SK43':
+      case 'SK32':
+      case 'SK31':
+      case 'SK30':
         resultData =
-        {
-          rollDamage0: true,
-          damageLvl0: 2,
-          wpnBlock0: true,
-          wpnDam0: 1,
-          armourBlock0: true,
-          damageCF0: true,
-          rollDamage1: false,
-          damageLvl1: 1,
-          wpnBlock1: false,
-          wpnDam1: 0,
-          armourBlock1: true,
-          damageCF1: false,
-        }
-        break;
-      case "WP21":
-      case "WP20":
-      case "WP10":
-      case "SK21":
-      case "SK20":
-      case "SK10":
+          {
+            rollDamage0: true,
+            damageLvl0: 3,
+            wpnBlock0: false,
+            wpnDam0: 0,
+            armourBlock0: true,
+            damageCF0: true,
+            rollDamage1: false,
+            damageLvl1: 1,
+            wpnBlock1: false,
+            wpnDam1: 0,
+            armourBlock1: true,
+            damageCF1: false
+          }
+        break
+      case 'WP30':
         resultData =
-        {
-          rollDamage0: true,
-          damageLvl0: 2,
-          wpnBlock0: false,
-          wpnDam0: 0,
-          armourBlock0: true,
-          damageCF0: true,
-          rollDamage1: false,
-          damageLvl1: 1,
-          wpnBlock1: false,
-          wpnDam1: 0,
-          armourBlock1: true,
-          damageCF1: false,
-        }
-        break;
-      case "WP04":
-      case "WP14":
+          {
+            rollDamage0: true,
+            damageLvl0: 3,
+            wpnBlock0: false,
+            wpnDam0: 0,
+            armourBlock0: false,
+            damageCF0: true,
+            rollDamage1: false,
+            damageLvl1: 1,
+            wpnBlock1: false,
+            wpnDam1: 0,
+            armourBlock1: true,
+            damageCF1: false
+          }
+        break
+      case 'WP44':
+      case 'WP33':
+      case 'WP22':
         resultData =
-        {
-          rollDamage0: false,
-          damageLvl0: 1,
-          wpnBlock0: false,
-          wpnDam0: 0,
-          armourBlock0: true,
-          damageCF0: false,
-          rollDamage1: true,
-          damageLvl1: 3,
-          wpnBlock1: true,
-          wpnDam1: 3,
-          armourBlock1: true,
-          damageCF1: false,
-        }
-        break;
-      case "WP03":
-      case "WP13":
-      case "WP24":
+          {
+            rollDamage0: true,
+            damageLvl0: 2,
+            wpnBlock0: true,
+            wpnDam0: 1,
+            armourBlock0: true,
+            damageCF0: true,
+            rollDamage1: false,
+            damageLvl1: 1,
+            wpnBlock1: false,
+            wpnDam1: 0,
+            armourBlock1: true,
+            damageCF1: false
+          }
+        break
+      case 'WP21':
+      case 'WP20':
+      case 'WP10':
+      case 'SK21':
+      case 'SK20':
+      case 'SK10':
         resultData =
-        {
-          rollDamage0: false,
-          damageLvl0: 1,
-          wpnBlock0: false,
-          wpnDam0: 0,
-          armourBlock0: true,
-          damageCF0: false,
-          rollDamage1: true,
-          damageLvl1: 3,
-          wpnBlock1: true,
-          wpnDam1: 2,
-          armourBlock1: true,
-          damageCF1: false,
-        }
-        break;
-      case "WP02":
-      case "WP23":
-      case "WP34":
-      case "WP12":
+          {
+            rollDamage0: true,
+            damageLvl0: 2,
+            wpnBlock0: false,
+            wpnDam0: 0,
+            armourBlock0: true,
+            damageCF0: true,
+            rollDamage1: false,
+            damageLvl1: 1,
+            wpnBlock1: false,
+            wpnDam1: 0,
+            armourBlock1: true,
+            damageCF1: false
+          }
+        break
+      case 'WP04':
+      case 'WP14':
         resultData =
-        {
-          rollDamage0: false,
-          damageLvl0: 1,
-          wpnBlock0: false,
-          wpnDam0: 0,
-          armourBlock0: true,
-          damageCF0: false,
-          rollDamage1: true,
-          damageLvl1: 2,
-          wpnBlock1: true,
-          wpnDam1: 1,
-          armourBlock1: true,
-          damageCF1: false,
-        }
-        break;
-      case "WP01":
-      case "WP00":
-      case "WP11":
-      case "SK44":
-      case "SK34":
-      case "SK33":
-      case "SK24":
-      case "SK23":
-      case "SK22":
-      case "SK14":
-      case "SK13":
-      case "SK12":
-      case "SK11":
-      case "SK04":
-      case "SK03":
-      case "SK02":
-      case "SK01":
-      case "SK00":
+          {
+            rollDamage0: false,
+            damageLvl0: 1,
+            wpnBlock0: false,
+            wpnDam0: 0,
+            armourBlock0: true,
+            damageCF0: false,
+            rollDamage1: true,
+            damageLvl1: 3,
+            wpnBlock1: true,
+            wpnDam1: 3,
+            armourBlock1: true,
+            damageCF1: false
+          }
+        break
+      case 'WP03':
+      case 'WP13':
+      case 'WP24':
         resultData =
-        {
-          rollDamage0: false,
-          damageLvl0: 1,
-          wpnBlock0: false,
-          wpnDam0: 0,
-          armourBlock0: true,
-          damageCF0: false,
-          rollDamage1: false,
-          damageLvl1: 1,
-          wpnBlock1: false,
-          wpnDam1: 0,
-          armourBlock1: true,
-          damageCF1: false,
-        }
-        break;
-     }
+          {
+            rollDamage0: false,
+            damageLvl0: 1,
+            wpnBlock0: false,
+            wpnDam0: 0,
+            armourBlock0: true,
+            damageCF0: false,
+            rollDamage1: true,
+            damageLvl1: 3,
+            wpnBlock1: true,
+            wpnDam1: 2,
+            armourBlock1: true,
+            damageCF1: false
+          }
+        break
+      case 'WP02':
+      case 'WP23':
+      case 'WP34':
+      case 'WP12':
+        resultData =
+          {
+            rollDamage0: false,
+            damageLvl0: 1,
+            wpnBlock0: false,
+            wpnDam0: 0,
+            armourBlock0: true,
+            damageCF0: false,
+            rollDamage1: true,
+            damageLvl1: 2,
+            wpnBlock1: true,
+            wpnDam1: 1,
+            armourBlock1: true,
+            damageCF1: false
+          }
+        break
+      case 'WP01':
+      case 'WP00':
+      case 'WP11':
+      case 'SK44':
+      case 'SK34':
+      case 'SK33':
+      case 'SK24':
+      case 'SK23':
+      case 'SK22':
+      case 'SK14':
+      case 'SK13':
+      case 'SK12':
+      case 'SK11':
+      case 'SK04':
+      case 'SK03':
+      case 'SK02':
+      case 'SK01':
+      case 'SK00':
+        resultData =
+          {
+            rollDamage0: false,
+            damageLvl0: 1,
+            wpnBlock0: false,
+            wpnDam0: 0,
+            armourBlock0: true,
+            damageCF0: false,
+            rollDamage1: false,
+            damageLvl1: 1,
+            wpnBlock1: false,
+            wpnDam1: 0,
+            armourBlock1: true,
+            damageCF1: false
+          }
+        break
+    }
     return resultData
   }
 
 
-  static async COFumble(config) {
+  /**
+   *
+   * @param config
+   */
+  static async COFumble (config) {
     let targetMsg = await game.messages.get(config.targetChatId)
     let chatCards = targetMsg.flags.aov.chatCard
     let chatCard = chatCards[Number(config.dataset.card)]
@@ -447,20 +459,20 @@ export class COCard {
       particImg: chatCard.particImg,
       rollResult: fumbleResults.roll.total
     }
-    let html = await foundry.applications.handlebars.renderTemplate("systems/aov/templates/chat/fumble.hbs", chatMsgData);
-    let alias = game.i18n.localize("AOV.card.fumble");
-    let chatData = {};
+    let html = await foundry.applications.handlebars.renderTemplate('systems/aov/templates/chat/fumble.hbs', chatMsgData)
+    let alias = game.i18n.localize('AOV.card.fumble')
+    let chatData = {}
     chatData = {
       user: game.user.id,
       style: CONST.CHAT_MESSAGE_STYLES.OTHER,
       content: html,
       speaker: {
         actor: chatCard.particId,
-        alias: alias,
-      },
-    };
+        alias: alias
+      }
+    }
 
-    let msg = await ChatMessage.create(chatData);
+    let msg = await ChatMessage.create(chatData)
 
     if (game.user.isGM) {
       COCard.resolveFum(config)
@@ -476,19 +488,23 @@ export class COCard {
         ui.notifications.warn(game.i18n.localize('AOV.noAvailableGM'))
       }
     }
-    return msg?.id ?? msg?._id ?? null;
+    return msg?.id ?? msg?._id ?? null
   }
 
 
-  static async CODamage(config) {
+  /**
+   *
+   * @param config
+   */
+  static async CODamage (config) {
     let targetMsg = await game.messages.get(config.targetChatId)
     let chatCards = targetMsg.flags.aov.chatCard
     let chatCard = chatCards[Number(config.dataset.card)]
     let newChatCards = []
     let particActor = await AOVactorDetails._getParticipant(
       chatCard.particId,
-      chatCard.particType,
-    );
+      chatCard.particType
+    )
 
 
     //Trigger a damage roll
@@ -509,7 +525,7 @@ export class COCard {
       wpnDam: chatCard.wpnDam,
       armourBlock: chatCard.armourBlock,
       damageCF: chatCard.damageCF,
-      origID: chatCard.origID,
+      origID: chatCard.origID
     })
 
     if (game.user.isGM) {
@@ -529,7 +545,11 @@ export class COCard {
   }
 
   //Update the original Combat Chat Card
-  static async resolveDam(config) {
+  /**
+   *
+   * @param config
+   */
+  static async resolveDam (config) {
     let targetMsg = await game.messages.get(config.targetChatId)
     let chatCards = targetMsg.flags.aov.chatCard
     let newChatCards = []
@@ -547,7 +567,11 @@ export class COCard {
 
 
 
-  static async resolveFum(config) {
+  /**
+   *
+   * @param config
+   */
+  static async resolveFum (config) {
     let targetMsg = await game.messages.get(config.targetChatId)
     let chatCards = targetMsg.flags.aov.chatCard
     let newChatCards = []
@@ -568,7 +592,11 @@ export class COCard {
   }
 
 
-  static async COHitLoc(config) {
+  /**
+   *
+   * @param config
+   */
+  static async COHitLoc (config) {
     let targetMsg = await game.messages.get(config.targetChatId)
     let chatCards = targetMsg.flags.aov.chatCard
     let chatCard = chatCards[0]
@@ -577,64 +605,64 @@ export class COCard {
     let thisUser = game.users.get(chatCard.origID)
     let targetActor = await AOVactorDetails._getParticipant(
       chatCard.targetId,
-      chatCard.targetType,
-    );
+      chatCard.targetType
+    )
     if (targetActor) {
-      let locList = await targetActor.items.filter(itm=>itm.type==='hitloc')
+      let locList = await targetActor.items.filter(itm => itm.type==='hitloc')
       let targetLocList = []
       //If we used a Aimed Attack
-      if(['aimedLimb','aimedTorso'].includes(chatCard.combatAction)) {
+      if(['aimedLimb', 'aimedTorso'].includes(chatCard.combatAction)) {
         if (chatCard.combatAction === 'aimedLimb') {
-          targetLocList = await locList.filter(itm=>itm.system.locType==='limb')
+          targetLocList = await locList.filter(itm => itm.system.locType==='limb')
         } else {
-           targetLocList = await locList.filter(itm=>(itm.system.locType!='limb'&&itm.system.locType!='general'))
+          targetLocList = await locList.filter(itm => (itm.system.locType!='limb'&&itm.system.locType!='general'))
         }
         if (targetLocList.length >0) {
-        let destination = "systems/aov/templates/dialog/hitlocSelect.hbs";
-        let data = {
-          headTitle: game.i18n.localize('AOV.aimedAttack'),
-          healing: false,
-          locList: targetLocList,
-        };
-        const html = await foundry.applications.handlebars.renderTemplate(destination, data);
-        const selected = await AOVDialog.input({
-          window: { title: game.i18n.localize('AOV.aimedAttack') },
-          content: html,
-          ok: {
-            label: game.i18n.localize("AOV.confirm"),
-          },
-        });
-        if(!selected) {return}
-        let hitLoc = targetActor.items.get(selected.selectItem)
-        if (!hitLoc) {return}
-        chatCard.targetLoc = hitLoc.name + " (" + targetActor.name +")";
-        chatCard.targetLocID = selected.selectItem;
-        if (targetActor.type==='npc') {
-          av = hitLoc.system.npcAP
-        } else {
-          av = hitLoc.system.map
-        }
+          let destination = 'systems/aov/templates/dialog/hitlocSelect.hbs'
+          let data = {
+            headTitle: game.i18n.localize('AOV.aimedAttack'),
+            healing: false,
+            locList: targetLocList
+          }
+          const html = await foundry.applications.handlebars.renderTemplate(destination, data)
+          const selected = await AOVDialog.input({
+            window: { title: game.i18n.localize('AOV.aimedAttack') },
+            content: html,
+            ok: {
+              label: game.i18n.localize('AOV.confirm')
+            }
+          })
+          if(!selected) {return}
+          let hitLoc = targetActor.items.get(selected.selectItem)
+          if (!hitLoc) {return}
+          chatCard.targetLoc = hitLoc.name + ' (' + targetActor.name +')'
+          chatCard.targetLocID = selected.selectItem
+          if (targetActor.type==='npc') {
+            av = hitLoc.system.npcAP
+          } else {
+            av = hitLoc.system.map
+          }
         } else {
           //If there's no selectable hit locations then default to normal attack
-          ui.notifications.warn(game.i18n.localize('AOV.noSelectableLocations'));
-          chatCard.combatAction = "attack"
+          ui.notifications.warn(game.i18n.localize('AOV.noSelectableLocations'))
+          chatCard.combatAction = 'attack'
         }
       }
 
-      if (!['aimedLimb','aimedTorso'].includes(chatCard.combatAction)) {
+      if (!['aimedLimb', 'aimedTorso'].includes(chatCard.combatAction)) {
         //Otherwise make a roll
-        let roll = new Roll('1D20');
-        await roll.evaluate();
+        let roll = new Roll('1D20')
+        await roll.evaluate()
         if (game.modules.get('dice-so-nice')?.active) {
           game.dice3d.showForRoll(roll, thisUser, true, null, false)
         }
-        let locRR = roll.total;
-        let locName = "";
-        let targetLocID = "";
+        let locRR = roll.total
+        let locName = ''
+        let targetLocID = ''
         for (let locItem of locList) {
           if (locRR >= locItem.system.lowRoll && locRR <= locItem.system.highRoll) {
-            locName = locItem.name + " (" + targetActor.name +") "
-            locName = locName + " (" + locRR + ")"
+            locName = locItem.name + ' (' + targetActor.name +') '
+            locName = locName + ' (' + locRR + ')'
             targetLocID = locItem._id
             if (targetActor.type==='npc') {
               av = locItem.system.npcAP
@@ -643,8 +671,8 @@ export class COCard {
             }
           }
         }
-        chatCard.targetLoc = locName;
-        chatCard.targetLocID = targetLocID;
+        chatCard.targetLoc = locName
+        chatCard.targetLocID = targetLocID
       }
 
       //Check to see if Armour can absord
@@ -654,30 +682,34 @@ export class COCard {
         chatCard.rollVal = chatCard.rollVal - chatCard.armourAbsorb
       }
 
-      newChatCards.push(chatCard);
+      newChatCards.push(chatCard)
 
-      let newState = 'closed';
+      let newState = 'closed'
       //Built in prep of "apply damage" rules
-      if (game.settings.get('aov','autoDmg')) {newState = "applyDmg"};
+      if (game.settings.get('aov', 'autoDmg')) {newState = 'applyDmg'};
       await targetMsg.update({
         'flags.aov.chatCard': newChatCards,
         'flags.aov.state': newState
-      });
-      const pushhtml = await AOVCheck.startChat(targetMsg.flags.aov);
-      await targetMsg.update({ content: pushhtml });
+      })
+      const pushhtml = await AOVCheck.startChat(targetMsg.flags.aov)
+      await targetMsg.update({ content: pushhtml })
     }
   }
 
 
-  static async COWeaponDamaged(config) {
+  /**
+   *
+   * @param config
+   */
+  static async COWeaponDamaged (config) {
     let targetActor = await AOVactorDetails._getParticipant(
       config.targetId,
-      config.targetType,
-    );
+      config.targetType
+    )
     let targetImg = await AOVactorDetails.getParticImg(
       config.targetId,
-      config.targetType,
-    );
+      config.targetType
+    )
     let targetWeapon = await targetActor.items.get(config.targetWpnId)
     if (targetWeapon) {
       // wpnDam 0 = target weapon takes no damage, 1 = 1HP if dam done > HP, 2 = Damage Done -weaponHP, 3 = Damage Done
@@ -690,68 +722,76 @@ export class COCard {
           damTaken = 1
           break
         case 2:
-          damTaken = config.damageBeforeAbsorb - Math.max(targetWeapon.system.currHP,0)
+          damTaken = config.damageBeforeAbsorb - Math.max(targetWeapon.system.currHP, 0)
           break
         case 3:
           damTaken = config.damageBeforeAbsorb
       }
       if (damTaken > 0) {
-        await targetWeapon.update({'system.currHP': targetWeapon.system.currHP -damTaken})
+        await targetWeapon.update({ 'system.currHP': targetWeapon.system.currHP -damTaken })
         let chatMsgData = {
           particName: targetActor.name,
           particImg: targetImg,
           weaponName: targetWeapon.name,
-          damTaken: damTaken,
+          damTaken: damTaken
         }
-        let html = await foundry.applications.handlebars.renderTemplate('systems/aov/templates/chat/damagedWeapon.hbs', chatMsgData);
+        let html = await foundry.applications.handlebars.renderTemplate('systems/aov/templates/chat/damagedWeapon.hbs', chatMsgData)
         let chatData = {
           user: game.user.id,
           style: CONST.CHAT_MESSAGE_STYLES.OTHER,
           content: html,
           speaker: {
             actor: config.targetId,
-            alias: game.i18n.localize("AOV.weaponDamaged"),
-          },
-        };
-        let msg = await ChatMessage.create(chatData);
-        ui.chat.render();  //Sometimes chat messages weren't showing - hopefully this solves it
+            alias: game.i18n.localize('AOV.weaponDamaged')
+          }
+        }
+        let msg = await ChatMessage.create(chatData)
+        ui.chat.render()  //Sometimes chat messages weren't showing - hopefully this solves it
       }
     } else {
-      ui.notifications.warn(game.i18n.localize('AOV.noTargetID'));
+      ui.notifications.warn(game.i18n.localize('AOV.noTargetID'))
     }
     return
   }
 
 
   //Apply Damage to target
-  static async COApplyDmg(config) {
-    let targetMsg = await game.messages.get(config.targetChatId);
-    let chatCards = targetMsg.flags.aov.chatCard;
-    let chatCard = chatCards[0];
-    let newChatCards = [];
+  /**
+   *
+   * @param config
+   */
+  static async COApplyDmg (config) {
+    let targetMsg = await game.messages.get(config.targetChatId)
+    let chatCards = targetMsg.flags.aov.chatCard
+    let chatCard = chatCards[0]
+    let newChatCards = []
     let targetActor = await AOVactorDetails._getParticipant(
       chatCard.targetId,
-      chatCard.targetType,
-    );
+      chatCard.targetType
+    )
     if (!targetActor) {
-      ui.notifications.warn(game.i18n.localize('AOV.noTargetID'));
-      return;
+      ui.notifications.warn(game.i18n.localize('AOV.noTargetID'))
+      return
     }
     let confirm = await AOVDamage.addWound(targetActor, chatCard.targetLocID, chatCard.rollVal)
     if (confirm) {
       await targetMsg.update({
         'flags.aov.state': 'closed'
-      });
-      const pushhtml = await AOVCheck.startChat(targetMsg.flags.aov);
-      await targetMsg.update({ content: pushhtml });
+      })
+      const pushhtml = await AOVCheck.startChat(targetMsg.flags.aov)
+      await targetMsg.update({ content: pushhtml })
     }
     return
   }
 
 
   //Make a table roll display if Dice so Nice active and return the roll
-  static async tableDiceRoll(table) {
-    const tableResults = await table.roll();
+  /**
+   *
+   * @param table
+   */
+  static async tableDiceRoll (table) {
+    const tableResults = await table.roll()
     if (game.modules.get('dice-so-nice')?.active) {
       game.dice3d.showForRoll(tableResults.roll, game.user, true, null, false)
     }

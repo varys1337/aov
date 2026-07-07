@@ -1,0 +1,26 @@
+_key: '!items!0fwb7PaOKCv24Jm8'
+_id: 0fwb7PaOKCv24Jm8
+name: Axe 1H
+type: weaponcat
+folder: null
+img: systems/aov/art-assets/master-of-arms.svg
+_stats:
+  coreVersion: '13.346'
+  createdTime: 1751569087469
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1754457915768
+  systemId: aov
+  systemVersion: '13.6'
+effects: []
+flags:
+  aov:
+    cidFlag:
+      id: i.weaponcat.axe-1-h
+      lang: en
+      priority: 0
+ownership:
+  default: 0
+sort: 0
+system: {}

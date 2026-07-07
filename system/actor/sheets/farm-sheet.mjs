@@ -1,8 +1,12 @@
-import { AoVActorSheet } from "./base-actor-sheet.mjs"
-import { AOVSelectLists } from "../../apps/select-lists.mjs"
+import { AoVActorSheet } from './base-actor-sheet.mjs'
+import { AOVSelectLists } from '../../apps/select-lists.mjs'
 
 export class AoVFarmSheet extends AoVActorSheet {
-  constructor(options = {}) {
+  /**
+   *
+   * @param options
+   */
+  constructor (options = {}) {
     super(options)
   }
 
@@ -11,7 +15,7 @@ export class AoVFarmSheet extends AoVActorSheet {
     position: {
       width: 610,
       height: 570
-    },
+    }
   }
 
   static PARTS = {
@@ -24,20 +28,28 @@ export class AoVFarmSheet extends AoVActorSheet {
     gmTab: { template: 'systems/aov/templates/actor/farm.gmtab.hbs' }
   }
 
-  async _prepareContext(options) {
+  /**
+   *
+   * @param options
+   */
+  async _prepareContext (options) {
     let context = await super._prepareContext(options)
-    context.tabs = this._getTabs(options.parts);
+    context.tabs = this._getTabs(options.parts)
     context.farmTypeOptions = await AOVSelectLists.farmTypeOptions()
-    context.farmTypeName = game.i18n.localize("AOV.Farm."+context.system.farmType)
+    context.farmTypeName = game.i18n.localize('AOV.Farm.'+context.system.farmType)
     context.farmCircOptions = await AOVSelectLists.farmCircOptions()
-    context.farmCircName = game.i18n.localize("AOV.FarmCirc."+context.system.status)
-    await this._prepareItems(context);
+    context.farmCircName = game.i18n.localize('AOV.FarmCirc.'+context.system.status)
+    await this._prepareItems(context)
     return context
   }
 
   //Handle Actor's Items
-  _prepareItems(context) {
-    const thralls = [];
+  /**
+   *
+   * @param context
+   */
+  _prepareItems (context) {
+    const thralls = []
 
     for (let itm of this.document.items) {
       if (itm.type === 'thrall') {
@@ -48,102 +60,115 @@ export class AoVFarmSheet extends AoVActorSheet {
         thralls.push(itm)
       }
     }
-    context.thralls = thralls.sort(function (a, b) {return a.name.localeCompare(b.name)});
+    context.thralls = thralls.sort(function (a, b) {return a.name.localeCompare(b.name)})
   }
 
 
   /** @override */
-  async _preparePartContext(partId, context) {
+  async _preparePartContext (partId, context) {
     switch (partId) {
       case 'details':
       case 'location':
       case 'thralls':
-        context.tab = context.tabs[partId];
-        break;
+        context.tab = context.tabs[partId]
+        break
       case 'description':
-        context.tab = context.tabs[partId];
+        context.tab = context.tabs[partId]
         context.enrichedDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
           this.actor.system.description,
           {
             async: true,
             secrets: this.document.isOwner,
             rollData: this.actor.getRollData(),
-            relativeTo: this.actor,
+            relativeTo: this.actor
           }
-        );
-        break;
+        )
+        break
       case 'gmTab':
-        context.tab = context.tabs[partId];
+        context.tab = context.tabs[partId]
         context.enrichedGMNotes = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
           this.actor.system.gmNotes,
           {
             async: true,
             secrets: this.document.isOwner,
             rollData: this.actor.getRollData(),
-            relativeTo: this.actor,
+            relativeTo: this.actor
           }
-        );
-        break;
+        )
+        break
     }
-    return context;
+    return context
   }
 
-  _getTabs(parts) {
-    const tabGroup = 'primary';
+  /**
+   *
+   * @param parts
+   */
+  _getTabs (parts) {
+    const tabGroup = 'primary'
     //Default tab
-    if (!this.tabGroups[tabGroup]) this.tabGroups[tabGroup] = 'details';
+    if (!this.tabGroups[tabGroup]) this.tabGroups[tabGroup] = 'details'
     return parts.reduce((tabs, partId) => {
       const tab = {
         cssClass: '',
         group: tabGroup,
         id: '',
         icon: '',
-        label: 'AOV.',
-      };
+        label: 'AOV.'
+      }
       switch (partId) {
         case 'header':
         case 'tabs':
-          return tabs;
+          return tabs
         case 'details':
-          tab.id = 'details';
-          tab.label += 'details';
-          break;
+          tab.id = 'details'
+          tab.label += 'details'
+          break
         case 'location':
-            tab.id = 'location';
-            tab.label += 'Tabs.location';
-            break;
+          tab.id = 'location'
+          tab.label += 'Tabs.location'
+          break
         case 'thralls':
-            tab.id = 'thralls';
-            tab.label += 'Tabs.thralls';
-            break;
+          tab.id = 'thralls'
+          tab.label += 'Tabs.thralls'
+          break
         case 'description':
-          tab.id = 'description';
-          tab.label += 'description';
-          break;
+          tab.id = 'description'
+          tab.label += 'description'
+          break
         case 'gmTab':
-          tab.id = 'gmTab';
-          tab.label += 'gmTab';
-          break;
+          tab.id = 'gmTab'
+          tab.label += 'gmTab'
+          break
       }
-      if (this.tabGroups[tabGroup] === tab.id) tab.cssClass = 'active';
-      tabs[partId] = tab;
-      return tabs;
-    }, {});
+      if (this.tabGroups[tabGroup] === tab.id) tab.cssClass = 'active'
+      tabs[partId] = tab
+      return tabs
+    }, {})
   }
 
-  _configureRenderOptions(options) {
-    super._configureRenderOptions(options);
+  /**
+   *
+   * @param options
+   */
+  _configureRenderOptions (options) {
+    super._configureRenderOptions(options)
     //Only show GM tab if you are GM
-    options.parts = ['header', 'tabs', 'details','thralls', 'location','description'];
+    options.parts = ['header', 'tabs', 'details', 'thralls', 'location', 'description']
     if (game.user.isGM) {
-        options.parts.push('gmTab');
+      options.parts.push('gmTab')
     }
   }
 
   //Activate event listeners using the prepared sheet HTML
-  _onRender(context, _options) {
-    this._dragDrop.forEach((d) => d.bind(this.element));
-    this.element.querySelectorAll('.gridLoc').forEach(n => n.addEventListener("dblclick", this.editLoc.bind(this)))
+  /**
+   *
+   * @param context
+   * @param _options
+   */
+  _onRender (context, _options) {
+    this._dragDrop.forEach((d) => d.bind(this.element))
+    this.element.querySelectorAll('.gridLoc').forEach(n => n.addEventListener('dblclick', this.editLoc.bind(this)))
   }
 
 
@@ -151,10 +176,14 @@ export class AoVFarmSheet extends AoVActorSheet {
 
   //-----------------------LISTENERS-----------------------------------
   //Handle Actor Toggles
-  async editLoc(event) {
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    const newLoc = Number(event.target.dataset.value);
+  /**
+   *
+   * @param event
+   */
+  async editLoc (event) {
+    event.preventDefault()
+    event.stopImmediatePropagation()
+    const newLoc = Number(event.target.dataset.value)
     let valid = false
     if (newLoc >=80 && newLoc <= 83) {valid = true}
     else if (newLoc >=117 && newLoc <= 120) {valid = true}
@@ -189,7 +218,7 @@ export class AoVFarmSheet extends AoVActorSheet {
     else if (newLoc >=800 && newLoc <= 802) {valid = true}
 
     if(valid) {
-      await this.actor.update({ 'system.location': newLoc });
+      await this.actor.update({ 'system.location': newLoc })
     }
   }
 

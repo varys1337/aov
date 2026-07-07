@@ -1,59 +1,72 @@
-import AOVDialog from "../setup/aov-dialog.mjs"
+import AOVDialog from '../setup/aov-dialog.mjs'
 
 export class AoVCombatTracker extends (foundry.applications?.sidebar?.tabs?.CombatTracker ?? CombatTracker) {
-  constructor(options = {}) {
+  /**
+   *
+   * @param options
+   */
+  constructor (options = {}) {
     super(options)
   }
 
   static DEFAULT_OPTIONS = {
     classes: ['aov']
-  };
+  }
 
   /** @override */
   static PARTS = {
     header: {
-      template: "systems/aov/templates/combat/header.hbs"
+      template: 'systems/aov/templates/combat/header.hbs'
     },
     tracker: {
-      template: "systems/aov/templates/combat/tracker.hbs"
+      template: 'systems/aov/templates/combat/tracker.hbs'
     },
     footer: {
-      template: "templates/sidebar/tabs/combat/footer.hbs"
+      template: 'templates/sidebar/tabs/combat/footer.hbs'
     }
-  };
+  }
 
   //Add custome round label with two phases
   /** @inheritDoc */
-  async _preparePartContext(partId, context, options) {
-    context = await super._preparePartContext(partId, context, options);
+  async _preparePartContext (partId, context, options) {
+    context = await super._preparePartContext(partId, context, options)
     switch ( partId ) {
-      case "footer": case "header": await this._prepareCombatContext(context, options); break;
-      case "tracker": await this._prepareTrackerContext(context, options); break;
+      case 'footer': case 'header': await this._prepareCombatContext(context, options); break
+      case 'tracker': await this._prepareTrackerContext(context, options); break
     }
     let round = Number(context?.combat?.round)
-    let roundLabel = ""
-      if (round > 0) {
-      roundLabel = game.i18n.format('COMBAT.Round', {round: Math.ceil(round/2)})
+    let roundLabel = ''
+    if (round > 0) {
+      roundLabel = game.i18n.format('COMBAT.Round', { round: Math.ceil(round/2) })
       if (round/2 === Math.ceil(round/2)) {
-        context.roundLabel = roundLabel + " (" + game.i18n.localize('AOV.action') +")"
+        context.roundLabel = roundLabel + ' (' + game.i18n.localize('AOV.action') +')'
         context.initAdj = false
       } else {
-        context.roundLabel = roundLabel + " (" + game.i18n.localize('AOV.intent') +")"
+        context.roundLabel = roundLabel + ' (' + game.i18n.localize('AOV.intent') +')'
         context.initAdj = true
       }
     }
-    return context;
+    return context
   }
 
   //Activate event listeners using the prepared sheet HTML
-  _onRender(context, _options) {
-    this.element.querySelectorAll('.adjustInit').forEach(n => n.addEventListener("click", this.adjustInit.bind(this)))
+  /**
+   *
+   * @param context
+   * @param _options
+   */
+  _onRender (context, _options) {
+    this.element.querySelectorAll('.adjustInit').forEach(n => n.addEventListener('click', this.adjustInit.bind(this)))
   }
 
-  async adjustInit(event) {
-    const { combatantId } = event.target.closest("[data-combatant-id]")?.dataset ?? {};
-    const combatant = this.viewed?.combatants.get(combatantId);
-    if ( !combatant ) return;
+  /**
+   *
+   * @param event
+   */
+  async adjustInit (event) {
+    const { combatantId } = event.target.closest('[data-combatant-id]')?.dataset ?? {}
+    const combatant = this.viewed?.combatants.get(combatantId)
+    if ( !combatant ) return
     let value = await AoVCombatTracker.adjDex(combatant.name, combatant.initiative)
     if (value) {
       if (game.user.isGM) {
@@ -74,45 +87,55 @@ export class AoVCombatTracker extends (foundry.applications?.sidebar?.tabs?.Comb
   }
 
 
-  static async updateInit(combatantUuid, value) {
+  /**
+   *
+   * @param combatantUuid
+   * @param value
+   */
+  static async updateInit (combatantUuid, value) {
     if (game.user.isGM) {
       let combatant = await fromUuid(combatantUuid)
-      await combatant.update({'initiative': value})
+      await combatant.update({ 'initiative': value })
     }
   }
 
 
   //Get value input
-  static async adjDex(name, init) {
-    let cardLabel = game.i18n.localize('AOV.Combat.combatant') + ": " + name + " [" + init + "]"
+  /**
+   *
+   * @param name
+   * @param init
+   */
+  static async adjDex (name, init) {
+    let cardLabel = game.i18n.localize('AOV.Combat.combatant') + ': ' + name + ' [' + init + ']'
     const data = {
-      cardLabel,
+      cardLabel
     }
 
 
-    const html = await foundry.applications.handlebars.renderTemplate('systems/aov/templates/dialog/dexRanks.hbs', data);
+    const html = await foundry.applications.handlebars.renderTemplate('systems/aov/templates/dialog/dexRanks.hbs', data)
     const dlg = await AOVDialog.input(
       {
-        window: {title: game.i18n.localize('AOV.Combat.adjInit')},
+        window: { title: game.i18n.localize('AOV.Combat.adjInit') },
         content: html,
         ok: {
-          label: game.i18n.localize("AOV.confirm"),
-        },
+          label: game.i18n.localize('AOV.confirm')
+        }
       }
-    );
+    )
     let value = 0
     if (dlg.adjOther) {
       value = dlg.adjOther
     } else {
       switch (dlg.action) {
-        case "draw":
-        case "sheath":
-        case "surprised":
-          value = 5;
-          break;
-        case "move":
-          value = init;
-          break;
+        case 'draw':
+        case 'sheath':
+        case 'surprised':
+          value = 5
+          break
+        case 'move':
+          value = init
+          break
       }
     }
     return value

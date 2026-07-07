@@ -1,0 +1,43 @@
+_key: '!items!MrL5EN2K9QDnqh3a'
+_id: MrL5EN2K9QDnqh3a
+name: Jump
+type: skill
+folder: null
+img: systems/aov/art-assets/anvil.svg
+_stats:
+  coreVersion: '13.348'
+  createdTime: 1751569087453
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1757317419054
+  systemId: aov
+  systemVersion: '13.12'
+effects: []
+flags:
+  aov:
+    cidFlag:
+      id: i.skill.jump
+      lang: en
+      priority: 0
+ownership:
+  default: 0
+sort: 0
+system:
+  base: 0
+  baseVal: dex3
+  category: agi
+  common: true
+  description: ''
+  effects: 0
+  gmNotes: ''
+  home: 0
+  mainName: Jump
+  noXP: false
+  pers: 0
+  specSkill: false
+  specialisation: ''
+  weaponCat: ''
+  weaponType: ''
+  xp: 0
+  xpCheck: false

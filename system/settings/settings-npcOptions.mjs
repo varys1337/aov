@@ -2,31 +2,31 @@ const SETTINGS = {
 
 
   tokenDropMode: {
-    name: "AOV.Settings.tokenDropMode",
-    hint: "AOV.Settings.tokenDropModeHint",
-    scope: "world",
+    name: 'AOV.Settings.tokenDropMode',
+    hint: 'AOV.Settings.tokenDropModeHint',
+    scope: 'world',
     config: false,
-    default: "ask",
+    default: 'ask',
     type: String
   },
 
   tokenVariantStatMode: {
-    name: "AOV.Settings.tokenVariantStatMode",
-    hint: "AOV.Settings.tokenVariantStatModeHint",
-    scope: "world",
+    name: 'AOV.Settings.tokenVariantStatMode',
+    hint: 'AOV.Settings.tokenVariantStatModeHint',
+    scope: 'world',
     config: false,
-    default: "ask",
+    default: 'ask',
     type: String
   },
 
   tokenVariantSkillMode: {
-    name: "AOV.Settings.tokenVariantSkillMode",
-    hint: "AOV.Settings.tokenVariantSkillModeHint",
-    scope: "world",
+    name: 'AOV.Settings.tokenVariantSkillMode',
+    hint: 'AOV.Settings.tokenVariantSkillModeHint',
+    scope: 'world',
     config: false,
-    default: "ask",
+    default: 'ask',
     type: String
-  },
+  }
 
 }
 
@@ -37,7 +37,7 @@ export class AOVNPCSettings extends HandlebarsApplicationMixin(ApplicationV2) {
     classes: ['aov', 'sheet', 'settings'],
     id: 'npc-settings',
     actions: {
-      reset: AOVNPCSettings.onResetDefaults,
+      reset: AOVNPCSettings.onResetDefaults
     },
     form: {
       handler: AOVNPCSettings.formHandler,
@@ -46,17 +46,20 @@ export class AOVNPCSettings extends HandlebarsApplicationMixin(ApplicationV2) {
     },
     position: {
       width: 550,
-      height: 'auto',
+      height: 'auto'
     },
     tag: 'form',
     window: {
       title: 'AOV.Settings.npcSettings',
-      contentClasses: ["standard-form"]
+      contentClasses: ['standard-form']
     }
   }
 
-  get title() {
-    return `${game.i18n.localize(this.options.window.title)}`;
+  /**
+   *
+   */
+  get title () {
+    return `${game.i18n.localize(this.options.window.title)}`
   }
 
   static PARTS = {
@@ -65,8 +68,12 @@ export class AOVNPCSettings extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
 
-  async _prepareContext(options) {
-    const isGM = game.user.isGM;
+  /**
+   *
+   * @param options
+   */
+  async _prepareContext (options) {
+    const isGM = game.user.isGM
     const optSet = {}
     for (const [k, v] of Object.entries(SETTINGS)) {
       optSet[k] = {
@@ -75,20 +82,20 @@ export class AOVNPCSettings extends HandlebarsApplicationMixin(ApplicationV2) {
       }
     }
     let tokenDropModeOptions = {
-      "ask": game.i18n.localize('AOV.Settings.tokenDropModeAsk'),
-      "roll": game.i18n.localize('AOV.Settings.tokenDropModeRoll'),
-      "average": game.i18n.localize('AOV.Settings.tokenDropModeAverage'),
-      "ignore": game.i18n.localize('AOV.Settings.tokenDropModeIgnore')
+      'ask': game.i18n.localize('AOV.Settings.tokenDropModeAsk'),
+      'roll': game.i18n.localize('AOV.Settings.tokenDropModeRoll'),
+      'average': game.i18n.localize('AOV.Settings.tokenDropModeAverage'),
+      'ignore': game.i18n.localize('AOV.Settings.tokenDropModeIgnore')
     }
     let tokenStatModeOptions = {
-      "ask": game.i18n.localize('AOV.Settings.tokenDropModeAsk'),
-      "roll": game.i18n.localize('AOV.Settings.tokenDropModeRoll'),
-      "ignore": game.i18n.localize('AOV.Settings.tokenDropModeIgnore')
+      'ask': game.i18n.localize('AOV.Settings.tokenDropModeAsk'),
+      'roll': game.i18n.localize('AOV.Settings.tokenDropModeRoll'),
+      'ignore': game.i18n.localize('AOV.Settings.tokenDropModeIgnore')
     }
     let tokenSkillModeOptions = {
-      "ask": game.i18n.localize('AOV.Settings.tokenDropModeAsk'),
-      "roll": game.i18n.localize('AOV.Settings.tokenDropModeRoll'),
-      "ignore": game.i18n.localize('AOV.Settings.tokenDropModeIgnore')
+      'ask': game.i18n.localize('AOV.Settings.tokenDropModeAsk'),
+      'roll': game.i18n.localize('AOV.Settings.tokenDropModeRoll'),
+      'ignore': game.i18n.localize('AOV.Settings.tokenDropModeIgnore')
     }
     return {
       tokenDropModeOptions,
@@ -97,19 +104,26 @@ export class AOVNPCSettings extends HandlebarsApplicationMixin(ApplicationV2) {
       isGM,
       optSet,
       buttons: [
-        { type: "submit", icon: "fa-solid fa-save", label: "SETTINGS.Save" },
-        { type: "reset", action: "reset", icon: "fa-solid fa-undo", label: "SETTINGS.Reset" },
+        { type: 'submit', icon: 'fa-solid fa-save', label: 'SETTINGS.Save' },
+        { type: 'reset', action: 'reset', icon: 'fa-solid fa-undo', label: 'SETTINGS.Reset' }
       ]
     }
   }
 
-  static registerSettings() {
+  /**
+   *
+   */
+  static registerSettings () {
     for (const [k, v] of Object.entries(SETTINGS)) {
       game.settings.register('aov', k, v)
     }
   }
 
-  static async onResetDefaults(event) {
+  /**
+   *
+   * @param event
+   */
+  static async onResetDefaults (event) {
     event.preventDefault()
     for await (const [k, v] of Object.entries(SETTINGS)) {
       await game.settings.set('aov', k, v?.default)
@@ -117,11 +131,17 @@ export class AOVNPCSettings extends HandlebarsApplicationMixin(ApplicationV2) {
     return this.render()
   }
 
-  static async formHandler(event, form, formData) {
+  /**
+   *
+   * @param event
+   * @param form
+   * @param formData
+   */
+  static async formHandler (event, form, formData) {
     const settings = foundry.utils.expandObject(formData.object)
     await Promise.all(
       Object.entries(settings)
-        .map(([key, value]) => game.settings.set("aov", key, value))
+        .map(([key, value]) => game.settings.set('aov', key, value))
     )
   }
 }

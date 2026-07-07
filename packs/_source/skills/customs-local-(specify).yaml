@@ -1,0 +1,43 @@
+_key: '!items!WZkXJqzcIZxuStN7'
+_id: WZkXJqzcIZxuStN7
+name: Customs Local (Specify)
+type: skill
+folder: null
+img: systems/aov/art-assets/anvil.svg
+_stats:
+  coreVersion: '13.348'
+  createdTime: 1751569087455
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1757317401524
+  systemId: aov
+  systemVersion: '13.12'
+effects: []
+flags:
+  aov:
+    cidFlag:
+      id: i.skill.customs-local
+      lang: en
+      priority: 0
+ownership:
+  default: 0
+sort: 0
+system:
+  base: 25
+  baseVal: fixed
+  category: knw
+  common: true
+  description: ''
+  effects: 0
+  gmNotes: ''
+  home: 0
+  mainName: Customs Local
+  noXP: false
+  pers: 0
+  specSkill: true
+  specialisation: Specify
+  weaponCat: ''
+  weaponType: ''
+  xp: 0
+  xpCheck: false

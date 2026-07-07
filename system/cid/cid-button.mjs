@@ -3,7 +3,7 @@
 /* global game */
 import { CIDEditor } from './cid-editor.mjs'
 
-export function addCIDSheetHeaderButton(headerButtons, sheet) {
+export function addCIDSheetHeaderButton (headerButtons, sheet) {
   const sheetCID = sheet.object.flags?.aov?.cidFlag
   const noId = (typeof sheetCID === 'undefined' || typeof sheetCID.id === 'undefined' || sheetCID.id === '')
   const CIDEditorButton = {

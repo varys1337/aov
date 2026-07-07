@@ -1,19 +1,22 @@
 export default class AOVDialog extends foundry.applications.api.DialogV2 {
 
   static DEFAULT_OPTIONS = {
-    classes: ["aov","item"],
+    classes: ['aov', 'item'],
     position: {
       width: 400,
-      height: "auto",
+      height: 'auto',
       top: 200,
       left: 1200,
       zIndex: 500
-    },
+    }
   }
+  /**
+   *
+   */
   async _postRender () {
-    let check = this.element.querySelector("#skill-select-form")
+    let check = this.element.querySelector('#skill-select-form')
     if (check) {
-      this.element.querySelector(".window-content").scrollTop = 0
+      this.element.querySelector('.window-content').scrollTop = 0
     }
   }
 }

@@ -1,12 +1,12 @@
-import { AOVDisplaySettings } from "./settings-displayOptions.mjs";
-import { AOVCIDSettings } from "./settings-cidOptions.mjs";
-import { AOVGameYearSettings } from "./settings-gameYear.mjs";
-import { AOVNPCSettings } from "./settings-npcOptions.mjs";
-import { AOVCreateSettings } from "./settings-creationOptions.mjs";
-import { AOVCombatSettings } from "./settings-combatOptions.mjs";
+import { AOVDisplaySettings } from './settings-displayOptions.mjs'
+import { AOVCIDSettings } from './settings-cidOptions.mjs'
+import { AOVGameYearSettings } from './settings-gameYear.mjs'
+import { AOVNPCSettings } from './settings-npcOptions.mjs'
+import { AOVCreateSettings } from './settings-creationOptions.mjs'
+import { AOVCombatSettings } from './settings-combatOptions.mjs'
 
 
-export async function registerSettings() {
+export async function registerSettings () {
   //Game Year Settings Button
   game.settings.registerMenu('aov', 'gameYearSettings', {
     name: 'AOV.Settings.gameYearSettingsHint',
@@ -97,7 +97,7 @@ export async function registerSettings() {
     scope: 'world',
     config: false,
     type: String,
-    default: ""
+    default: ''
   })
 
   game.settings.register('aov', 'showLogo', {

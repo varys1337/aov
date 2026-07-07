@@ -1,0 +1,43 @@
+_key: '!items!0L3yTbrsfbaBMOez'
+_id: 0L3yTbrsfbaBMOez
+name: Read/Write (Specify)
+type: skill
+folder: null
+img: systems/aov/art-assets/anvil.svg
+_stats:
+  coreVersion: '13.348'
+  createdTime: 1751569087451
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1757317429772
+  systemId: aov
+  systemVersion: '13.12'
+effects: []
+flags:
+  aov:
+    cidFlag:
+      id: i.skill.read-write
+      lang: en
+      priority: 0
+ownership:
+  default: 0
+sort: 0
+system:
+  base: 0
+  baseVal: fixed
+  category: knw
+  common: true
+  description: ''
+  effects: 0
+  gmNotes: ''
+  home: 0
+  mainName: Read/Write
+  noXP: false
+  pers: 0
+  specSkill: true
+  specialisation: Specify
+  weaponCat: ''
+  weaponType: ''
+  xp: 0
+  xpCheck: false

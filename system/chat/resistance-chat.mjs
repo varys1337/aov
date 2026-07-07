@@ -1,11 +1,15 @@
-import { AOVCheck } from "../apps/checks.mjs"
-import { OPCard } from "./opposed-chat.mjs"
+import { AOVCheck } from '../apps/checks.mjs'
+import { OPCard } from './opposed-chat.mjs'
 
 export class RECard {
 
 
   //Remove a roll from a resistance card
-  static async RERemove(config) {
+  /**
+   *
+   * @param config
+   */
+  static async RERemove (config) {
     let targetMsg = await game.messages.get(config.targetChatId)
     let rank = config.dataset.rank
     let newChatCards = targetMsg.flags.aov.chatCard
@@ -15,7 +19,11 @@ export class RECard {
   }
 
   //Close a resistance card
-    static async REClose(config) {
+  /**
+   *
+   * @param config
+   */
+  static async REClose (config) {
     let targetMsg = await game.messages.get(config.targetChatId)
     await targetMsg.update({
       'flags.aov.state': 'closed',
@@ -28,7 +36,12 @@ export class RECard {
   }
 
   //Add a new roll to a Resistance Card
-  static async REAdd(config, msgId) {
+  /**
+   *
+   * @param config
+   * @param msgId
+   */
+  static async REAdd (config, msgId) {
     if (game.user.isGM) {
       let targetMsg = await game.messages.get(msgId)
       let maxPart = 2
@@ -58,7 +71,11 @@ export class RECard {
   }
 
   //Resolve a resistance card - roll dice, update and close
-  static async REResolve(config) {
+  /**
+   *
+   * @param config
+   */
+  static async REResolve (config) {
     let targetMsg = await game.messages.get(config.targetChatId)
     let chatCards = targetMsg.flags.aov.chatCard
     let cardType = targetMsg.flags.aov.cardType
@@ -71,13 +88,13 @@ export class RECard {
     await roll.evaluate()
     let rollResult = Number(roll.result)
     let targetScore = chatCards[0].targetScore - chatCards[1].targetScore + 50
-    targetScore = Math.min(Math.max(5, targetScore),95)
+    targetScore = Math.min(Math.max(5, targetScore), 95)
 
-    let diceRolled = ""
+    let diceRolled = ''
     for (let diceRoll = 0; diceRoll < roll.dice.length; diceRoll++) {
       for (let thisDice = 0; thisDice < roll.dice[diceRoll].values.length; thisDice++) {
         if (thisDice != 0 || diceRoll != 0) {
-          diceRolled = diceRolled + ", "
+          diceRolled = diceRolled + ', '
         }
         diceRolled = diceRolled + roll.dice[diceRoll].values[thisDice]
       }
@@ -85,11 +102,11 @@ export class RECard {
 
     let newchatCards = []
     let resultLevel = await AOVCheck.successLevel({
-        targetScore: targetScore,
-        rollResult: rollResult,
-        cardType,
-        critChance: 5,
-        fumbleChance: 5
+      targetScore: targetScore,
+      rollResult: rollResult,
+      cardType,
+      critChance: 5,
+      fumbleChance: 5
     })
 
     for (let i of chatCards) {
@@ -106,7 +123,7 @@ export class RECard {
     await targetMsg.update({
       'flags.aov.chatCard': newchatCards,
       'flags.aov.state': 'closed',
-      'flags.aov.rollResult': rollResult,
+      'flags.aov.rollResult': rollResult
     })
 
     const pushhtml = await AOVCheck.startChat(targetMsg.flags.aov)

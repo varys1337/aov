@@ -1,32 +1,36 @@
-import { AOVUtilities } from "./utilities.mjs";
-import { RECard } from "../chat/resistance-chat.mjs";
-import { AOVCheck } from "./checks.mjs";
-import { COCard } from "../chat/combat-chat.mjs";
-import { AOVCharCreate } from "../actor/charCreate.mjs";
-import { AoVCombatant } from "../combat/combatant.mjs";
-import { AoVCombatTracker } from "../combat/combat-tracker.mjs";
-import { AOVDamage } from "./damage.mjs";
+import { AOVUtilities } from './utilities.mjs'
+import { RECard } from '../chat/resistance-chat.mjs'
+import { AOVCheck } from './checks.mjs'
+import { COCard } from '../chat/combat-chat.mjs'
+import { AOVCharCreate } from '../actor/charCreate.mjs'
+import { AoVCombatant } from '../combat/combatant.mjs'
+import { AoVCombatTracker } from '../combat/combat-tracker.mjs'
+import { AOVDamage } from './damage.mjs'
 
 export class AOVSystemSocket {
 
-  static async callSocket(data) {
+  /**
+   *
+   * @param data
+   */
+  static async callSocket (data) {
     //If a target (to) is specified then only carry this out if its this user
     if (!!data.to && game.userId !== data.to) { return }
     switch (data.type) {
       case 'updateChar':
-        AOVUtilities.updateCharSheets(true);  //True locks the character sheet
-        break;
+        AOVUtilities.updateCharSheets(true)  //True locks the character sheet
+        break
       case 'updateCharCreate':
-        AOVUtilities.updateCharCreate();
-        break;
+        AOVUtilities.updateCharCreate()
+        break
       case 'healChar':
-        AOVUtilities.updateCharSheets(false);  //False doesn't lock the character sheet
-        break;
+        AOVUtilities.updateCharSheets(false)  //False doesn't lock the character sheet
+        break
       case 'REAdd':
         if (data.to === game.user.id) {
-          RECard.REAdd(data.value.config, data.value.msgId);
+          RECard.REAdd(data.value.config, data.value.msgId)
         }
-        break;
+        break
       case 'healHitLoc':
         if (data.to === game.user.id) {
           AOVDamage.healHitLoc(
@@ -36,7 +40,7 @@ export class AOVSystemSocket {
             data.value.config.healingVal
           )
         }
-        break;
+        break
       case 'injureHitLoc':
         if (data.to === game.user.id) {
           AOVDamage.injureHitLoc(
@@ -46,41 +50,41 @@ export class AOVSystemSocket {
             data.value.config.healingVal
           )
         }
-        break;
+        break
       case 'chatUpdate':
         if (data.to === game.user.id) {
-          AOVCheck.handleChatButton(data.value);
+          AOVCheck.handleChatButton(data.value)
         }
-        break;
+        break
       case 'resolveDam':
         if (data.to === game.user.id) {
-          COCard.resolveDam(data.value.config);
+          COCard.resolveDam(data.value.config)
         }
-        break;
+        break
       case 'resolveFum':
         if (data.to === game.user.id) {
-          COCard.resolveFum(data.value.config);
+          COCard.resolveFum(data.value.config)
         }
-        break;
+        break
       case 'weaponDamaged':
         if (data.to === game.user.id) {
-          COCard.COWeaponDamaged(data.value.config);
+          COCard.COWeaponDamaged(data.value.config)
         }
-        break;
+        break
       case 'createFarm':
         if (data.to === game.user.id) {
-          AOVCharCreate.farm(data.value.actor);
+          AOVCharCreate.farm(data.value.actor)
         }
-        break;
+        break
       case 'toggleMapNotes':
         game.settings.set('core', NotesLayer.TOGGLE_SETTING, data.toggle === true)
-        break;
+        break
       case 'combatantImage':
-        AoVCombatant.updateImage(data.value.combatantUuid, data.value.img);
-        break;
+        AoVCombatant.updateImage(data.value.combatantUuid, data.value.img)
+        break
       case 'combatantInit':
-        AoVCombatTracker.updateInit(data.value.combatantUuid, data.value.initiative);
-        break;
+        AoVCombatTracker.updateInit(data.value.combatantUuid, data.value.initiative)
+        break
       case 'toggleMapNotes':
         game.settings.set('core', NotesLayer.TOGGLE_SETTING, data.toggle === true)
         break

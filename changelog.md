@@ -1,5 +1,6 @@
 ## 14.5
 - Roll Table CID button should stop disappearing
+- Item drag and drop functionality moved to Base Item
 
 ## 14.4
 - Stat variants for NPCs now rolling properly

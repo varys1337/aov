@@ -1,67 +1,67 @@
 const SETTINGS = {
 
   randomDice: {
-    name: "AOV.Settings.randomDice",
-    hint: "AOV.Settings.randomDiceHint",
-    scope: "world",
+    name: 'AOV.Settings.randomDice',
+    hint: 'AOV.Settings.randomDiceHint',
+    scope: 'world',
     config: false,
     type: Boolean,
     default: true
   },
 
   allocatedDice: {
-    name: "AOV.Settings.allocatedDice",
-    hint: "AOV.Settings.allocatedDiceHint",
-    scope: "world",
+    name: 'AOV.Settings.allocatedDice',
+    hint: 'AOV.Settings.allocatedDiceHint',
+    scope: 'world',
     config: false,
     type: Boolean,
     default: true
   },
 
   allocatePoints: {
-    name: "AOV.Settings.allocatePoints",
-    hint: "AOV.Settings.allocatePointsHint",
-    scope: "world",
+    name: 'AOV.Settings.allocatePoints',
+    hint: 'AOV.Settings.allocatePointsHint',
+    scope: 'world',
     config: false,
     type: Boolean,
     default: true
   },
 
   binaryGender: {
-    name: "AOV.Settings.binaryGender",
-    hint: "AOV.Settings.binaryGenderHint",
-    scope: "world",
+    name: 'AOV.Settings.binaryGender',
+    hint: 'AOV.Settings.binaryGenderHint',
+    scope: 'world',
     config: false,
     type: Boolean,
     default: true
   },
 
   addThralls: {
-    name: "AOV.Settings.addThralls",
-    hint: "AOV.Settings.addThrallsHint",
-    scope: "world",
+    name: 'AOV.Settings.addThralls',
+    hint: 'AOV.Settings.addThrallsHint',
+    scope: 'world',
     config: false,
     type: Boolean,
     default: true
   },
 
   childDeath: {
-    name: "AOV.Settings.childDeath",
-    hint: "AOV.Settings.childDeathHint",
-    scope: "world",
+    name: 'AOV.Settings.childDeath',
+    hint: 'AOV.Settings.childDeathHint',
+    scope: 'world',
     config: false,
     type: Boolean,
     default: true
   },
 
   showDiceRolls: {
-    name: "AOV.Settings.showDiceRolls",
-    hint: "AOV.Settings.showDiceRollsHint",
-    scope: "world",
+    name: 'AOV.Settings.showDiceRolls',
+    hint: 'AOV.Settings.showDiceRollsHint',
+    scope: 'world',
     config: false,
     type: Boolean,
     default: true
-  },
+  }
 }
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api
@@ -70,7 +70,7 @@ export class AOVCreateSettings extends HandlebarsApplicationMixin(ApplicationV2)
     classes: ['aov', 'sheet', 'settings'],
     id: 'create-settings',
     actions: {
-      reset: AOVCreateSettings.onResetDefaults,
+      reset: AOVCreateSettings.onResetDefaults
     },
     form: {
       handler: AOVCreateSettings.formHandler,
@@ -79,17 +79,20 @@ export class AOVCreateSettings extends HandlebarsApplicationMixin(ApplicationV2)
     },
     position: {
       width: 550,
-      height: 'auto',
+      height: 'auto'
     },
     tag: 'form',
     window: {
       title: 'AOV.Settings.createSettings',
-      contentClasses: ["standard-form"]
+      contentClasses: ['standard-form']
     }
   }
 
-  get title() {
-    return `${game.i18n.localize(this.options.window.title)}`;
+  /**
+   *
+   */
+  get title () {
+    return `${game.i18n.localize(this.options.window.title)}`
   }
 
   static PARTS = {
@@ -98,8 +101,12 @@ export class AOVCreateSettings extends HandlebarsApplicationMixin(ApplicationV2)
   }
 
 
-  async _prepareContext(options) {
-    const isGM = game.user.isGM;
+  /**
+   *
+   * @param options
+   */
+  async _prepareContext (options) {
+    const isGM = game.user.isGM
     const optSet = {}
     for (const [k, v] of Object.entries(SETTINGS)) {
       optSet[k] = {
@@ -111,19 +118,26 @@ export class AOVCreateSettings extends HandlebarsApplicationMixin(ApplicationV2)
       isGM,
       optSet,
       buttons: [
-        { type: "submit", icon: "fa-solid fa-save", label: "SETTINGS.Save" },
-        { type: "reset", action: "reset", icon: "fa-solid fa-undo", label: "SETTINGS.Reset" },
+        { type: 'submit', icon: 'fa-solid fa-save', label: 'SETTINGS.Save' },
+        { type: 'reset', action: 'reset', icon: 'fa-solid fa-undo', label: 'SETTINGS.Reset' }
       ]
     }
   }
 
-  static registerSettings() {
+  /**
+   *
+   */
+  static registerSettings () {
     for (const [k, v] of Object.entries(SETTINGS)) {
       game.settings.register('aov', k, v)
     }
   }
 
-  static async onResetDefaults(event) {
+  /**
+   *
+   * @param event
+   */
+  static async onResetDefaults (event) {
     event.preventDefault()
     for await (const [k, v] of Object.entries(SETTINGS)) {
       await game.settings.set('aov', k, v?.default)
@@ -131,11 +145,17 @@ export class AOVCreateSettings extends HandlebarsApplicationMixin(ApplicationV2)
     return this.render()
   }
 
-  static async formHandler(event, form, formData) {
+  /**
+   *
+   * @param event
+   * @param form
+   * @param formData
+   */
+  static async formHandler (event, form, formData) {
     const settings = foundry.utils.expandObject(formData.object)
     await Promise.all(
       Object.entries(settings)
-        .map(([key, value]) => game.settings.set("aov", key, value))
+        .map(([key, value]) => game.settings.set('aov', key, value))
     )
 
   }

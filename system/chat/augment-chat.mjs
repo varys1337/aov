@@ -1,8 +1,12 @@
-import { AOVCheck } from "../apps/checks.mjs"
-import { OPCard } from "./opposed-chat.mjs"
+import { AOVCheck } from '../apps/checks.mjs'
+import { OPCard } from './opposed-chat.mjs'
 
 export class AUCard {
- static async AUResolve(config) {
+  /**
+   *
+   * @param config
+   */
+  static async AUResolve (config) {
     let targetMsg = await game.messages.get(config.targetChatId)
     let chatCards = targetMsg.flags.aov.chatCard
     let cardType = targetMsg.flags.aov.cardType
@@ -24,11 +28,11 @@ export class AUCard {
       await roll.evaluate()
       let rollResult = Number(roll.result)
 
-      let diceRolled = ""
+      let diceRolled = ''
       for (let diceRoll = 0; diceRoll < roll.dice.length; diceRoll++) {
         for (let thisDice = 0; thisDice < roll.dice[diceRoll].values.length; thisDice++) {
           if (thisDice != 0 || diceRoll != 0) {
-            diceRolled = diceRolled + ", "
+            diceRolled = diceRolled + ', '
           }
           diceRolled = diceRolled + roll.dice[diceRoll].values[thisDice]
         }
@@ -74,11 +78,11 @@ export class AUCard {
 
     await targetMsg.update({
       'flags.aov.chatCard': newchatCards,
-      'flags.aov.state': 'closed',
+      'flags.aov.state': 'closed'
     })
     const pushhtml = await AOVCheck.startChat(targetMsg.flags.aov)
     await targetMsg.update({ content: pushhtml })
     return
 
- }
+  }
 }

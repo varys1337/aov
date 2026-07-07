@@ -1,19 +1,19 @@
-import { AOV } from "../setup/config.mjs";
-import { AOVActor } from "../actor/actor.mjs";
-import { AOVItem } from "../item/item.mjs";
+import { AOV } from '../setup/config.mjs'
+import { AOVActor } from '../actor/actor.mjs'
+import { AOVItem } from '../item/item.mjs'
 import { CID } from '../cid/cid.mjs'
-import { handlebarsHelper } from '../setup/handlebar-helpers.mjs';
+import { handlebarsHelper } from '../setup/handlebar-helpers.mjs'
 import { registerSettings } from '../settings/register-settings.mjs'
 import { registerSheets } from '../setup/register-sheets.mjs'
-import * as models from '../data/_module.mjs';
-import { AOVActiveEffect } from "../apps/active-effects.mjs";
-import { AoVCombatTracker } from "../combat/combat-tracker.mjs";
-import { AoVCombat } from "../combat/combat.mjs";
-import { AoVCombatant } from "../combat/combatant.mjs";
-import { AOVPause } from "../apps/pause.mjs";
-import AOVClickableEvents from "../apps/clickable-events.mjs";
+import * as models from '../data/_module.mjs'
+import { AOVActiveEffect } from '../apps/active-effects.mjs'
+import { AoVCombatTracker } from '../combat/combat-tracker.mjs'
+import { AoVCombat } from '../combat/combat.mjs'
+import { AoVCombatant } from '../combat/combatant.mjs'
+import { AOVPause } from '../apps/pause.mjs'
+import AOVClickableEvents from '../apps/clickable-events.mjs'
 
-export default function Init() {
+export default function Init () {
   //Add classes to global game object
   game.aov = {
     AOVActor,
@@ -29,25 +29,25 @@ export default function Init() {
     toScene: AOVClickableEvents.toScene
   }
   //Add Custom Configuration
-  CONFIG.AOV = AOV;
-    CONFIG.Combat.initiative = {
+  CONFIG.AOV = AOV
+  CONFIG.Combat.initiative = {
     formula: '@abilities.dex.total + (@abilities.int.total/100)',
-    decimals: 2,
-  };
+    decimals: 2
+  }
 
 
   //Register Settings and Handlebar Helpers
-  registerSettings();
-  handlebarsHelper();
+  registerSettings()
+  handlebarsHelper()
 
   // Define custom Document classes
-  CONFIG.Item.documentClass = AOVItem;
-  CONFIG.Actor.documentClass = AOVActor;
-  CONFIG.ActiveEffect.documentClass = AOVActiveEffect;
-  CONFIG.Combat.documentClass = AoVCombat;
-  CONFIG.Combatant.documentClass = AoVCombatant;
-  CONFIG.ui.combat = AoVCombatTracker;
-  CONFIG.ui.pause = AOVPause;
+  CONFIG.Item.documentClass = AOVItem
+  CONFIG.Actor.documentClass = AOVActor
+  CONFIG.ActiveEffect.documentClass = AOVActiveEffect
+  CONFIG.Combat.documentClass = AoVCombat
+  CONFIG.Combatant.documentClass = AoVCombatant
+  CONFIG.ui.combat = AoVCombatTracker
+  CONFIG.ui.pause = AOVPause
 
 
   //Declare Data Models
@@ -79,60 +79,60 @@ export default function Init() {
   CID.init()
   registerSheets()
 
-  Hooks.on("hotbarDrop", (bar, data, slot) => {
+  Hooks.on('hotbarDrop', (bar, data, slot) => {
     if (game.user) {
-      return createItemMacro(data, slot);
+      return createItemMacro(data, slot)
     }
-  });
+  })
 }
 
 //  Hotbar Macros
-function createItemMacro(data, slot) {
+function createItemMacro (data, slot) {
   // First, determine if this is a valid owned item.
-  if (data.type !== "Item") return true;
-  if (!data.uuid.includes("Actor.") && !data.uuid.includes("Token.")) {
-    ui.notifications.warn(game.i18n.localize("AOV.noMacroItemOwner"));
-    return false;
+  if (data.type !== 'Item') return true
+  if (!data.uuid.includes('Actor.') && !data.uuid.includes('Token.')) {
+    ui.notifications.warn(game.i18n.localize('AOV.noMacroItemOwner'))
+    return false
   }
   // If it is, retrieve it based on the uuid.
-    Item.fromDropData(data).then(async (item) => {
+  Item.fromDropData(data).then(async (item) => {
     // Create the macro command using the uuid.
-    const command = `game.aov.rollItemMacro("${data.uuid}");`;
+    const command = `game.aov.rollItemMacro("${data.uuid}");`
     let macro = game.macros.find(
-      (m) => m.name === item.name && m.command === command,
-    );
+      (m) => m.name === item.name && m.command === command
+    )
     if (!macro) {
       macro = await Macro.create({
         name: item.name,
-        type: "script",
+        type: 'script',
         img: item.img,
         command: command,
-        flags: { "aov.itemMacro": true },
-      });
+        flags: { 'aov.itemMacro': true }
+      })
     }
-    game.user.assignHotbarMacro(macro, slot);
+    game.user.assignHotbarMacro(macro, slot)
   })
-  return false;
+  return false
 }
 
 //Create a Macro from an Item drop.
-function rollItemMacro(itemUuid) {
+function rollItemMacro (itemUuid) {
   // Reconstruct the drop data so that we can load the item.
   const dropData = {
-    type: "Item",
-    uuid: itemUuid,
-  };
+    type: 'Item',
+    uuid: itemUuid
+  }
   // Load the item from the uuid.
   Item.fromDropData(dropData).then((item) => {
     // Determine if the item loaded and if it's an owned item.
     if (!item || !item.parent) {
-      const itemName = item?.name ?? itemUuid;
+      const itemName = item?.name ?? itemUuid
       return ui.notifications.warn(
-        game.i18n.format("AOV.noMacroItemFound", { itemName }),
-      );
+        game.i18n.format('AOV.noMacroItemFound', { itemName })
+      )
     }
 
     // Trigger the item roll
-    item.roll();
-  });
+    item.roll()
+  })
 }

@@ -1,9 +1,13 @@
-import AOVDialog from "../setup/aov-dialog.mjs"
-import { COCard } from "../chat/combat-chat.mjs"
+import AOVDialog from '../setup/aov-dialog.mjs'
+import { COCard } from '../chat/combat-chat.mjs'
 
 export class AOVUtilities {
 
-  static toKebabCase(s) {
+  /**
+   *
+   * @param s
+   */
+  static toKebabCase (s) {
     if (!s) {
       return ''
     }
@@ -14,7 +18,11 @@ export class AOVUtilities {
     return match.join('-').toLowerCase()
   }
 
-  static async copyToClipboard(text) {
+  /**
+   *
+   * @param text
+   */
+  static async copyToClipboard (text) {
     try {
       if (navigator.clipboard && window.isSecureContext) {
         return navigator.clipboard.writeText(text)
@@ -42,7 +50,11 @@ export class AOVUtilities {
   }
 
 
-  static quoteRegExp(string) {
+  /**
+   *
+   * @param string
+   */
+  static quoteRegExp (string) {
     // https://bitbucket.org/cggaertner/js-hacks/raw/master/quote.js
     const len = string.length
     let qString = ''
@@ -94,7 +106,12 @@ export class AOVUtilities {
   }
 
 
-  static sortByNameKey(a, b) {
+  /**
+   *
+   * @param a
+   * @param b
+   */
+  static sortByNameKey (a, b) {
     return a.name
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
@@ -107,6 +124,10 @@ export class AOVUtilities {
       )
   }
 
+  /**
+   *
+   * @param toggle
+   */
   static async toggleDevPhase (toggle) {
     let state = await game.settings.get('aov', 'developmentEnabled')
     await game.settings.set('aov', 'developmentEnabled', !state)
@@ -136,6 +157,10 @@ export class AOVUtilities {
     AOVUtilities.updateCharSheets(true)
   }
 
+  /**
+   *
+   * @param toggle
+   */
   static async toggleCreate (toggle) {
     let state = await game.settings.get('aov', 'createEnabled')
     await game.settings.set('aov', 'createEnabled', !state)
@@ -156,6 +181,10 @@ export class AOVUtilities {
     AOVUtilities.updateCharCreate()
   }
 
+  /**
+   *
+   * @param toggle
+   */
   static async toggleVictory (toggle) {
     let state = await game.settings.get('aov', 'victoryEnabled')
     await game.settings.set('aov', 'victoryEnabled', !state)
@@ -194,34 +223,38 @@ export class AOVUtilities {
       if (confirm) {
         let year = game.settings.get('aov', 'gameYear') +1
         await game.settings.set('aov', 'gameYear', year)
-        ui.notifications.info(game.i18n.format('AOV.yearIncreased', { year: year}))
+        ui.notifications.info(game.i18n.format('AOV.yearIncreased', { year: year }))
       }
 
       let omenTable = (await game.aov.cid.fromCIDBest({ cid: 'rt..omens' }))[0]
       if (!omenTable) {
         ui.notifications.error(game.i18n.format('AOV.ErrorMsg.noTable', { tableCID: 'rt..omens' }))
-      return false
-    }
-     const omenConfirm = await AOVDialog.confirm({
-    window: { title: 'AOV.confirm' },
-      content: game.i18n.localize('AOV.rollOmens')
-    })
-    if (omenConfirm) {
-      const omenTableResults = await COCard.tableDiceRoll(omenTable)
-      let omenResult = await omenTableResults.results[0].name
-      let omen = omenResult.toLowerCase().replace("-", "")
-      if (["cursed","illfavoured","normal","good","blessed"].includes(omen)){
-        await game.settings.set('aov', 'omens', omen)
-        ui.notifications.info(game.i18n.format('AOV.newOmens', { omen: omenResult}))
-      } else {
-        ui.notifications.info(game.i18n.format('AOV.ErrorMsg.invalidOmen', { omen: omenResult}))
+        return false
       }
+      const omenConfirm = await AOVDialog.confirm({
+        window: { title: 'AOV.confirm' },
+        content: game.i18n.localize('AOV.rollOmens')
+      })
+      if (omenConfirm) {
+        const omenTableResults = await COCard.tableDiceRoll(omenTable)
+        let omenResult = await omenTableResults.results[0].name
+        let omen = omenResult.toLowerCase().replace('-', '')
+        if (['cursed', 'illfavoured', 'normal', 'good', 'blessed'].includes(omen)){
+          await game.settings.set('aov', 'omens', omen)
+          ui.notifications.info(game.i18n.format('AOV.newOmens', { omen: omenResult }))
+        } else {
+          ui.notifications.info(game.i18n.format('AOV.ErrorMsg.invalidOmen', { omen: omenResult }))
+        }
       }
     }
 
   }
 
-    static updateCharSheets (lock) {
+  /**
+   *
+   * @param lock
+   */
+  static updateCharSheets (lock) {
     if (game.user.isGM) {
       for (const a of game.actors.contents) {
         if (a?.type === 'character' && a?.sheet && a?.sheet?.rendered) {
@@ -243,7 +276,10 @@ export class AOVUtilities {
     }
   }
 
-    static async updateCharCreate () {
+  /**
+   *
+   */
+  static async updateCharCreate () {
     let state = await game.settings.get('aov', 'createEnabled')
     if (game.user.isGM) {
       for (const a of game.actors.contents) {
@@ -268,7 +304,12 @@ export class AOVUtilities {
 
 
 
-  static async getDataFromDropEvent(event, entityType = 'Item') {
+  /**
+   *
+   * @param event
+   * @param entityType
+   */
+  static async getDataFromDropEvent (event, entityType = 'Item') {
     if (event.originalEvent) return []
     try {
       const dataList = JSON.parse(event.dataTransfer.getData('text/plain'))
@@ -288,12 +329,16 @@ export class AOVUtilities {
     }
   }
 
-  static async augmentReset(toggle) {
+  /**
+   *
+   * @param toggle
+   */
+  static async augmentReset (toggle) {
     for (let actr of game.actors) {
-      if (!['character','npc'].includes(actr.type)) continue
+      if (!['character', 'npc'].includes(actr.type)) continue
       let updateItems = []
       for (let itm of actr.items) {
-        if (!['skill','passion'].includes(itm.type)) continue
+        if (!['skill', 'passion'].includes(itm.type)) continue
         if (itm.system.augment) {
           updateItems.push ({ _id: itm._id, 'system.augment': false })
         }

@@ -1,5 +1,5 @@
-import { AOVActor } from "../actor/actor.mjs"
-import AOVDialog from "../setup/aov-dialog.mjs";
+import { AOVActor } from '../actor/actor.mjs'
+import AOVDialog from '../setup/aov-dialog.mjs'
 
 /* global Dialog, game, ui */
 export default async function (document, options, userId) {
@@ -14,38 +14,38 @@ export default async function (document, options, userId) {
 
   // If there is something to roll ask if we should roll it
   if (document._object.actor.type === 'npc') {
-    let dropM = game.settings.get('aov', 'tokenDropMode');
-    let statV = game.settings.get('aov', 'tokenVariantStatMode');
-    let skillV = game.settings.get('aov', 'tokenVariantSkillMode');
+    let dropM = game.settings.get('aov', 'tokenDropMode')
+    let statV = game.settings.get('aov', 'tokenVariantStatMode')
+    let skillV = game.settings.get('aov', 'tokenVariantSkillMode')
 
-    let askStats = false;
-    let askStatVariant = false;
-    let askSkillVariant = false;
+    let askStats = false
+    let askStatVariant = false
+    let askSkillVariant = false
     let askDialog = false
 
     if (dropM === 'ask' && document._object.actor.hasRollableCharacteristics) {
-      askStats = true;
-      askDialog = true;
+      askStats = true
+      askDialog = true
     }
     if (statV === 'ask') {
-      askStatVariant = true;
-      askDialog = true;
+      askStatVariant = true
+      askDialog = true
     }
 
     if (skillV === 'ask') {
-      askSkillVariant = true;
-      askDialog = true;
+      askSkillVariant = true
+      askDialog = true
     }
 
     if (askDialog) {
       let statCreateOptions = {
-        "roll": game.i18n.localize('AOV.Settings.tokenDropModeRoll'),
-        "average": game.i18n.localize('AOV.Settings.tokenDropModeAverage'),
-        "ignore": game.i18n.localize('AOV.Settings.tokenDropModeIgnore')
+        'roll': game.i18n.localize('AOV.Settings.tokenDropModeRoll'),
+        'average': game.i18n.localize('AOV.Settings.tokenDropModeAverage'),
+        'ignore': game.i18n.localize('AOV.Settings.tokenDropModeIgnore')
       }
       let statVariantOptions = {
-        "roll": game.i18n.localize('AOV.Settings.tokenDropModeRoll'),
-        "ignore": game.i18n.localize('AOV.Settings.tokenDropModeIgnore')
+        'roll': game.i18n.localize('AOV.Settings.tokenDropModeRoll'),
+        'ignore': game.i18n.localize('AOV.Settings.tokenDropModeIgnore')
       }
 
 
@@ -54,7 +54,7 @@ export default async function (document, options, userId) {
         askStatVariant,
         askSkillVariant,
         statCreateOptions,
-        statVariantOptions,
+        statVariantOptions
       }
       let choices = await createTokenDialog.tokenDialog(data)
 
@@ -114,15 +114,19 @@ export default async function (document, options, userId) {
 }
 
 export class createTokenDialog {
-  static async tokenDialog(data) {
-      const html = await foundry.applications.handlebars.renderTemplate("systems/aov/templates/dialog/npcTokenCreate.hbs", data);
-      const choices = await AOVDialog.input(
-        {
-          window: {title: game.i18n.localize('AOV.TokenCreationRoll.Title')},
-          content: html,
-          ok: {},
-        }
-      );
-    return choices;
+  /**
+   *
+   * @param data
+   */
+  static async tokenDialog (data) {
+    const html = await foundry.applications.handlebars.renderTemplate('systems/aov/templates/dialog/npcTokenCreate.hbs', data)
+    const choices = await AOVDialog.input(
+      {
+        window: { title: game.i18n.localize('AOV.TokenCreationRoll.Title') },
+        content: html,
+        ok: {}
+      }
+    )
+    return choices
   }
 }

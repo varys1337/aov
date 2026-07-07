@@ -1,4 +1,4 @@
-export const AOV = {};
+export const AOV = {}
 
 AOV.abilities = {
   str: 'AOV.Ability.str',
@@ -7,15 +7,15 @@ AOV.abilities = {
   dex: 'AOV.Ability.dex',
   int: 'AOV.Ability.int',
   pow: 'AOV.Ability.pow',
-  cha: 'AOV.Ability.cha',
-};
+  cha: 'AOV.Ability.cha'
+}
 
 AOV.omensList = {
-  "cursed": "AOV.Omens.cursed",
-  "illfavoured": "AOV.Omens.illfavoured",
-  "normal": "AOV.Omens.normal",
-  "good": "AOV.Omens.good",
-  "blessed": "AOV.Omens.blessed"
+  'cursed': 'AOV.Omens.cursed',
+  'illfavoured': 'AOV.Omens.illfavoured',
+  'normal': 'AOV.Omens.normal',
+  'good': 'AOV.Omens.good',
+  'blessed': 'AOV.Omens.blessed'
 }
 
 AOV.keysActiveEffects = {
@@ -37,9 +37,9 @@ AOV.keysActiveEffects = {
   'system.move.effects': 'AOV.mr',
   'system.powResist': 'AOV.magicDef',
   'system.parryBonus': 'AOV.parryBonus',
-  'system.healing': "AOV.healingAbbr",
-  'system.injure': "AOV.causeInjury",
+  'system.healing': 'AOV.healingAbbr',
+  'system.injure': 'AOV.causeInjury',
   'system.move.penalty': 'AOV.slowed',
   'system.damageObject': 'AOV.damageObject'
-};
+}
 

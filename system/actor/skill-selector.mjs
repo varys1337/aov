@@ -1,12 +1,21 @@
-import AOVDialog from "../setup/aov-dialog.mjs"
+import AOVDialog from '../setup/aov-dialog.mjs'
 
 export class SkillsSelectDialog extends AOVDialog {
 
-  _onRender(context, _options) {
-    this.element.querySelectorAll('.select.rollable').forEach(n => n.addEventListener("click", this._onSelectClicked.bind(this)))
+  /**
+   *
+   * @param context
+   * @param _options
+   */
+  _onRender (context, _options) {
+    this.element.querySelectorAll('.select.rollable').forEach(n => n.addEventListener('click', this._onSelectClicked.bind(this)))
   }
 
-  async _onSelectClicked(event) {
+  /**
+   *
+   * @param event
+   */
+  async _onSelectClicked (event) {
     const chosen = event.currentTarget.closest('.mediumIcon')
     let choice = chosen.dataset.set
     let change = 1
@@ -30,9 +39,16 @@ export class SkillsSelectDialog extends AOVDialog {
     }
   }
 
-  static async create(selectOptions, picks, type,brief) {
-    let destination = 'systems/aov/templates/dialog/skillSelect.hbs';
-    let winTitle = game.i18n.format("AOV.selectItem", { type: type });
+  /**
+   *
+   * @param selectOptions
+   * @param picks
+   * @param type
+   * @param brief
+   */
+  static async create (selectOptions, picks, type, brief) {
+    let destination = 'systems/aov/templates/dialog/skillSelect.hbs'
+    let winTitle = game.i18n.format('AOV.selectItem', { type: type })
     for (let option of selectOptions) {
       option.selected = false
     }
@@ -42,34 +58,34 @@ export class SkillsSelectDialog extends AOVDialog {
       picks,
       added: 0
     }
-    const html = await foundry.applications.handlebars.renderTemplate(destination, data);
+    const html = await foundry.applications.handlebars.renderTemplate(destination, data)
 
     return new Promise(resolve => {
       const dlg = SkillsSelectDialog.wait(
         {
           window: { title: winTitle },
           classes: ['skill-selector'],
-          form: {closeOnSubmit: false },
+          form: { closeOnSubmit: false },
           title: winTitle,
           content: html,
           data,
           buttons:[{
-            label: game.i18n.localize("AOV.confirm"),
+            label: game.i18n.localize('AOV.confirm'),
             callback: (event, button, dialog) => {
               if (dialog.options.data.added < dialog.options.data.picks) {
                 button.disabled = true
               } else {
-              dialog.options.form.closeOnSubmit = true
-              const selected = dialog.options.data.selectOptions.filter(option => (option.selected))
-              return resolve(selected)
+                dialog.options.form.closeOnSubmit = true
+                const selected = dialog.options.data.selectOptions.filter(option => (option.selected))
+                return resolve(selected)
               }
             }
-          }],
+          }]
         }
       )
 
     })
-     return dlg
+    return dlg
   }
 }
 

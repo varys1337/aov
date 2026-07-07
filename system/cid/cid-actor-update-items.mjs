@@ -15,23 +15,26 @@ export class AOVCIDActorUpdateItems extends HandlebarsApplicationMixin(Applicati
       handler: AOVCIDActorUpdateItems.formHandler,
       closeOnSubmit: true,
       submitOnClose: false,
-      submitOnChange: false,
+      submitOnChange: false
     },
     position: {
       width: 600,
-      height: 420,
+      height: 420
     },
     actions: {
-      cancel: AOVCIDActorUpdateItems.onCancel,
+      cancel: AOVCIDActorUpdateItems.onCancel
     },
     window: {
       title: 'AOV.ActorCID.ItemsBest',
-      contentClasses: ["standard-form"],
+      contentClasses: ['standard-form']
     }
   }
 
-  get title() {
-    return `${game.i18n.localize(this.options.window.title)}`;
+  /**
+   *
+   */
+  get title () {
+    return `${game.i18n.localize(this.options.window.title)}`
   }
 
   static PARTS = {
@@ -39,23 +42,31 @@ export class AOVCIDActorUpdateItems extends HandlebarsApplicationMixin(Applicati
     footer: { template: 'templates/generic/form-footer.hbs' }
   }
 
-  async _prepareContext(options) {
+  /**
+   *
+   * @param options
+   */
+  async _prepareContext (options) {
 
     const sheetData = await super._prepareContext()
     sheetData.lang = CONFIG.supportedLanguages[game.i18n.lang] ?? '?'
     sheetData.isEn = game.i18n.lang === 'en'
-    let submitLabel = game.i18n.localize('AOV.ActorCID.ItemsUpdate');
-    let cancelLabel = game.i18n.localize('AOV.cancel');
+    let submitLabel = game.i18n.localize('AOV.ActorCID.ItemsUpdate')
+    let cancelLabel = game.i18n.localize('AOV.cancel')
     return {
       sheetData,
       buttons: [
-        { type: "submit", icon: "fa-solid fa-check", label: submitLabel },
-        { type: "button", action: "cancel", icon: "fa-solid fa-ban", label: cancelLabel }
+        { type: 'submit', icon: 'fa-solid fa-check', label: submitLabel },
+        { type: 'button', action: 'cancel', icon: 'fa-solid fa-ban', label: cancelLabel }
       ]
     }
   }
 
-  getUpdateData(item) {
+  /**
+   *
+   * @param item
+   */
+  getUpdateData (item) {
     const output = {
       flags: {
         aov: {
@@ -89,7 +100,12 @@ export class AOVCIDActorUpdateItems extends HandlebarsApplicationMixin(Applicati
     return output
   }
 
-  async updateActors(actorList, parent) {
+  /**
+   *
+   * @param actorList
+   * @param parent
+   */
+  async updateActors (actorList, parent) {
     if (parent) {
       const unlinkedActors = await actorList.filter(a => a.token?.actorLink === false).map(a => a.id).filter((a, o, v) => v.indexOf(a) === o).reduce(async (c, i) => {
         c.push(await fromUuid('Actor.' + i))
@@ -129,12 +145,18 @@ export class AOVCIDActorUpdateItems extends HandlebarsApplicationMixin(Applicati
       }
       //If there are updates then update the embedded items in the actor
       if (updates.length) {
-        await Item.implementation.updateDocuments(updates, { parent: actor });
+        await Item.implementation.updateDocuments(updates, { parent: actor })
       }
     }
   }
 
-  static async formHandler(event, form, formData) {
+  /**
+   *
+   * @param event
+   * @param form
+   * @param formData
+   */
+  static async formHandler (event, form, formData) {
     const usage = foundry.utils.expandObject(formData.object)
     if (event.submitter.className.indexOf('currently-submitting') > -1) {
       return
@@ -174,11 +196,21 @@ export class AOVCIDActorUpdateItems extends HandlebarsApplicationMixin(Applicati
     }
   }
 
-  static async onCancel(event, form, formData) {
+  /**
+   *
+   * @param event
+   * @param form
+   * @param formData
+   */
+  static async onCancel (event, form, formData) {
     this.close()
   }
 
-  static async create(options = {}) {
+  /**
+   *
+   * @param options
+   */
+  static async create (options = {}) {
     new AOVCIDActorUpdateItems(options).render(true)
   }
 }

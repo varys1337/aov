@@ -24,19 +24,19 @@ export default function (application, element, context, options) {
   }
   select.addEventListener('change', (event) => {
     event.preventDefault()
-    const submitData = application._processFormData(null, application.form, new foundry.applications.ux.FormDataExtended(application.form));
-    const changes = Object.values(submitData.system?.changes ?? {});
-    const initial = application.document.system.schema.fields.changes.element.getInitialValue();
+    const submitData = application._processFormData(null, application.form, new foundry.applications.ux.FormDataExtended(application.form))
+    const changes = Object.values(submitData.system?.changes ?? {})
+    const initial = application.document.system.schema.fields.changes.element.getInitialValue()
     initial.key = event.currentTarget.value
     event.currentTarget.value = ''
-    changes.push(initial);
+    changes.push(initial)
     return application.submit({
       updateData: {
         system: {
           changes
         }
       }
-    });
+    })
   })
   div2.append(select)
   div.append(div2)

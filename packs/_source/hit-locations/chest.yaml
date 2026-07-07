@@ -1,0 +1,35 @@
+_key: '!items!XVBYEiO2m5tHmfKR'
+_id: XVBYEiO2m5tHmfKR
+name: Chest
+type: hitloc
+folder: null
+img: systems/aov/art-assets/arm-bandage.svg
+_stats:
+  coreVersion: '13.346'
+  createdTime: 1751569087438
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1754457566470
+  systemId: aov
+  systemVersion: '13.6'
+effects: []
+flags:
+  aov:
+    cidFlag:
+      id: i.hitloc.chest
+      lang: en
+      priority: 0
+ownership:
+  default: 0
+sort: 0
+system:
+  description: ''
+  gmNotes: ''
+  gridPos: 5
+  highRoll: 12
+  hpMod: 1
+  locType: chest
+  lowRoll: 12
+  npcAP: 0
+  npcDmg: 0

@@ -1,0 +1,43 @@
+_key: '!items!VQkOFl0U75R7XROB'
+_id: VQkOFl0U75R7XROB
+name: Self Bow
+type: skill
+folder: null
+img: systems/aov/art-assets/anvil.svg
+_stats:
+  coreVersion: '13.348'
+  createdTime: 1751569087478
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1757317471439
+  systemId: aov
+  systemVersion: '13.12'
+effects: []
+flags:
+  aov:
+    cidFlag:
+      id: i.skill.self-bow
+      lang: en
+      priority: 0
+ownership:
+  default: 0
+sort: 0
+system:
+  base: 5
+  baseVal: fixed
+  category: cbt
+  common: true
+  description: ''
+  effects: 0
+  gmNotes: ''
+  home: 0
+  mainName: Self Bow
+  noXP: false
+  pers: 0
+  specSkill: false
+  specialisation: ''
+  weaponCat: i.weaponcat.bow
+  weaponType: missile
+  xp: 0
+  xpCheck: false

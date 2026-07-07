@@ -1,9 +1,15 @@
 export class AoVCombatant extends Combatant {
 
-  async _onCreate(data, options, userID) {
-    super._onCreate(data, options, userID);
+  /**
+   *
+   * @param data
+   * @param options
+   * @param userID
+   */
+  async _onCreate (data, options, userID) {
+    super._onCreate(data, options, userID)
     //Don't use token images for combatants as they are too small.  Use actor images
-    if (game.settings.get('aov','combatToken')) {
+    if (game.settings.get('aov', 'combatToken')) {
       let parent = await fromUuid('Actor.'+this.actorId)
       if (game.user.isGM) {
         AoVCombatant.updateImage( this.uuid, parent.img)
@@ -23,10 +29,15 @@ export class AoVCombatant extends Combatant {
   }
 
 
-  static async updateImage(combatantUuid, value) {
+  /**
+   *
+   * @param combatantUuid
+   * @param value
+   */
+  static async updateImage (combatantUuid, value) {
     if (game.user.isGM) {
       let combatant = await fromUuid(combatantUuid)
-      await combatant.update({'img': value})
+      await combatant.update({ 'img': value })
     }
   }
 

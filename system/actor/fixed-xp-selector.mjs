@@ -1,12 +1,21 @@
-import AOVDialog from "../setup/aov-dialog.mjs"
+import AOVDialog from '../setup/aov-dialog.mjs'
 
 export class FixedXPDialog extends AOVDialog {
 
-  _onRender(context, _options) {
-    this.element.querySelectorAll('.select.rollable').forEach(n => n.addEventListener("click", this._onSelectClicked.bind(this)))
+  /**
+   *
+   * @param context
+   * @param _options
+   */
+  _onRender (context, _options) {
+    this.element.querySelectorAll('.select.rollable').forEach(n => n.addEventListener('click', this._onSelectClicked.bind(this)))
   }
 
-  async _onSelectClicked(event) {
+  /**
+   *
+   * @param event
+   */
+  async _onSelectClicked (event) {
     const chosen = event.currentTarget.closest('.mediumIcon')
     let choice = chosen.dataset.set
 
@@ -24,13 +33,17 @@ export class FixedXPDialog extends AOVDialog {
 
 
 
-  static async create(selectOptions) {
-    let destination = 'systems/aov/templates/dialog/fixedXP.hbs';
-    let winTitle = game.i18n.localize("AOV.fixedXP");
+  /**
+   *
+   * @param selectOptions
+   */
+  static async create (selectOptions) {
+    let destination = 'systems/aov/templates/dialog/fixedXP.hbs'
+    let winTitle = game.i18n.localize('AOV.fixedXP')
     let data = {
-      selectOptions,
+      selectOptions
     }
-    const html = await foundry.applications.handlebars.renderTemplate(destination, data);
+    const html = await foundry.applications.handlebars.renderTemplate(destination, data)
 
     return new Promise(resolve => {
       const dlg = FixedXPDialog.wait(
@@ -40,12 +53,12 @@ export class FixedXPDialog extends AOVDialog {
           content: html,
           data,
           buttons: [{
-            label: game.i18n.localize("AOV.confirm"),
+            label: game.i18n.localize('AOV.confirm'),
             callback: (event, button, dialog) => {
               const selected = dialog.options.data.selectOptions.filter(option => (option.selected))
               return resolve(selected)
             }
-          }],
+          }]
         }
       )
 

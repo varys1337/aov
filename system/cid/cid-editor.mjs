@@ -7,41 +7,49 @@ export class CIDEditor extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static DEFAULT_OPTIONS = {
     tag: 'form',
-    name: "cidEditor",
+    name: 'cidEditor',
     classes: ['aov', 'dialog', 'cid-editor'],
     form: {
       handler: CIDEditor._updateObject,
       closeOnSubmit: false,
       submitOnClose: true,
-      submitOnChange: true,
+      submitOnChange: true
     },
     position: {
       width: 900,
-      height: "auto",
+      height: 'auto'
     },
     actions: {
       copyToClip: CIDEditor.copyToClip,
-      guess: CIDEditor.guessID,
+      guess: CIDEditor.guessID
     },
 
 
 
     window: {
       title: 'AOV.CIDFlag.title',
-      contentClasses: ["standard-form"],
+      contentClasses: ['standard-form']
     }
   }
 
-  get title() {
-    return `${game.i18n.localize(this.options.window.title)}`;
+  /**
+   *
+   */
+  get title () {
+    return `${game.i18n.localize(this.options.window.title)}`
   }
 
   static PARTS = {
-    form: { template: 'systems/aov/templates/cid/cid-editor.hbs' },
+    form: { template: 'systems/aov/templates/cid/cid-editor.hbs' }
   }
 
+  /**
+   *
+   * @param application
+   * @param element
+   */
   static addCIDSheetHeaderButton (application, element) {
-    if (!element.querySelector("button.header-control.fa-solid.fa-fingerprint")) {
+    if (!element.querySelector('button.header-control.fa-solid.fa-fingerprint')) {
       application.options.actions.cid = {
         handler: (event, element) => {
           event.preventDefault()
@@ -71,7 +79,11 @@ export class CIDEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     }
   }
 
-  async _prepareContext(options) {
+  /**
+   *
+   * @param options
+   */
+  async _prepareContext (options) {
 
     this.document = this.options.document
     const sheetData = await super._prepareContext()
@@ -115,9 +127,9 @@ export class CIDEditor extends HandlebarsApplicationMixin(ApplicationV2) {
           folder: d?.folder?.name
         }
       }))
-      const uniqueWorldPriorityCount = new Set(worldDocuments.map((d) => d.flags.aov.cidFlag.priority)).size;
+      const uniqueWorldPriorityCount = new Set(worldDocuments.map((d) => d.flags.aov.cidFlag.priority)).size
       if (uniqueWorldPriorityCount !== worldDocuments.length) {
-        sheetData.warnDuplicateWorldPriority = true;
+        sheetData.warnDuplicateWorldPriority = true
       }
       sheetData.worldDuplicates = worldDocuments.length ?? 0
 
@@ -136,9 +148,9 @@ export class CIDEditor extends HandlebarsApplicationMixin(ApplicationV2) {
         }
       }))
 
-      const uniqueCompendiumPriorityCount = new Set(compendiumDocuments.map((d) => d.flags.aov.cidFlag.priority)).size;
+      const uniqueCompendiumPriorityCount = new Set(compendiumDocuments.map((d) => d.flags.aov.cidFlag.priority)).size
       if (uniqueCompendiumPriorityCount !== compendiumDocuments.length) {
-        sheetData.warnDuplicateCompendiumPriority = true;
+        sheetData.warnDuplicateCompendiumPriority = true
       }
       sheetData.compendiumDuplicates = compendiumDocuments.length ?? 0
     } else {
@@ -152,37 +164,52 @@ export class CIDEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     return sheetData
   }
 
-  _onRender(context, options) {
+  /**
+   *
+   * @param context
+   * @param options
+   */
+  _onRender (context, options) {
     if (this.element.querySelector('input[name=_existing')) {
-      this.element.querySelector('input[name=_existing').addEventListener("change", function (e) {
+      this.element.querySelector('input[name=_existing').addEventListener('change', function (e) {
         const obj = $(this)
         const prefix = obj.data('prefix')
         let value = obj.val()
         if (value !== '') {
           value = prefix + AOVUtilities.toKebabCase(value)
         }
-        let target = document.querySelector('input[name=id]');
+        let target = document.querySelector('input[name=id]')
         target.value = value
       })
     }
 
 
     if (this.element.querySelector('select[name=known]')) {
-      this.element.querySelector('select[name=known]').addEventListener("change", function (e) {
+      this.element.querySelector('select[name=known]').addEventListener('change', function (e) {
         const obj = $(this)
         let value = obj.val()
-        let target = document.querySelector('input[name=id]');
+        let target = document.querySelector('input[name=id]')
         target.value = value
       })
     }
 
   }
 
-  static async copyToClip(event, target) {
+  /**
+   *
+   * @param event
+   * @param target
+   */
+  static async copyToClip (event, target) {
     await AOVUtilities.copyToClipboard($(target).siblings('input').val())
   }
 
-  static async guessID(event, target) {
+  /**
+   *
+   * @param event
+   * @param target
+   */
+  static async guessID (event, target) {
     const guess = target.dataset.guess
     const priority = this.document.flags.aov?.cidFlag?.priority ?? 0
     const lang = this.document.flags.aov?.cidFlag?.lang ?? game.i18n.lang
@@ -190,7 +217,7 @@ export class CIDEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     await this.document.update({
       'flags.aov.cidFlag.id': guess,
       'flags.aov.cidFlag.lang': lang,
-      'flags.aov.cidFlag.priority': priority,
+      'flags.aov.cidFlag.priority': priority
     })
     const html = $(this.document.sheet.element).find('header.window-header .edit-cid-warning,header.window-header .edit-cid-exisiting')
     if (html.length) {
@@ -201,7 +228,13 @@ export class CIDEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     this.render()
   }
 
-  static async _updateObject(event, form, formData) {
+  /**
+   *
+   * @param event
+   * @param form
+   * @param formData
+   */
+  static async _updateObject (event, form, formData) {
     const usage = foundry.utils.expandObject(formData.object)
     const id = usage.id || ''
     const priority = usage.priority || 0
@@ -209,7 +242,7 @@ export class CIDEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     await this.document.update({
       'flags.aov.cidFlag.id': id,
       'flags.aov.cidFlag.lang': lang,
-      'flags.aov.cidFlag.priority': priority,
+      'flags.aov.cidFlag.priority': priority
     })
     const html = $(this.document.sheet.element).find('header.window-header .edit-cid-warning,header.window-header .edit-cid-exisiting')
     if (html.length) {

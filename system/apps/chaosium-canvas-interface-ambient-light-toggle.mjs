@@ -2,6 +2,9 @@
 import ChaosiumCanvasInterface from './chaosium-canvas-interface.mjs'
 
 export default class ChaosiumCanvasInterfaceAmbientLightToggle extends ChaosiumCanvasInterface {
+  /**
+   *
+   */
   static get actionToggles () {
     const buttons = super.actionToggles
     buttons[ChaosiumCanvasInterface.actionToggle.On] = 'AOV.ChaosiumCanvasInterface.AmbientLightToggle.Action.On'
@@ -9,10 +12,16 @@ export default class ChaosiumCanvasInterfaceAmbientLightToggle extends ChaosiumC
     return buttons
   }
 
+  /**
+   *
+   */
   static get icon () {
     return 'fa-regular fa-lightbulb'
   }
 
+  /**
+   *
+   */
   static defineSchema () {
     const fields = foundry.data.fields
     return {
@@ -41,10 +50,16 @@ export default class ChaosiumCanvasInterfaceAmbientLightToggle extends ChaosiumC
     }
   }
 
+  /**
+   *
+   */
   async _handleMouseOverEvent () {
     return game.user.isGM
   }
 
+  /**
+   *
+   */
   async #handleClickEvent () {
     let toggle = false
     switch (this.action) {
@@ -71,12 +86,18 @@ export default class ChaosiumCanvasInterfaceAmbientLightToggle extends ChaosiumC
     }
   }
 
+  /**
+   *
+   */
   async _handleLeftClickEvent () {
     if (this.triggerButton === ChaosiumCanvasInterface.triggerButton.Left) {
       this.#handleClickEvent()
     }
   }
 
+  /**
+   *
+   */
   async _handleRightClickEvent () {
     if (this.triggerButton === ChaosiumCanvasInterface.triggerButton.Right) {
       this.#handleClickEvent()

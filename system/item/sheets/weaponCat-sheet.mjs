@@ -1,7 +1,11 @@
-import { AoVItemSheet } from "./base-item-sheet.mjs"
+import { AoVItemSheet } from './base-item-sheet.mjs'
 
 export class AoVWeaponCatSheet extends AoVItemSheet {
-  constructor(options = {}) {
+  /**
+   *
+   * @param options
+   */
+  constructor (options = {}) {
     super(options)
   }
 
@@ -10,21 +14,25 @@ export class AoVWeaponCatSheet extends AoVItemSheet {
     position: {
       width: 600,
       height: 150
-    },
+    }
   }
 
   static PARTS = {
-    header: { template: 'systems/aov/templates/item/item.header.hbs' },
+    header: { template: 'systems/aov/templates/item/item.header.hbs' }
   }
 
-  async _prepareContext(options) {
+  /**
+   *
+   * @param options
+   */
+  async _prepareContext (options) {
     let context = await super._prepareContext(options)
     return context
   }
 
   /** @override */
-  async _preparePartContext(partId, context) {
-    return context;
+  async _preparePartContext (partId, context) {
+    return context
   }
 
 

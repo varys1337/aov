@@ -1,0 +1,112 @@
+_key: '!journal!fmAbF04foYlYRFiE'
+_id: fmAbF04foYlYRFiE
+name: Instructions
+folder: null
+_stats:
+  coreVersion: '13.351'
+  createdTime: 1759074473038
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1780553553218
+  systemId: aov
+  systemVersion: '13.26'
+categories: {}
+flags:
+  aov:
+    css-adventure-entry: true
+    fixed-adventure-heading: true
+ownership:
+  default: 0
+pages:
+  - _key: '!journal.pages!fmAbF04foYlYRFiE.3IEgFxSSlurMJXVf'
+    _id: 3IEgFxSSlurMJXVf
+    name: Instructions
+    type: text
+    _stats:
+      coreVersion: '13.351'
+      createdTime: 1759074480459
+      duplicateSource: null
+      exportSource: null
+      lastModifiedBy: PackAgeOfVikings
+      modifiedTime: 1780553565016
+      systemId: aov
+      systemVersion: '13.13'
+    category: null
+    flags: {}
+    image: {}
+    ownership:
+      default: -1
+    sort: 100000
+    src: null
+    system: {}
+    text:
+      content: "<p>The instructions for the game are over on the wiki for the Age of Vikings Foundry system. You can find them at:</p><p>\_</p><p><a href=\"https://github.com/cragstone/aov/wiki\">Home · cragstone/aov Wiki</a></p><p>\_</p><p>By keeping them outside of the Foundry system it will allow for more rapid and frequent updates without the constant need to refresh the game system.</p><p>\_</p><p>Any suggestions for new pages, updates, corrections then please contact us via Github or the Chaosium Discord server.</p><p></p>"
+      format: 1
+    title:
+      level: 1
+      show: false
+    video:
+      controls: true
+      volume: 0.5
+  - _key: '!journal.pages!fmAbF04foYlYRFiE.whxZ0KQeXQf12ttH'
+    _id: whxZ0KQeXQf12ttH
+    name: Character Creation
+    type: text
+    _stats:
+      coreVersion: '14.364'
+      createdTime: 1759255593764
+      duplicateSource: null
+      exportSource: null
+      lastModifiedBy: PackAgeOfVikings
+      modifiedTime: 1781939412026
+      systemId: aov
+      systemVersion: '13.14'
+    category: null
+    flags: {}
+    image: {}
+    ownership:
+      default: -1
+    sort: 200000
+    src: null
+    system: {}
+    text:
+      content: "<p>You can create characters in a number of ways</p><p></p><ul class=\"jnl\"><li><p>You can edit everything manually on the character sheet</p></li><li><p>You can drag items to the character sheet (Homeland, Species etc) and do other party manually (such as choosing which skills to increase) or make history rolls (a hybrid approach)</p></li><li><p>You can use the Character Creation Phase from the GM Tools, this is what we are covering here - but this can be used as guidelines to creating the character manually.</p></li></ul><p>\_</p><p>The steps for Character Creation are:</p><ul class=\"jnl\"><li><p>Create Character</p></li><li><p>Choose Gender</p></li><li><p>Add Name, Meaning and Nickname</p></li><li><p>Set year of Birth</p></li><li><p>Add a Species</p></li><li><p>Choose a Homeland</p></li><li><p>Determine Characteristics</p></li><li><p>Roll History</p></li><li><p>Select Personal Skills</p></li><li><p>Choose Devotions</p></li><li><p>Determine Family</p></li><li><p>Roll for Farm type</p></li><li><p>Select starting weapons</p></li><li><p>Determine distinctive features</p></li></ul><p>\_</p><p><strong>Create a new character</strong></p><ul class=\"jnl\"><li><p>Go to the Actors Directory</p></li><li><p>Click on Create item</p></li><li><p>You can leave the name with the default \"Character\" name</p></li><li><p>Select the type \"Character\"</p></li><li><p>In the open character sheet go to the \"Stats\" tab (it may default to this)</p></li></ul><p>\_</p><p>The areas in gold are where we need to make some choices.</p><p></p><p>\_</p><img src=\"systems/aov/art-assets/charcreation.webp\"><p>\_</p><p><strong>Gender</strong> - first choose a gender - either from the drop down menu or enter text depending on your Game Settings</p><p>\_</p><p><strong>Name</strong> - either enter a name or click on the D20 to roll a random name. Depending on which name tables exist, and the gender options you have set in Game Settings either a name (and meaning) will be rolled and added or you will be asked if you want to role a male or female name for first name, patrionic name and if you want to use \"son\" or \"dottir\" for the patrionic suffix</p><p>\_</p><p><strong>Nickname</strong> - either enter a nickname or click on the D20 icon to roll a random nickname, if the nickname table exists</p><p>\_</p><p><strong>Personality</strong> - select a personality from the drop down menu or click the D20 icon to roll a random personality. The relevant Skill Category bonuses are automatically updated for the personality. Enter a relevant spirit animal.</p><p>\_</p><p><strong>Born</strong> - enter the year you were born (age is automatically calculated based on this and the game year)</p><p>\_</p><p>The following entries are on the \"Stats\" tab - if you can't see them then click on the tab (shown with the arrow in the screen shot above)</p><p>\_</p><p><strong>Species</strong> - drag a Species on to the character - this will determine the Characteristic Dice, Min/Max values and Hit Locations. If you have added a Species item to the character then you will see a red cross to the right of the species - double click this to delete the species. If you don't want to add a species you can simply type a species name in.</p><p>\_</p><p><strong>Homeland</strong> - drag a Homeland on to the character - this will determine starting skills, passions and equipment and determine which History tables to roll. If you have added a Homeland item to the character then you will see a red cross to the right of the homeland - double click this to delete the homeland. If you don't want to add a homeland you can simply type a homeland name in.</p><p>\_</p><p><strong>Characteristics</strong> - you have three options for determining characteristics:</p><ul><li><p>Roll Dice Randomly (pair of dice icon) - dice are rolled based on the \"Dice\" value in stats in a fixed order. Results are shown in a chat message</p></li><li><p>Roll Dice and Assign them (cube icon) - dice are rolled and then you assign the values to the stats. Results are shown in a chat message</p></li><li><p>Spend points (pencil icon)</p></li></ul><p>You should only re-roll stats with your GMs agreement</p><p>\_</p><p><strong>History</strong> - subject to the appropriate tables being available the Histories set out in the Homeland will be rolled automatically. Where you need to make choices then these will be presented to you in a series of dialogue boxes. All new skills, improvements, equipment etc will be added to the character and relevant History items added as well. A chat message will show the results. If at any point your grandparent or parent dies then any subsequent rolls for them are skipped. You can erase the histories by clicking the grey broom icon and then re-clicking the history icon</p><p>\_</p><p><strong>Personal Skills</strong> - you will be presented with a dialogue box to select the relevant skills that can be improved, five with a 25% bonus and six with a 10% bonus. The list will only include those skills that can be improved and going over the maximum starting value is prohibited.</p><p>\_</p><p><strong>Devotions</strong> - select three devotions at the relevant scores. The relevant Worship skills will be added/improved and Devotion Points will be set.</p><p>\_</p><p><strong>Family</strong> - assuming the relevant tables are available a roll will be made to determine your marital status and starting family. Relevant family members will be added, and a chat message shown.</p><p>\_</p><p><strong>Farm</strong> - a dice roll is made to determine which type of farm you have, if the relevant table and items exist. The number of starting thralls will be added if the game settings permit. It will be added to the character sheet automatically and a chat message produced.</p><p>\_</p><p><strong>Weapons</strong> - you will be given a list of all common weapons and able to select two of them. Remember you may already have some starting weapons from the Homeland or History so its worth checking what's on the character sheet.</p><p>\_</p><p><strong>Distinctive Features</strong> - if the relevant table is available roll for the distinctive features and add them to the character sheet.</p><p>\_</p><p><strong>What tables do I need</strong></p><p>Nicknames Table</p><p>Male Names Table</p><p>Female Names Table</p><p>Personality Type Table</p><p>Martial Status Table</p><p>Farm Type Table</p><p>Distinctive Features Table</p><p>\_</p><p>You can find more information about the tables, homelands, species, skills etc at the Wiki (<a href=\"https://github.com/cragstone/aov/wiki\">Home · cragstone/aov Wiki</a>)</p><p>\_</p>"
+      format: 1
+    title:
+      level: 1
+      show: false
+    video:
+      controls: true
+      volume: 0.5
+  - _key: '!journal.pages!fmAbF04foYlYRFiE.xfrq9zlPqI6QU27e'
+    _id: xfrq9zlPqI6QU27e
+    name: Credits
+    type: text
+    _stats:
+      coreVersion: '13.351'
+      createdTime: 1770022559620
+      duplicateSource: null
+      exportSource: null
+      lastModifiedBy: PackAgeOfVikings
+      modifiedTime: 1780553613183
+      systemId: aov
+      systemVersion: '13.20'
+    category: null
+    flags: {}
+    image: {}
+    ownership:
+      default: -1
+    sort: 300000
+    src: null
+    system: {}
+    text:
+      content: '<p>Paper Doll Art: Lionel Marty</p>'
+      format: 1
+    title:
+      level: 1
+      show: false
+    video:
+      controls: true
+      volume: 0.5
+sort: 0

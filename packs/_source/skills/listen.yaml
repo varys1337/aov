@@ -1,0 +1,43 @@
+_key: '!items!Yeh3xgplHQLb1uDf'
+_id: Yeh3xgplHQLb1uDf
+name: Listen
+type: skill
+folder: null
+img: systems/aov/art-assets/anvil.svg
+_stats:
+  coreVersion: '13.348'
+  createdTime: 1751569087455
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1757317420631
+  systemId: aov
+  systemVersion: '13.12'
+effects: []
+flags:
+  aov:
+    cidFlag:
+      id: i.skill.listen
+      lang: en
+      priority: 0
+ownership:
+  default: 0
+sort: 0
+system:
+  base: 25
+  baseVal: fixed
+  category: per
+  common: true
+  description: ''
+  effects: 0
+  gmNotes: ''
+  home: 0
+  mainName: Listen
+  noXP: false
+  pers: 0
+  specSkill: false
+  specialisation: ''
+  weaponCat: ''
+  weaponType: ''
+  xp: 0
+  xpCheck: false

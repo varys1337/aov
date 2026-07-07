@@ -1,0 +1,36 @@
+_key: '!macros!ZLpi7v0TQPlIsKU8'
+_id: ZLpi7v0TQPlIsKU8
+name: Change Scene Thumbnail
+type: script
+folder: null
+img: icons/svg/hanging-sign.svg
+_stats:
+  coreVersion: '14.364'
+  createdTime: 1781845339524
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1781845339532
+  systemId: aov
+  systemVersion: '14.1'
+author: PJCaEzKJYo2eOXXX
+command: |-
+  const data = await foundry.applications.api.DialogV2.input({
+    window: { title: "Scene UUID" },
+    content: `<input type="text" name="scnuuid">`,
+    ok: {
+      label: "Save",
+      icon: "fa-solid fa-floppy-disk",
+    }
+  })
+  let scene = await fromUuid(data.scnuuid)
+  let oldPath = scene.thumb.split("scenes/")[1]
+  oldPath = oldPath.split(".webp")[0]
+  let newPath = "modules/cha-aov-fvtt-en-thecursedfarm/art/"+oldPath+".webp"
+  await scene.update({'thumb': newPath})
+  console.log("Scene Thumb updated to " + newPath)
+flags: {}
+ownership:
+  default: 0
+scope: global
+sort: 200000

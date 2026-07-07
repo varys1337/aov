@@ -1,11 +1,14 @@
 export class AOVActiveEffect extends ActiveEffect {
-  get active() {
+  /**
+   *
+   */
+  get active () {
     if (this.parent instanceof Item && typeof this.parent.system?.equipStatus !== 'undefined') {
       //If item type isn't carried then effect is not active
       if (this.parent.system.equipStatus !== 1) {
-        return false;
+        return false
       }
     }
-    return super.active;
+    return super.active
   }
 }

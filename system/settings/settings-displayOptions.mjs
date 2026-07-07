@@ -1,33 +1,33 @@
 const SETTINGS = {
 
   singleColourBar: {
-    name: "AOV.Settings.singleColourBar",
-    hint: "AOV.Settings.singleColourBarHint",
-    scope: "client",
+    name: 'AOV.Settings.singleColourBar',
+    hint: 'AOV.Settings.singleColourBarHint',
+    scope: 'client',
     config: false,
     type: Boolean,
     default: false
   },
 
-    smallScreen: {
-    name: "AOV.Settings.smallScreen",
-    hint: "AOV.Settings.smallScreen",
-    scope: "client",
+  smallScreen: {
+    name: 'AOV.Settings.smallScreen',
+    hint: 'AOV.Settings.smallScreen',
+    scope: 'client',
     config: false,
     type: Boolean,
     default: false,
-    requiresReload: true,
+    requiresReload: true
   },
 
-    partyHPVal: {
-    name: "AOV.Settings.partyHPVal",
-    hint: "AOV.Settings.partyHPValHint",
-    scope: "world",
+  partyHPVal: {
+    name: 'AOV.Settings.partyHPVal',
+    hint: 'AOV.Settings.partyHPValHint',
+    scope: 'world',
     config: false,
     type: Boolean,
     default: true,
-    requiresReload: true,
-  },
+    requiresReload: true
+  }
 }
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api
@@ -36,7 +36,7 @@ export class AOVDisplaySettings extends HandlebarsApplicationMixin(ApplicationV2
     classes: ['aov', 'sheet', 'settings'],
     id: 'display-settings',
     actions: {
-      reset: AOVDisplaySettings.onResetDefaults,
+      reset: AOVDisplaySettings.onResetDefaults
     },
     form: {
       handler: AOVDisplaySettings.formHandler,
@@ -45,17 +45,20 @@ export class AOVDisplaySettings extends HandlebarsApplicationMixin(ApplicationV2
     },
     position: {
       width: 550,
-      height: 'auto',
+      height: 'auto'
     },
     tag: 'form',
     window: {
       title: 'AOV.Settings.displayOptions',
-      contentClasses: ["standard-form"]
+      contentClasses: ['standard-form']
     }
   }
 
-  get title() {
-    return `${game.i18n.localize(this.options.window.title)}`;
+  /**
+   *
+   */
+  get title () {
+    return `${game.i18n.localize(this.options.window.title)}`
   }
 
   static PARTS = {
@@ -64,8 +67,12 @@ export class AOVDisplaySettings extends HandlebarsApplicationMixin(ApplicationV2
   }
 
 
-  async _prepareContext(options) {
-    const isGM = game.user.isGM;
+  /**
+   *
+   * @param options
+   */
+  async _prepareContext (options) {
+    const isGM = game.user.isGM
     const optSet = {}
     for (const [k, v] of Object.entries(SETTINGS)) {
       optSet[k] = {
@@ -77,19 +84,26 @@ export class AOVDisplaySettings extends HandlebarsApplicationMixin(ApplicationV2
       isGM,
       optSet,
       buttons: [
-        { type: "submit", icon: "fa-solid fa-save", label: "SETTINGS.Save" },
-        { type: "reset", action: "reset", icon: "fa-solid fa-undo", label: "SETTINGS.Reset" },
+        { type: 'submit', icon: 'fa-solid fa-save', label: 'SETTINGS.Save' },
+        { type: 'reset', action: 'reset', icon: 'fa-solid fa-undo', label: 'SETTINGS.Reset' }
       ]
     }
   }
 
-  static registerSettings() {
+  /**
+   *
+   */
+  static registerSettings () {
     for (const [k, v] of Object.entries(SETTINGS)) {
       game.settings.register('aov', k, v)
     }
   }
 
-  static async onResetDefaults(event) {
+  /**
+   *
+   * @param event
+   */
+  static async onResetDefaults (event) {
     event.preventDefault()
     for await (const [k, v] of Object.entries(SETTINGS)) {
       await game.settings.set('aov', k, v?.default)
@@ -97,11 +111,17 @@ export class AOVDisplaySettings extends HandlebarsApplicationMixin(ApplicationV2
     return this.render()
   }
 
-  static async formHandler(event, form, formData) {
+  /**
+   *
+   * @param event
+   * @param form
+   * @param formData
+   */
+  static async formHandler (event, form, formData) {
     const settings = foundry.utils.expandObject(formData.object)
     await Promise.all(
       Object.entries(settings)
-        .map(([key, value]) => game.settings.set("aov", key, value))
+        .map(([key, value]) => game.settings.set('aov', key, value))
     )
   }
 

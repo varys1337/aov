@@ -1,0 +1,43 @@
+_key: '!items!BSBc0NWMxg6G8wOf'
+_id: BSBc0NWMxg6G8wOf
+name: Battle Axe
+type: skill
+folder: null
+img: systems/aov/art-assets/anvil.svg
+_stats:
+  coreVersion: '13.348'
+  createdTime: 1751569087477
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1757317459198
+  systemId: aov
+  systemVersion: '13.12'
+effects: []
+flags:
+  aov:
+    cidFlag:
+      id: i.skill.battle-axe
+      lang: en
+      priority: 0
+ownership:
+  default: 0
+sort: 0
+system:
+  base: 10
+  baseVal: fixed
+  category: cbt
+  common: true
+  description: ''
+  effects: 0
+  gmNotes: ''
+  home: 0
+  mainName: Battle Axe
+  noXP: false
+  pers: 0
+  specSkill: false
+  specialisation: ''
+  weaponCat: i.weaponcat.axe-1-h
+  weaponType: melee
+  xp: 0
+  xpCheck: false

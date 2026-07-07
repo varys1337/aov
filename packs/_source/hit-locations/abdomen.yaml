@@ -1,0 +1,35 @@
+_key: '!items!7mUa1uS8mv0A98PX'
+_id: 7mUa1uS8mv0A98PX
+name: Abdomen
+type: hitloc
+folder: null
+img: systems/aov/art-assets/arm-bandage.svg
+_stats:
+  coreVersion: '13.346'
+  createdTime: 1751569087438
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1754457563125
+  systemId: aov
+  systemVersion: '13.6'
+effects: []
+flags:
+  aov:
+    cidFlag:
+      id: i.hitloc.abdomen
+      lang: en
+      priority: 0
+ownership:
+  default: 0
+sort: 100000
+system:
+  description: ''
+  gmNotes: ''
+  gridPos: 8
+  highRoll: 11
+  hpMod: 0
+  locType: abdomen
+  lowRoll: 9
+  npcAP: 0
+  npcDmg: 0

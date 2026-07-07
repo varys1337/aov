@@ -1,22 +1,22 @@
 const SETTINGS = {
 
   actorCID: {
-    name: "AOV.Settings.actorCID",
-    hint: "AOV.Settings.actorCIDHint",
-    scope: "world",
+    name: 'AOV.Settings.actorCID',
+    hint: 'AOV.Settings.actorCIDHint',
+    scope: 'world',
     config: false,
     type: Boolean,
     default: false
   },
 
   actorItemCID: {
-    name: "AOV.Settings.actorItemCID",
-    hint: "AOV.Settings.actorItemCIDHint",
-    scope: "world",
+    name: 'AOV.Settings.actorItemCID',
+    hint: 'AOV.Settings.actorItemCIDHint',
+    scope: 'world',
     config: false,
     type: Boolean,
     default: false
-  },
+  }
 }
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api
@@ -25,7 +25,7 @@ export class AOVCIDSettings extends HandlebarsApplicationMixin(ApplicationV2) {
     classes: ['aov', 'sheet', 'settings'],
     id: 'cid-settings',
     actions: {
-      reset: AOVCIDSettings.onResetDefaults,
+      reset: AOVCIDSettings.onResetDefaults
     },
     form: {
       handler: AOVCIDSettings.formHandler,
@@ -34,17 +34,20 @@ export class AOVCIDSettings extends HandlebarsApplicationMixin(ApplicationV2) {
     },
     position: {
       width: 550,
-      height: 'auto',
+      height: 'auto'
     },
     tag: 'form',
     window: {
       title: 'AOV.Settings.cidOptions',
-      contentClasses: ["standard-form"]
+      contentClasses: ['standard-form']
     }
   }
 
-  get title() {
-    return `${game.i18n.localize(this.options.window.title)}`;
+  /**
+   *
+   */
+  get title () {
+    return `${game.i18n.localize(this.options.window.title)}`
   }
 
   static PARTS = {
@@ -53,7 +56,11 @@ export class AOVCIDSettings extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
 
-  async _prepareContext(options) {
+  /**
+   *
+   * @param options
+   */
+  async _prepareContext (options) {
 
     const optSet = {}
     for (const [k, v] of Object.entries(SETTINGS)) {
@@ -65,19 +72,26 @@ export class AOVCIDSettings extends HandlebarsApplicationMixin(ApplicationV2) {
     return {
       optSet,
       buttons: [
-        { type: "submit", icon: "fa-solid fa-save", label: "SETTINGS.Save" },
-        { type: "reset", action: "reset", icon: "fa-solid fa-undo", label: "SETTINGS.Reset" },
+        { type: 'submit', icon: 'fa-solid fa-save', label: 'SETTINGS.Save' },
+        { type: 'reset', action: 'reset', icon: 'fa-solid fa-undo', label: 'SETTINGS.Reset' }
       ]
     }
   }
 
-  static registerSettings() {
+  /**
+   *
+   */
+  static registerSettings () {
     for (const [k, v] of Object.entries(SETTINGS)) {
       game.settings.register('aov', k, v)
     }
   }
 
-  static async onResetDefaults(event) {
+  /**
+   *
+   * @param event
+   */
+  static async onResetDefaults (event) {
     event.preventDefault()
     for await (const [k, v] of Object.entries(SETTINGS)) {
       await game.settings.set('aov', k, v?.default)
@@ -85,11 +99,17 @@ export class AOVCIDSettings extends HandlebarsApplicationMixin(ApplicationV2) {
     return this.render()
   }
 
-  static async formHandler(event, form, formData) {
+  /**
+   *
+   * @param event
+   * @param form
+   * @param formData
+   */
+  static async formHandler (event, form, formData) {
     const settings = foundry.utils.expandObject(formData.object)
     await Promise.all(
       Object.entries(settings)
-        .map(([key, value]) => game.settings.set("aov", key, value))
+        .map(([key, value]) => game.settings.set('aov', key, value))
     )
   }
 

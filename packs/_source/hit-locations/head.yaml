@@ -1,0 +1,35 @@
+_key: '!items!tP3uTOjmNO4iHVqT'
+_id: tP3uTOjmNO4iHVqT
+name: Head
+type: hitloc
+folder: null
+img: systems/aov/art-assets/arm-bandage.svg
+_stats:
+  coreVersion: '13.346'
+  createdTime: 1751569087438
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1754457574845
+  systemId: aov
+  systemVersion: '13.6'
+effects: []
+flags:
+  aov:
+    cidFlag:
+      id: i.hitloc.head
+      lang: en
+      priority: 0
+ownership:
+  default: 0
+sort: 0
+system:
+  description: ''
+  gmNotes: ''
+  gridPos: 2
+  highRoll: 20
+  hpMod: 0
+  locType: head
+  lowRoll: 19
+  npcAP: 0
+  npcDmg: 0

@@ -1,20 +1,25 @@
-import AOVDialog from "../setup/aov-dialog.mjs";
-import { COCard } from "../chat/combat-chat.mjs";
-import { StatsSelectDialog } from "./actor-usePoints.mjs";
-import { AssignDiceDialog } from "./actor-assignDice.mjs";
-import { PersSkillSelectDialog } from "./persskill-selector.mjs"
-import { DevotionSelectDialog } from "./devotion-selector.mjs";
-import { WeaponSelectDialog } from "./weapon-selector.mjs";
-import { AOVUtilities } from "../apps/utilities.mjs";
-import { AOVSelectLists } from "../apps/select-lists.mjs";
-import { AOVActorItemDrop } from "./actor-item-drop.mjs";
-import { AOVCharDevelop } from "./charDevelop.mjs";
-import { SkillsSelectDialog} from "./skill-selector.mjs";
+import AOVDialog from '../setup/aov-dialog.mjs'
+import { COCard } from '../chat/combat-chat.mjs'
+import { StatsSelectDialog } from './actor-usePoints.mjs'
+import { AssignDiceDialog } from './actor-assignDice.mjs'
+import { PersSkillSelectDialog } from './persskill-selector.mjs'
+import { DevotionSelectDialog } from './devotion-selector.mjs'
+import { WeaponSelectDialog } from './weapon-selector.mjs'
+import { AOVUtilities } from '../apps/utilities.mjs'
+import { AOVSelectLists } from '../apps/select-lists.mjs'
+import { AOVActorItemDrop } from './actor-item-drop.mjs'
+import { AOVCharDevelop } from './charDevelop.mjs'
+import { SkillsSelectDialog } from './skill-selector.mjs'
 
 export class AOVCharCreate {
 
   //Roll Character Name
-  static async characName(actor, target) {
+  /**
+   *
+   * @param actor
+   * @param target
+   */
+  static async characName (actor, target) {
     let type = target.dataset.type
     let nickNameTable = (await game.aov.cid.fromCIDBest({ cid: 'rt..nicknames' }))[0]
     if (type === 'nickname') {
@@ -25,7 +30,7 @@ export class AOVCharCreate {
       const tableResults = await COCard.tableDiceRoll(nickNameTable)
       await actor.update({ 'system.nickname': tableResults.results[0].name })
     } else if (type === 'name') {
-      let gender = "other"
+      let gender = 'other'
       if (game.settings.get('aov', 'binaryGender')) {
         if (['male', 'female'].includes(actor.system.gender)) {
           gender = actor.system.gender
@@ -43,11 +48,16 @@ export class AOVCharCreate {
   }
 
   //Roll Character Name
-  static async rollName(gender, patrionic) {
+  /**
+   *
+   * @param gender
+   * @param patrionic
+   */
+  static async rollName (gender, patrionic) {
     let maleTable = (await game.aov.cid.fromCIDBest({ cid: 'rt..male-names' }))[0]
     let femaleTable = (await game.aov.cid.fromCIDBest({ cid: 'rt..female-names' }))[0]
-    let table = ""
-    let patrionicTable = ""
+    let table = ''
+    let patrionicTable = ''
     let oneTable = false
     let askPatrionic = true
     let dlg = {}
@@ -67,50 +77,50 @@ export class AOVCharCreate {
           return false
         }
         table = maleTable
-        patrionicTable = maleTable;
-        break;
+        patrionicTable = maleTable
+        break
       case 'female':
         if (!femaleTable) {
           ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.noTable', { tableCID: 'rt..female-names' }))
           return false
         }
         table = femaleTable
-        patrionicTable = femaleTable;
-        break;
+        patrionicTable = femaleTable
+        break
       default:
         if (!maleTable) {
-          table = femaleTable;
-          patrionicTable = femaleTable;
+          table = femaleTable
+          patrionicTable = femaleTable
           oneTable = true
         } else if (!femaleTable) {
-          table = maleTable;
-          patrionicTable = maleTable;
+          table = maleTable
+          patrionicTable = maleTable
           oneTable = true
         }
         let data = {
           oneTable: oneTable,
           askPatrionic: askPatrionic
         }
-        const html = await foundry.applications.handlebars.renderTemplate("systems/aov/templates/dialog/nameOptions.hbs", data);
+        const html = await foundry.applications.handlebars.renderTemplate('systems/aov/templates/dialog/nameOptions.hbs', data)
         dlg = await AOVDialog.input(
           {
             window: { title: game.i18n.localize('AOV.charName') },
             content: html,
             ok: {
-              label: game.i18n.localize("AOV.rollDice"),
-            },
+              label: game.i18n.localize('AOV.rollDice')
+            }
           }
-        );
+        )
         if (!dlg) { return false }
         if (dlg.mainName === 'male') {
-          table = maleTable;
+          table = maleTable
         } else if (dlg.mainName === 'female') {
-          table = femaleTable;
+          table = femaleTable
         }
         if (dlg.patrionicName === 'male') {
-          patrionicTable = maleTable;
+          patrionicTable = maleTable
         } else if (dlg.patrionicName === 'female') {
-          patrionicTable = femaleTable;
+          patrionicTable = femaleTable
         }
         break
     }
@@ -128,31 +138,31 @@ export class AOVCharCreate {
 
     let lastChar = patrionic.slice(-1)
     let lastTwoChar = patrionic.slice(-2)
-    if (lastChar === "i") {
-      patrionic = patrionic.slice(0, patrionic.length - 1) + "a"
-    } else if (lastChar === "a") {
-      patrionic = patrionic.slice(0, patrionic.length - 1) + "u"
-    } else if (lastTwoChar === "nn") {
-      patrionic = patrionic.slice(0, patrionic.length - 2) + "ns"
-    } else if (lastTwoChar === "ll") {
-      patrionic = patrionic.slice(0, patrionic.length - 2) + "ls"
-    } else if (lastTwoChar === "ur") {
-      patrionic = patrionic.slice(0, patrionic.length - 2) + "s"
-    } else if (lastTwoChar === "ir") {
-      patrionic = patrionic.slice(0, patrionic.length - 2) + "is"
+    if (lastChar === 'i') {
+      patrionic = patrionic.slice(0, patrionic.length - 1) + 'a'
+    } else if (lastChar === 'a') {
+      patrionic = patrionic.slice(0, patrionic.length - 1) + 'u'
+    } else if (lastTwoChar === 'nn') {
+      patrionic = patrionic.slice(0, patrionic.length - 2) + 'ns'
+    } else if (lastTwoChar === 'll') {
+      patrionic = patrionic.slice(0, patrionic.length - 2) + 'ls'
+    } else if (lastTwoChar === 'ur') {
+      patrionic = patrionic.slice(0, patrionic.length - 2) + 's'
+    } else if (lastTwoChar === 'ir') {
+      patrionic = patrionic.slice(0, patrionic.length - 2) + 'is'
     }
 
     if (gender === 'male') {
-      patrionic = patrionic + "son"
+      patrionic = patrionic + 'son'
     } else if (gender === 'female') {
-      patrionic = patrionic + "dóttir"
+      patrionic = patrionic + 'dóttir'
     } else if (dlg.suffix === 'son') {
-      patrionic = patrionic + "son"
+      patrionic = patrionic + 'son'
     } else {
-      patrionic = patrionic + "dóttir"
+      patrionic = patrionic + 'dóttir'
     }
 
-    newName = newName + " " + patrionic
+    newName = newName + ' ' + patrionic
 
     let results = ({ newName: newName, nameMean: nameMean })
     return results
@@ -160,17 +170,22 @@ export class AOVCharCreate {
 
 
   //Reset Species
-  static async resetSpecies(target, actor) {
+  /**
+   *
+   * @param target
+   * @param actor
+   */
+  static async resetSpecies (target, actor) {
     let species = await actor.items.filter(i => i.type === 'species')
     if (species.length < 1) { return }
-    await species[0].delete();
+    await species[0].delete()
     let changes = {}
     for (let [key, ability] of Object.entries(actor.system.abilities)) {
-      let formula = "3D6"
+      let formula = '3D6'
       let min = 3
       let max = 21
       if (['int', 'siz'].includes(key)) {
-        formula = "2D6+6"
+        formula = '2D6+6'
         min = 8
       }
       changes = Object.assign(changes, {
@@ -183,10 +198,15 @@ export class AOVCharCreate {
   }
 
   //Reset Homeland
-  static async resetHomeland(target, actor) {
+  /**
+   *
+   * @param target
+   * @param actor
+   */
+  static async resetHomeland (target, actor) {
     let home = await actor.items.filter(i => i.type === 'homeland')
     if (home.length < 1) { return }
-    await home[0].delete();
+    await home[0].delete()
     let updateItems = []
     for (let itm of actor.items) {
       if (['passion', 'skill'].includes(itm.type)) {
@@ -202,7 +222,11 @@ export class AOVCharCreate {
 
 
   //Roll Character Dice - Random
-  static async rollRandom(actor) {
+  /**
+   *
+   * @param actor
+   */
+  static async rollRandom (actor) {
     const abilities = {}
     const results = []
     const rolls = []
@@ -215,17 +239,17 @@ export class AOVCharCreate {
             roll.total
           )
         }
-        let diceRolled = ""
+        let diceRolled = ''
         for (let diceRoll = 0; diceRoll < roll.dice.length; diceRoll++) {
           for (let thisDice = 0; thisDice < roll.dice[diceRoll].values.length; thisDice++) {
             if (thisDice != 0 || diceRoll != 0) {
-              diceRolled = diceRolled + ", "
+              diceRolled = diceRolled + ', '
             }
             diceRolled = diceRolled + roll.dice[diceRoll].values[thisDice]
           }
         }
         results.push({ label: value.label, formula: value.formula, value: roll.total, dice: diceRolled })
-        if(game.settings.get('aov','showDiceRolls')) {
+        if(game.settings.get('aov', 'showDiceRolls')) {
           rolls.push(roll)
         }
       }
@@ -235,13 +259,13 @@ export class AOVCharCreate {
       particImg: actor.img,
       results: results
     }
-    let html = await foundry.applications.handlebars.renderTemplate("systems/aov/templates/chat/random-dice.hbs", msgData);
+    let html = await foundry.applications.handlebars.renderTemplate('systems/aov/templates/chat/random-dice.hbs', msgData)
     let msg = await AOVCharCreate.showStats(html, rolls, game.i18n.localize('AOV.rollRandom'), actor._id)
 
     if (msg) {
       await actor.update(abilities)
       await actor.update({
-        'system.mp.value': actor.system.mp.max - (actor.system.lockedMP ?? 0),
+        'system.mp.value': actor.system.mp.max - (actor.system.lockedMP ?? 0)
       })
       ui.notifications.warn(game.i18n.localize('AOV.diceRolled'))
     }
@@ -249,7 +273,11 @@ export class AOVCharCreate {
   }
 
   //Roll Character Dice - Assign
-  static async assignRandom(actor) {
+  /**
+   *
+   * @param actor
+   */
+  static async assignRandom (actor) {
     const abilities = {}
     const rolls = []
     const dice = []
@@ -257,27 +285,27 @@ export class AOVCharCreate {
     for (const [key, value] of Object.entries(actor.system.abilities)) {
       if (value.formula && !value.formula.startsWith('@')) {
         const roll = new Roll(value.formula)
-        value.numDic = value.formula.split("D6")[0]
-        value.adjVal = Number(value.formula.split("D6")[1] ?? 0)
+        value.numDic = value.formula.split('D6')[0]
+        value.adjVal = Number(value.formula.split('D6')[1] ?? 0)
         await roll.evaluate()
-        let diceRolled = ""
+        let diceRolled = ''
         for (let diceRoll = 0; diceRoll < roll.dice.length; diceRoll++) {
           for (let thisDice = 0; thisDice < roll.dice[diceRoll].values.length; thisDice++) {
-            dice.push({ value: roll.dice[diceRoll].values[thisDice], pick: "none", picked: 0 })
+            dice.push({ value: roll.dice[diceRoll].values[thisDice], pick: 'none', picked: 0 })
           }
         }
-        if(game.settings.get('aov','showDiceRolls')) {
+        if(game.settings.get('aov', 'showDiceRolls')) {
           rolls.push(roll)
-         }
+        }
       }
     }
     //Sort the dice rolled numerically
     dice.sort(function (a, b) {
-      let x = a.value;
-      let y = b.value;
+      let x = a.value
+      let y = b.value
       if (x < y) { return 1 };
       if (x > y) { return -1 };
-      return 0;
+      return 0
     })
     //Put the dice results to a chat card (which in turn kicks off dice so nice)
     let results = actor.system.abilities
@@ -285,9 +313,9 @@ export class AOVCharCreate {
       particName: actor.name,
       particImg: actor.img,
       dice,
-      results,
+      results
     }
-    let html = await foundry.applications.handlebars.renderTemplate("systems/aov/templates/chat/assign-dice.hbs", msgData);
+    let html = await foundry.applications.handlebars.renderTemplate('systems/aov/templates/chat/assign-dice.hbs', msgData)
     let msg = await AOVCharCreate.showStats(html, rolls, game.i18n.localize('AOV.assignRoll'), actor._id)
     //Pass the dice and stats to a dialog to assign dice to stats
     let selectedStats = await AssignDiceDialog.create(dice, dice.length, results)
@@ -304,7 +332,7 @@ export class AOVCharCreate {
       }
       await actor.update(abilities)
       await actor.update({
-        'system.mp.value': actor.system.mp.max - (actor.system.lockedMP ?? 0),
+        'system.mp.value': actor.system.mp.max - (actor.system.lockedMP ?? 0)
       })
       ui.notifications.warn(game.i18n.localize('AOV.diceAllocated'))
     }
@@ -312,7 +340,11 @@ export class AOVCharCreate {
   }
 
   //Assign Stats using Points
-  static async usePoints(actor) {
+  /**
+   *
+   * @param actor
+   */
+  static async usePoints (actor) {
     const abilities = {}
     let selectedStats = await StatsSelectDialog.create(actor.system.abilities)
     if (!selectedStats) { return }
@@ -321,13 +353,17 @@ export class AOVCharCreate {
     }
     await actor.update(abilities)
     await actor.update({
-      'system.mp.value': actor.system.mp.max - (actor.system.lockedMP ?? 0),
+      'system.mp.value': actor.system.mp.max - (actor.system.lockedMP ?? 0)
     })
     ui.notifications.warn(game.i18n.localize('AOV.pointsAllocated'))
   }
 
   //Roll Personality
-  static async rollPersonality(actor) {
+  /**
+   *
+   * @param actor
+   */
+  static async rollPersonality (actor) {
     let table = (await game.aov.cid.fromCIDBest({ cid: 'rt..spirit-animal' }))[0]
     if (!table) {
       ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.noTable', { tableCID: 'rt..spirit-animal' }))
@@ -342,7 +378,11 @@ export class AOVCharCreate {
 
 
   //Select Personal Skills
-  static async persSkills(actor) {
+  /**
+   *
+   * @param actor
+   */
+  static async persSkills (actor) {
 
     let mythic = false
     if (actor.system.persType === 'spiritual') { mythic = true }
@@ -357,22 +397,22 @@ export class AOVCharCreate {
     await Item.updateDocuments(oldList, { parent: actor })
 
     for (let loop=1; loop<3; loop++) {
-        let skillList = []
-        let picks = 4 + loop;
-        let bonus = 25;
-        if (loop>1) bonus = 10
+      let skillList = []
+      let picks = 4 + loop
+      let bonus = 25
+      if (loop>1) bonus = 10
 
       if (mythic) {
-        skillList = await actor.items.filter(h => h.type === 'skill').filter(i => i.system.total < 100 && i.system.pers === 0).map(itm => { return { id: itm._id, name: itm.system.label +"("+itm.system.total+")", score: itm.system.total, bonus: 0 } })
+        skillList = await actor.items.filter(h => h.type === 'skill').filter(i => i.system.total < 100 && i.system.pers === 0).map(itm => { return { id: itm._id, name: itm.system.label +'('+itm.system.total+')', score: itm.system.total, bonus: 0 } })
       } else {
-        skillList = await actor.items.filter(h => h.type === 'skill').filter(i => i.system.total < 100 && i.system.pers === 0).filter(m => m.system.category != 'myt').map(itm => { return { id: itm._id, name: itm.system.label +"("+itm.system.total+")", score: itm.system.total, bonus: 0 } })
+        skillList = await actor.items.filter(h => h.type === 'skill').filter(i => i.system.total < 100 && i.system.pers === 0).filter(m => m.system.category != 'myt').map(itm => { return { id: itm._id, name: itm.system.label +'('+itm.system.total+')', score: itm.system.total, bonus: 0 } })
       }
-      skillList = skillList.sort(function (a, b) { return a.name.localeCompare(b.name) });
-      skillList.unshift({ id: "xxx", name: game.i18n.format('AOV.selectItem', { type: game.i18n.localize('TYPES.Item.skill') }), score: -1000, bonus: 0 })
+      skillList = skillList.sort(function (a, b) { return a.name.localeCompare(b.name) })
+      skillList.unshift({ id: 'xxx', name: game.i18n.format('AOV.selectItem', { type: game.i18n.localize('TYPES.Item.skill') }), score: -1000, bonus: 0 })
 
       //Make the selections
       //let personalSkills = await PersSkillSelectDialog.create(skillList)
-      let personalSkills = await SkillsSelectDialog.create(skillList, picks, game.i18n.format("AOV.selectItem", { type: game.i18n.localize("TYPES.Item.skill")}),  game.i18n.format("AOV.personalSkillPicks", { bonus: bonus}))
+      let personalSkills = await SkillsSelectDialog.create(skillList, picks, game.i18n.format('AOV.selectItem', { type: game.i18n.localize('TYPES.Item.skill') }),  game.i18n.format('AOV.personalSkillPicks', { bonus: bonus }))
       if (personalSkills) {
         let updateItems = []
         for (let itm of personalSkills) {
@@ -391,12 +431,16 @@ export class AOVCharCreate {
 
 
   //Select devotions
-  static async devotions(actor) {
+  /**
+   *
+   * @param actor
+   */
+  static async devotions (actor) {
     //Prepare List of Devotions
     let devotionList = await AOVSelectLists.preLoadCategoriesCategories()
-    devotionList = devotionList.filter(itm => itm.type === 'devotion').map(itm => { return { id: itm._id, name: itm.name+"("+itm.system.ideals+")", score: 0, cid: itm.flags.aov?.cidFlag?.id, skillCid: itm.system.skills[0].cid } })
-    devotionList = devotionList.sort(function (a, b) { return a.name.localeCompare(b.name) });
-    devotionList.unshift({ id: "xxx", name: game.i18n.format('AOV.selectItem', { type: game.i18n.localize('TYPES.Item.devotion') }), score: 0 })
+    devotionList = devotionList.filter(itm => itm.type === 'devotion').map(itm => { return { id: itm._id, name: itm.name+'('+itm.system.ideals+')', score: 0, cid: itm.flags.aov?.cidFlag?.id, skillCid: itm.system.skills[0].cid } })
+    devotionList = devotionList.sort(function (a, b) { return a.name.localeCompare(b.name) })
+    devotionList.unshift({ id: 'xxx', name: game.i18n.format('AOV.selectItem', { type: game.i18n.localize('TYPES.Item.devotion') }), score: 0 })
 
     let devotionsChosen = await DevotionSelectDialog.create(devotionList)
 
@@ -433,7 +477,7 @@ export class AOVCharCreate {
           let newSkill = await game.aov.cid.fromCID(devotion.skillCid)
           if (newSkill.length > 0) {
             let xItm = newSkill[0].toObject()
-            xItm.system.dev = devScore;
+            xItm.system.dev = devScore
             newItems.push(xItm)
           }
         }
@@ -476,20 +520,24 @@ export class AOVCharCreate {
 
 
   //Create Family
-  static async family(actor) {
+  /**
+   *
+   * @param actor
+   */
+  static async family (actor) {
     //Adjust Age for an older/younger character
     let ageAdj = Math.max(actor.system.age - 22, 0)
     let family = []
 
     //Define template for a new family member
-    const docCls = getDocumentClass('Item');
+    const docCls = getDocumentClass('Item')
     const docData = {
       name: docCls.defaultName({
         type: 'family',
-        parent: actor,
+        parent: actor
       }),
-      type: "family"
-    };
+      type: 'family'
+    }
 
     //Check Table and roll on it
     let table = (await game.aov.cid.fromCIDBest({ cid: 'rt..marital-status' }))[0]
@@ -501,9 +549,9 @@ export class AOVCharCreate {
     let mainRoll = tableResults.roll.total
     let familyResult = (tableResults.results[0].description).replace(/(<([^>]+)>)/ig, '')
     let familyName = tableResults.results[0].name
-    let spouses = Number((familyResult.split(",")[0]).split(":")[1])
-    let children = Number((familyResult.split(",")[1]).split(":")[1])
-    let age = ((familyResult.split(",")[2]).split(":")[1]).trim()
+    let spouses = Number((familyResult.split(',')[0]).split(':')[1])
+    let children = Number((familyResult.split(',')[1]).split(':')[1])
+    let age = ((familyResult.split(',')[2]).split(':')[1]).trim()
     let newItems = []
     //Get current Family - delete later
     let spouseLabel = game.i18n.localize('AOV.spouse')
@@ -513,8 +561,8 @@ export class AOVCharCreate {
     //Roll Spouse
     if (spouses > 0) {
       for (let count = 1; count <= spouses; count++) {
-        let gender = ""
-        let genderLabel = ""
+        let gender = ''
+        let genderLabel = ''
         if (game.settings.get('aov', 'binaryGender')) {
           if (actor.system.gender === 'male') {
             gender = 'female'
@@ -530,7 +578,7 @@ export class AOVCharCreate {
 
         docData.name = (await (AOVCharCreate.rollName(gender))).newName
 
-        const newItem = await docCls.create(docData, { parent: actor });
+        const newItem = await docCls.create(docData, { parent: actor })
         let key = await game.aov.cid.guessId(newItem)
         await newItem.update({
           'flags.aov.cidFlag.id': key,
@@ -539,7 +587,7 @@ export class AOVCharCreate {
           'system.born': actor.system.birthYear,
           'system.relation': spouseLabel,
           'system.relationship': 'spouse',
-          'system.gender': gender,
+          'system.gender': gender
         })
         family.push({ name: newItem.name, relation: spouseLabel, gender: genderLabel, age: actor.system.age })
       }
@@ -548,14 +596,14 @@ export class AOVCharCreate {
     //Roll Children
     if (children > 0) {
       for (let count = 1; count <= children; count++) {
-        let gender = ""
-        let genderLabel = ""
+        let gender = ''
+        let genderLabel = ''
         if (!Roll.validate(age)) {
-          age = "1D6"
+          age = '1D6'
         }
         let ageRoll = new Roll(age)
         await ageRoll.evaluate()
-        await AOVCharDevelop.showDiceRoll(ageRoll);
+        await AOVCharDevelop.showDiceRoll(ageRoll)
         let currAge = ageRoll.total
         if (currAge % 2 == 0) {
           gender = 'male'
@@ -570,9 +618,9 @@ export class AOVCharCreate {
         }
         currAge = currAge + ageAdj
         let born = game.settings.get('aov', 'gameYear') - currAge
-        let patrionic = ((actor.name).split(" ")[0]).trim()
+        let patrionic = ((actor.name).split(' ')[0]).trim()
         docData.name = (await (AOVCharCreate.rollName(gender, patrionic))).newName
-        const newItem = await docCls.create(docData, { parent: actor });
+        const newItem = await docCls.create(docData, { parent: actor })
         let key = await game.aov.cid.guessId(newItem)
         await newItem.update({
           'flags.aov.cidFlag.id': key,
@@ -581,7 +629,7 @@ export class AOVCharCreate {
           'system.born': born,
           'system.relation': 'childLabel',
           'system.relationship': 'child',
-          'system.gender': gender,
+          'system.gender': gender
         })
         family.push({ name: newItem.name, relation: childLabel, gender: genderLabel, age: currAge })
       }
@@ -591,7 +639,7 @@ export class AOVCharCreate {
       particImg: actor.img,
       family: family,
       noFamily: family.length === 0,
-      mainRoll: mainRoll,
+      mainRoll: mainRoll
     }
 
     //Delete any pre-existing children and spouses
@@ -599,7 +647,7 @@ export class AOVCharCreate {
 
     //Create Chat Message
     let rolls = {}
-    let html = await foundry.applications.handlebars.renderTemplate("systems/aov/templates/chat/create-family.hbs", msgData);
+    let html = await foundry.applications.handlebars.renderTemplate('systems/aov/templates/chat/create-family.hbs', msgData)
     let msg = await AOVCharCreate.showStats(html, rolls, game.i18n.localize('AOV.familyCreated'), actor._id)
     ui.notifications.warn(game.i18n.localize('AOV.familyCreated'))
     return
@@ -607,7 +655,11 @@ export class AOVCharCreate {
 
 
   //Create a new farm from the Roll Table
-  static async farm(actor) {
+  /**
+   *
+   * @param actor
+   */
+  static async farm (actor) {
     let owners = actor.ownership
 
     //Check Table and roll on it
@@ -627,10 +679,10 @@ export class AOVCharCreate {
     let farmUuid = farmResult.documentUuid
     if (!farmUuid) { return }
     let farm = await fromUuid(farmUuid)
-    let farmName = game.i18n.format('AOV.farmOwner', { person: actor.name.split(" ")[0] })
+    let farmName = game.i18n.format('AOV.farmOwner', { person: actor.name.split(' ')[0] })
     let newFarm = await Actor.implementation.create({
       name: farmName,
-      type: "farm",
+      type: 'farm',
       ownership: owners,
       img: 'systems/aov/art-assets/grain-bundle.svg',
       system: {
@@ -640,45 +692,45 @@ export class AOVCharCreate {
         horses: farm.system.horses,
         value: farm.system.value
       }
-    });
+    })
 
 
-    let thrallRoll = new Roll('1D3');
-    await thrallRoll.evaluate();
-    await AOVCharDevelop.showDiceRoll(thrallRoll);
+    let thrallRoll = new Roll('1D3')
+    await thrallRoll.evaluate()
+    await AOVCharDevelop.showDiceRoll(thrallRoll)
     let thrallCount = thrallRoll.total
     let thrallFlag = true
     //Check if we add Thralls or Sheep
     if (game.settings.get('aov', 'addThralls')) {
       for (let counter = 1; counter <= thrallCount; counter++) {
-        let genderRoll = new Roll('1D2');
-        await genderRoll.evaluate();
-        await AOVCharDevelop.showDiceRoll(genderRoll);
-        let gender = "male"
+        let genderRoll = new Roll('1D2')
+        await genderRoll.evaluate()
+        await AOVCharDevelop.showDiceRoll(genderRoll)
+        let gender = 'male'
         if (genderRoll.total === 2) {
-          gender = "female"
+          gender = 'female'
         }
         if (!game.settings.get('aov', 'binaryGender')) {
           gender = game.i18n.localize('AOV.' + gender)
         }
-        let ageRoll = new Roll('2D6');
-        await ageRoll.evaluate();
-        await AOVCharDevelop.showDiceRoll(ageRoll);
+        let ageRoll = new Roll('2D6')
+        await ageRoll.evaluate()
+        await AOVCharDevelop.showDiceRoll(ageRoll)
         let born = game.settings.get('aov', 'gameYear') - (16 + ageRoll.total)
 
-        const docCls = getDocumentClass('Item');
+        const docCls = getDocumentClass('Item')
         const docData = {
           name: docCls.defaultName({
             type: 'thrall',
-            parent: newFarm,
+            parent: newFarm
           }),
-          type: "thrall",
+          type: 'thrall',
           system: {
             born: born,
             gender: gender
           }
-        };
-        const newThrall = await docCls.create(docData, { parent: newFarm });
+        }
+        const newThrall = await docCls.create(docData, { parent: newFarm })
       }
 
 
@@ -705,7 +757,7 @@ export class AOVCharCreate {
 
     //Create Chat Message
     let rolls = {}
-    let html = await foundry.applications.handlebars.renderTemplate("systems/aov/templates/chat/create-farm.hbs", msgData);
+    let html = await foundry.applications.handlebars.renderTemplate('systems/aov/templates/chat/create-farm.hbs', msgData)
     let msg = await AOVCharCreate.showStats(html, rolls, game.i18n.localize('AOV.farmCreated'), actor._id)
     ui.notifications.warn(game.i18n.localize('AOV.farmCreated'))
     return
@@ -713,12 +765,16 @@ export class AOVCharCreate {
   }
 
 
-  static async selectWeapons(actor) {
+  /**
+   *
+   * @param actor
+   */
+  static async selectWeapons (actor) {
     let currentWpns = await actor.items.filter(itm => itm.system.source === 'weapons').map(itm => { return (itm.id) })
     let weaponList = await AOVSelectLists.preLoadCategoriesCategories()
-    weaponList = weaponList.filter(itm => itm.type === 'weapon').filter(itm => itm.system.weaponType != 'naturalWpn').filter(itm=>itm.system.common).map(itm => { return { id: itm._id, name: itm.name, cid: itm.flags.aov?.cidFlag?.id, skillCid: itm.system.skillCID, score: 0 } })
-    weaponList = weaponList.sort(function (a, b) {return a.name.localeCompare(b.name)});
-    weaponList.unshift({ id: "xxx", name: game.i18n.format('AOV.selectItem', { type: game.i18n.localize('TYPES.Item.weapon') }), score: 0 })
+    weaponList = weaponList.filter(itm => itm.type === 'weapon').filter(itm => itm.system.weaponType != 'naturalWpn').filter(itm => itm.system.common).map(itm => { return { id: itm._id, name: itm.name, cid: itm.flags.aov?.cidFlag?.id, skillCid: itm.system.skillCID, score: 0 } })
+    weaponList = weaponList.sort(function (a, b) {return a.name.localeCompare(b.name)})
+    weaponList.unshift({ id: 'xxx', name: game.i18n.format('AOV.selectItem', { type: game.i18n.localize('TYPES.Item.weapon') }), score: 0 })
     let weaponsChosen = await WeaponSelectDialog.create(weaponList)
 
     if (weaponsChosen) {
@@ -737,7 +793,7 @@ export class AOVCharCreate {
         let newWpn = await game.aov.cid.fromCID(weapon.cid)
         if (newWpn.length > 0) {
           let xItm = newWpn[0].toObject()
-          xItm.system.source = "weapons"
+          xItm.system.source = 'weapons'
           newItems.push(xItm)
         }
 
@@ -761,16 +817,20 @@ export class AOVCharCreate {
     }
   }
 
-  static async features(actor) {
+  /**
+   *
+   * @param actor
+   */
+  static async features (actor) {
 
-    let rollResult = ""
+    let rollResult = ''
     //Check Table and roll on it
     let table = (await game.aov.cid.fromCIDBest({ cid: 'rt..distinctive-features' }))[0]
     if (!table) {
       ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.noTable', { tableCID: 'rt..distinctive-features' }))
       return
     }
-    let features = ""
+    let features = ''
     for (let counter = 1; counter <= 3; counter++) {
       const tableResults = await COCard.tableDiceRoll(table)
       let result = await tableResults.results.filter(i => i.type === 'text')[0]
@@ -781,8 +841,8 @@ export class AOVCharCreate {
       features = features + result.name
       rollResult = rollResult + tableResults.roll.total
       if (counter < 3) {
-        features = features + ", "
-        rollResult = rollResult + ", "
+        features = features + ', '
+        rollResult = rollResult + ', '
       }
     }
 
@@ -790,22 +850,26 @@ export class AOVCharCreate {
       await actor.update({ 'system.distFeatures': features })
       let rolls={}
       let msgData = {
-      particName: actor.name,
-      particImg: actor.img,
-      features: features,
-      rollResult: rollResult
-    }
+        particName: actor.name,
+        particImg: actor.img,
+        features: features,
+        rollResult: rollResult
+      }
 
-    //Create Chat Message
+      //Create Chat Message
 
-    let html = await foundry.applications.handlebars.renderTemplate("systems/aov/templates/chat/create-features.hbs", msgData);
-    let msg = await AOVCharCreate.showStats(html, rolls, game.i18n.localize('AOV.distFeatures'), actor._id)
+      let html = await foundry.applications.handlebars.renderTemplate('systems/aov/templates/chat/create-features.hbs', msgData)
+      let msg = await AOVCharCreate.showStats(html, rolls, game.i18n.localize('AOV.distFeatures'), actor._id)
 
       ui.notifications.warn(game.i18n.localize('AOV.featuresSelected'))
     }
   }
 
-  static async history(actor) {
+  /**
+   *
+   * @param actor
+   */
+  static async history (actor) {
     let homeland = await actor.items.get(actor.system.homeID)
     let newItems = []
     if (!homeland) {
@@ -819,11 +883,11 @@ export class AOVCharCreate {
     const collection = homeland.system.historyToday ? foundry.utils.duplicate(homeland.system.historyToday) : []
     //Sort History by CID (i.e. in to year order)
     collection.sort(function (a, b) {
-      let x = a.cid;
-      let y = b.cid;
+      let x = a.cid
+      let y = b.cid
       if (x < y) { return -1 };
       if (x > y) { return 1 };
-      return 0;
+      return 0
     })
 
     let results = []
@@ -859,9 +923,9 @@ export class AOVCharCreate {
         results.push({ itemName: xItm.name, rollVal: mainRoll, year: xItm.system.year })
         //If result means ancestor died update the character
         if (historyDoc.system.dies) {
-          if (target === "grandparent" && !actor.system.grandparents) {
+          if (target === 'grandparent' && !actor.system.grandparents) {
             await actor.update({ 'system.grandparents': true })
-          } else if (target === "parent" && !actor.system.parents) {
+          } else if (target === 'parent' && !actor.system.parents) {
             await actor.update({ 'system.parents': true })
           }
         }
@@ -890,9 +954,9 @@ export class AOVCharCreate {
           results.push({ itemName: xItm.name, rollVal: secRoll, year: xItm.system.year })
           //If result means ancestor died update the character
           if (sechistoryDoc.system.dies) {
-            if (target === "grandparent" && !actor.system.grandparents) {
+            if (target === 'grandparent' && !actor.system.grandparents) {
               await actor.update({ 'system.grandparents': true })
-            } else if (target === "parent" && !actor.system.parents) {
+            } else if (target === 'parent' && !actor.system.parents) {
               await actor.update({ 'system.parents': true })
             }
           }
@@ -908,13 +972,20 @@ export class AOVCharCreate {
       results: results
     }
     let rolls = {}
-    let html = await foundry.applications.handlebars.renderTemplate("systems/aov/templates/chat/character-history.hbs", msgData);
+    let html = await foundry.applications.handlebars.renderTemplate('systems/aov/templates/chat/character-history.hbs', msgData)
     let msg = await AOVCharCreate.showStats(html, rolls, game.i18n.localize('AOV.familyHistory'), actor._id)
   }
 
   //Show Roll Message
-  static async showStats(html, rolls, alias, actorID) {
-    let chatData = {};
+  /**
+   *
+   * @param html
+   * @param rolls
+   * @param alias
+   * @param actorID
+   */
+  static async showStats (html, rolls, alias, actorID) {
+    let chatData = {}
     chatData = {
       user: game.user.id,
       style: CONST.CHAT_MESSAGE_STYLES.OTHER,
@@ -922,27 +993,30 @@ export class AOVCharCreate {
       content: html,
       speaker: {
         actor: actorID,
-        alias: alias,
-      },
-    };
-    let msg = await ChatMessage.create(chatData);
+        alias: alias
+      }
+    }
+    let msg = await ChatMessage.create(chatData)
     return msg
   }
 
   //Get gender
-  static async askGender() {
+  /**
+   *
+   */
+  static async askGender () {
     const gender = await AOVDialog.wait({
       window: { title: game.i18n.localize('AOV.gender') },
       content: game.i18n.localize('AOV.askGender'),
       buttons: [
         {
-          label: game.i18n.localize("AOV.male"),
-          action: "male",
+          label: game.i18n.localize('AOV.male'),
+          action: 'male'
         },
         {
-          label: game.i18n.localize("AOV.male"),
-          action: "female",
-        },
+          label: game.i18n.localize('AOV.male'),
+          action: 'female'
+        }
       ]
     })
 
@@ -950,41 +1024,52 @@ export class AOVCharCreate {
   }
 
   //Get value input
-  static async inpValue(title) {
+  /**
+   *
+   * @param title
+   */
+  static async inpValue (title) {
     let inpVal = await AOVDialog.input({
       window: { title: title },
-      content: `<input class="centre" type="number" name="inpvalue">`,
+      content: '<input class="centre" type="number" name="inpvalue">'
     })
     return inpVal
   }
 
   //Get text input
-  static async inpText(title) {
+  /**
+   *
+   * @param title
+   */
+  static async inpText (title) {
     let inpVal = await AOVDialog.input({
       window: { title: title },
-      content: `<input class="centre" type="text" name="inpvalue">`,
+      content: '<input class="centre" type="text" name="inpvalue">'
     })
     return inpVal
   }
 
   //Get history type
-  static async askHistory() {
+  /**
+   *
+   */
+  static async askHistory () {
     const person = await AOVDialog.wait({
       window: { title: game.i18n.localize('TYPES.Item.history') },
       content: game.i18n.localize('AOV.askHistory'),
       buttons: [
         {
-          label: game.i18n.localize("AOV.grandparent"),
-          action: "grandparent",
+          label: game.i18n.localize('AOV.grandparent'),
+          action: 'grandparent'
         },
         {
-          label: game.i18n.localize("AOV.parent"),
-          action: "parent",
+          label: game.i18n.localize('AOV.parent'),
+          action: 'parent'
         },
         {
-          label: game.i18n.localize("TYPES.Actor.character"),
-          action: "character",
-        },
+          label: game.i18n.localize('TYPES.Actor.character'),
+          action: 'character'
+        }
       ]
     })
     return person
@@ -992,7 +1077,11 @@ export class AOVCharCreate {
 
 
   //Reset Actor History
-  static async resetHistory(actor) {
+  /**
+   *
+   * @param actor
+   */
+  static async resetHistory (actor) {
     let resetSkills = []
     //Reset any skill or passion history scores to zero
     for (let itm of actor.items) {

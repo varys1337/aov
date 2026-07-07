@@ -1,0 +1,43 @@
+_key: '!items!DfywWVo06oONTeB0'
+_id: DfywWVo06oONTeB0
+name: Act
+type: skill
+folder: null
+img: systems/aov/art-assets/anvil.svg
+_stats:
+  coreVersion: '13.348'
+  createdTime: 1751569087452
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1757317393760
+  systemId: aov
+  systemVersion: '13.12'
+effects: []
+flags:
+  aov:
+    cidFlag:
+      id: i.skill.act
+      lang: en
+      priority: 0
+ownership:
+  default: 0
+sort: 0
+system:
+  base: 5
+  baseVal: fixed
+  category: com
+  common: true
+  description: ''
+  effects: 0
+  gmNotes: ''
+  home: 0
+  mainName: Act
+  noXP: false
+  pers: 0
+  specSkill: false
+  specialisation: ''
+  weaponCat: ''
+  weaponType: ''
+  xp: 0
+  xpCheck: false

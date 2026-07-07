@@ -10,7 +10,7 @@ export default function (application, element, context, options) {
     }
     //Force to use themed-light
     if (!element.classList.contains('theme-light')) {
-      element.classList.add('themed','theme-light')
+      element.classList.add('themed', 'theme-light')
     }
 
 
@@ -18,7 +18,7 @@ export default function (application, element, context, options) {
       element.classList.add('fixed-adventure-heading')
       //Force to use themed-light
       if (!element.classList.contains('theme-light')) {
-        element.classList.add('themed','theme-light')
+        element.classList.add('themed', 'theme-light')
       }
 
       if (typeof application.document.pages?.contents?.[0]?.id === 'string') {

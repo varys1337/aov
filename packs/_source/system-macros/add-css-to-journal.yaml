@@ -1,0 +1,43 @@
+_key: '!macros!Iatn7qrvsFlY4xzy'
+_id: Iatn7qrvsFlY4xzy
+name: Add CSS to Journal
+type: script
+folder: null
+img: icons/svg/book.svg
+_stats:
+  coreVersion: '14.364'
+  createdTime: 1781685478911
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1781845339532
+  systemId: aov
+  systemVersion: '14.1'
+author: PJCaEzKJYo2eOXXX
+command: |-
+  const data = await foundry.applications.api.DialogV2.input({
+    window: { title: "Journal UUID" },
+    content: `<input type="text" name="jnluuid">`,
+    ok: {
+      label: "Save",
+      icon: "fa-solid fa-floppy-disk",
+    }
+  })
+  let journal = await fromUuid(data.jnluuid)
+
+  if (!journal) {
+    
+  } else if (journal.type === 'actor') {
+      
+  } else {
+
+  await journal.update({
+            'flags.aov.css-adventure-entry': true,
+            'flags.aov.fixed-adventure-heading': true     
+          })
+  }
+flags: {}
+ownership:
+  default: 0
+scope: global
+sort: 100000

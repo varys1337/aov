@@ -1,0 +1,26 @@
+_key: '!items!vr5bk7norkgUfm7l'
+_id: vr5bk7norkgUfm7l
+name: Sword 1H
+type: weaponcat
+folder: null
+img: systems/aov/art-assets/master-of-arms.svg
+_stats:
+  coreVersion: '13.346'
+  createdTime: 1751569087471
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1754457970044
+  systemId: aov
+  systemVersion: '13.6'
+effects: []
+flags:
+  aov:
+    cidFlag:
+      id: i.weaponcat.sword-1-h
+      lang: en
+      priority: 0
+ownership:
+  default: 0
+sort: 0
+system: {}

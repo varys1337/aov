@@ -1,0 +1,95 @@
+_key: '!macros!d9bMOqIyFiuSnVVw'
+_id: d9bMOqIyFiuSnVVw
+name: Dark/Light Mode
+type: script
+folder: null
+img: icons/svg/light.svg
+_stats:
+  coreVersion: '14.364'
+  createdTime: 1781685477298
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1781845339532
+  systemId: aov
+  systemVersion: '14.1'
+author: PJCaEzKJYo2eOXXX
+command: |-
+  //Macro from Call of Cthulhu Foundry VTT implementation courtesy of JamesB
+
+  class CoC7TestLights extends foundry.applications.api.ApplicationV2 {
+    static DEFAULT_OPTIONS = {
+      id: 'toggleLightDarkMode',
+      position: {
+        top: 0,
+        width: 550
+      },
+      window: {
+        title: 'Change the lights'
+      }
+    }
+
+    async _onRender (context, options) {
+      await super._onRender(context, options)
+      this.element.querySelectorAll('input[type=radio]').forEach((element) => element.addEventListener('click', (event) => {
+        if (foundry.utils.isNewerVersion(game.version, 13)) {
+          const uiConfig = game.settings.get('core', 'uiConfig')
+          uiConfig.colorScheme[element.name] = element.value
+          game.settings.set('core', 'uiConfig', uiConfig)
+        } else {
+          game.settings.set('core', 'colorScheme', element.value)
+        }
+      }))
+      this.element.querySelectorAll('label').forEach((element) => element.addEventListener('click', (event) => {
+        element.previousSibling.click()
+      }))
+    }
+    
+    async _renderHTML(context, options) {
+      if (foundry.utils.isNewerVersion(game.version, 13)) {
+        const uiConfig = game.settings.get('core', 'uiConfig')
+        const lines = [
+          '<div class="form-group flexrow">',
+          '<label style="flex: 0 0 10rem;">Interface</label>',
+          '<div class="form-fields">',
+          '<input type="radio" name="interface" value=""' + (uiConfig.colorScheme.interface === '' ? ' checked="checked"' : '') + '><label style="margin-right: 1rem;">Browser Default</label>',
+          '<input type="radio" name="interface" value="dark"' + (uiConfig.colorScheme.interface === 'dark' ? ' checked="checked"' : '') + '><label style="margin-right: 1rem;">Dark</label>',
+          '<input type="radio" name="interface" value="light"' + (uiConfig.colorScheme.interface === 'light' ? ' checked="checked"' : '') + '><label style="margin-right: 1rem;">Light</label>',
+          '</div>',
+          '</div>',
+          '<div class="form-group flexrow">',
+          '<label style="flex: 0 0 10rem;">Applications</label>',
+          '<div class="form-fields">',
+          '<input type="radio" name="applications" value=""' + (uiConfig.colorScheme.applications === '' ? ' checked="checked"' : '') + '><label style="margin-right: 1rem;">Browser Default</label>',
+          '<input type="radio" name="applications" value="dark"' + (uiConfig.colorScheme.applications === 'dark' ? ' checked="checked"' : '') + '><label style="margin-right: 1rem;">Dark</label>',
+          '<input type="radio" name="applications" value="light"' + (uiConfig.colorScheme.applications === 'light' ? ' checked="checked"' : '') + '><label style="margin-right: 1rem;">Light</label>',
+          '</div>',
+          '</div>'
+        ]
+        return lines.join('')
+      } else {
+        const colorScheme = game.settings.get('core', 'colorScheme')
+        const lines = [
+          '<div class="form-group flexrow">',
+          '<label style="flex: 0 0 10rem;">Interface</label>',
+          '<div class="form-fields">',
+          '<input type="radio" name="interface" value=""' + (colorScheme === '' ? ' checked="checked"' : '') + '><label style="margin-right: 1rem;">Browser Default</label>',
+          '<input type="radio" name="interface" value="dark"' + (colorScheme === 'dark' ? ' checked="checked"' : '') + '><label style="margin-right: 1rem;">Dark</label>',
+          '<input type="radio" name="interface" value="light"' + (colorScheme === 'light' ? ' checked="checked"' : '') + '><label style="margin-right: 1rem;">Light</label>',
+          '</div>',
+          '</div>'
+        ]
+        return lines.join('')
+      }
+    }
+
+    _replaceHTML(result, content, options) {
+      content.innerHTML = result
+    }
+  }
+  (new CoC7TestLights()).render({ force: true })
+flags: {}
+ownership:
+  default: 0
+scope: global
+sort: 300000

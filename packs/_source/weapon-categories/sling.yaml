@@ -1,0 +1,26 @@
+_key: '!items!C2KW1E20hIVxxbDH'
+_id: C2KW1E20hIVxxbDH
+name: Sling
+type: weaponcat
+folder: null
+img: systems/aov/art-assets/master-of-arms.svg
+_stats:
+  coreVersion: '13.346'
+  createdTime: 1751569087470
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1754457962356
+  systemId: aov
+  systemVersion: '13.6'
+effects: []
+flags:
+  aov:
+    cidFlag:
+      id: i.weaponcat.sling
+      lang: en
+      priority: 0
+ownership:
+  default: 0
+sort: 0
+system: {}

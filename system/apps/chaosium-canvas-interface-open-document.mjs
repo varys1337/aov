@@ -1,6 +1,9 @@
-import ChaosiumCanvasInterface from "./chaosium-canvas-interface.mjs";
+import ChaosiumCanvasInterface from './chaosium-canvas-interface.mjs'
 
 export default class ChaosiumCanvasInterfaceOpenDocument extends ChaosiumCanvasInterface {
+  /**
+   *
+   */
   static get PERMISSIONS () {
     return {
       ALWAYS: 'AOV.ChaosiumCanvasInterface.Permission.Always',
@@ -10,10 +13,16 @@ export default class ChaosiumCanvasInterfaceOpenDocument extends ChaosiumCanvasI
     }
   }
 
+  /**
+   *
+   */
   static get icon () {
     return 'fa-solid fa-book-atlas'
   }
 
+  /**
+   *
+   */
   static defineSchema () {
     const fields = foundry.data.fields
     return {
@@ -58,6 +67,9 @@ export default class ChaosiumCanvasInterfaceOpenDocument extends ChaosiumCanvasI
     }
   }
 
+  /**
+   *
+   */
   async _handleMouseOverEvent () {
     switch (this.permission) {
       case 'ALWAYS':
@@ -84,26 +96,29 @@ export default class ChaosiumCanvasInterfaceOpenDocument extends ChaosiumCanvasI
     return false
   }
 
+  /**
+   *
+   */
   async #handleClickEvent () {
     let doc = await fromUuid(this.documentUuid)
-      if (this.pageId) {
-        const page = doc.pages.get(this.pageId)
-        if (page) {
-          doc = page
-        }
+    if (this.pageId) {
+      const page = doc.pages.get(this.pageId)
+      if (page) {
+        doc = page
       }
+    }
     if (doc?.testUserPermission(game.user, CONST.DOCUMENT_OWNERSHIP_LEVELS.LIMITED)) {
       if (doc instanceof JournalEntryPage) {
         doc.parent.sheet.render(true, { pageId: doc.id, anchor: this.anchor })
         if (this.showPlayers) {
-          if (doc.type === "image") {
-            let users = game.users.filter(u => !u.isSelf).map(u => u.id);
+          if (doc.type === 'image') {
+            let users = game.users.filter(u => !u.isSelf).map(u => u.id)
             foundry.documents.collections.Journal.showImage(doc.src, {
               users,
               title: doc.name,
               showTitle: false,
               uuid: doc.uuid
-            });
+            })
           }
         }
       } else {
@@ -114,12 +129,18 @@ export default class ChaosiumCanvasInterfaceOpenDocument extends ChaosiumCanvasI
     }
   }
 
+  /**
+   *
+   */
   async _handleLeftClickEvent () {
     if (this.documentUuid && this.triggerButton === ChaosiumCanvasInterface.triggerButton.Left) {
       this.#handleClickEvent()
     }
   }
 
+  /**
+   *
+   */
   async _handleRightClickEvent () {
     if (this.documentUuid && this.triggerButton === ChaosiumCanvasInterface.triggerButton.Right) {
       this.#handleClickEvent()

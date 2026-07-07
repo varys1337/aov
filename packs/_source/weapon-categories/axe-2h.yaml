@@ -1,0 +1,26 @@
+_key: '!items!uOqBCW0DOKc02mD8'
+_id: uOqBCW0DOKc02mD8
+name: Axe 2H
+type: weaponcat
+folder: null
+img: systems/aov/art-assets/master-of-arms.svg
+_stats:
+  coreVersion: '13.346'
+  createdTime: 1751569087471
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1754457920237
+  systemId: aov
+  systemVersion: '13.6'
+effects: []
+flags:
+  aov:
+    cidFlag:
+      id: i.weaponcat.axe-2-h
+      lang: en
+      priority: 0
+ownership:
+  default: 0
+sort: 0
+system: {}

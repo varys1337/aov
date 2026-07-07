@@ -1,0 +1,43 @@
+_key: '!items!8jWA0uGx1AGCCOtl'
+_id: 8jWA0uGx1AGCCOtl
+name: Charm
+type: skill
+folder: null
+img: systems/aov/art-assets/anvil.svg
+_stats:
+  coreVersion: '13.348'
+  createdTime: 1751569087452
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1757317397580
+  systemId: aov
+  systemVersion: '13.12'
+effects: []
+flags:
+  aov:
+    cidFlag:
+      id: i.skill.charm
+      lang: en
+      priority: 0
+ownership:
+  default: 0
+sort: 0
+system:
+  base: 15
+  baseVal: fixed
+  category: com
+  common: true
+  description: ''
+  effects: 0
+  gmNotes: ''
+  home: 0
+  mainName: Charm
+  noXP: false
+  pers: 0
+  specSkill: false
+  specialisation: ''
+  weaponCat: ''
+  weaponType: ''
+  xp: 0
+  xpCheck: false

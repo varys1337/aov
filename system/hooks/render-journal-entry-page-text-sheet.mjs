@@ -7,7 +7,7 @@ export default function (application, element, context, options) {
 
     //Force to use themed-light
     if (!element.classList.contains('theme-light')) {
-      element.classList.add('themed','theme-light')
+      element.classList.add('themed', 'theme-light')
     }
 
     element.querySelectorAll('section.tmi-toggleable p.toggle').forEach((element) => element.addEventListener('click', (event) => {

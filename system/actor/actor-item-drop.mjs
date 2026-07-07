@@ -1,86 +1,91 @@
-import { SkillsSelectDialog } from "../actor/skill-selector.mjs";
-import AOVDialog from "../setup/aov-dialog.mjs";
-import { AOVUtilities } from "../apps/utilities.mjs";
-import { AOVSelectLists } from "../apps/select-lists.mjs";
+import { SkillsSelectDialog } from '../actor/skill-selector.mjs'
+import AOVDialog from '../setup/aov-dialog.mjs'
+import { AOVUtilities } from '../apps/utilities.mjs'
+import { AOVSelectLists } from '../apps/select-lists.mjs'
 
 export class AOVActorItemDrop {
 
   // Change default on Drop Item Create routine for requirements (single items and folder drop)-----------------------------------------------------------------
-  static async _AOVonDropItemCreate(itemData, actor) {
-    const newItemData = [];
-    itemData = itemData instanceof Array ? itemData : [itemData];
+  /**
+   *
+   * @param itemData
+   * @param actor
+   */
+  static async _AOVonDropItemCreate (itemData, actor) {
+    const newItemData = []
+    itemData = itemData instanceof Array ? itemData : [itemData]
     for (let thisItem of itemData) {
       let nItm = thisItem.toObject()
       let nItmCidFlag = nItm.flags.aov?.cidFlag?.id
 
       //Can't drop certain types of items on any actors
-      if (['wound', 'runescript', "seidur", "thrall", "family", "weaponcat"].includes(nItm.type)) {
-        ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.cantTransfer', { itemType: game.i18n.localize('TYPES.Item.' + nItm.type) }));
-        continue;
+      if (['wound', 'runescript', 'seidur', 'thrall', 'family', 'weaponcat'].includes(nItm.type)) {
+        ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.cantTransfer', { itemType: game.i18n.localize('TYPES.Item.' + nItm.type) }))
+        continue
       }
 
       //Don't let skill groups be added
       if (['skill'].includes(nItm.type)) {
         if (nItm.system.category === 'zzz') {
-          ui.notifications.warn(game.i18n.localize('AOV.ErrorMsg.noGroupSkill'));
-          continue;
+          ui.notifications.warn(game.i18n.localize('AOV.ErrorMsg.noGroupSkill'))
+          continue
         }
       }
 
       //Can't drop certain item types on anything but a character
-      if (['homeland', 'species','history'].includes(nItm.type) && actor.type != 'character') {
-        ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.characterOnly', { itemType: game.i18n.localize('TYPES.Item.' + nItm.type) }));
-        continue;
+      if (['homeland', 'species', 'history'].includes(nItm.type) && actor.type != 'character') {
+        ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.characterOnly', { itemType: game.i18n.localize('TYPES.Item.' + nItm.type) }))
+        continue
       }
 
       //Can only add certain item types during Creation Phase
       if (['homeland', 'species'].includes(nItm.type) && !game.settings.get('aov', 'createEnabled')) {
-        ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.createOnly', { itemType: game.i18n.localize('TYPES.Item.' + nItm.type) }));
-        continue;
+        ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.createOnly', { itemType: game.i18n.localize('TYPES.Item.' + nItm.type) }))
+        continue
       }
 
       //Check Dropped item has a Chaosium ID, if not then don't add it
       if (!nItmCidFlag) {
-        ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.noCIDFlag', { itemName: nItm.name }));
-        continue;
+        ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.noCIDFlag', { itemName: nItm.name }))
+        continue
       }
 
       //Only let a Species be added if there isn't one already
       if (nItm.type === 'species' && actor.system.speciesID) {
-        ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.speciesExists', { type: game.i18n.localize('TYPES.Item.' + nItm.type) }));
+        ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.speciesExists', { type: game.i18n.localize('TYPES.Item.' + nItm.type) }))
         continue
       }
 
       //Only let a Homeland be added if there isn't one already
       if (nItm.type === 'homeland' && actor.system.homeID) {
-        ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.speciesExists', { type: game.i18n.localize('TYPES.Item.' + nItm.type) }));
+        ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.speciesExists', { type: game.i18n.localize('TYPES.Item.' + nItm.type) }))
         continue
       }
 
       //Only let thralls be dropped on farms
       if (actor.type === 'farm' && !['thrall'].includes(nItm.type)) {
-        ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.cantDropItem', { itemType: game.i18n.localize('TYPES.Item.' + nItm.type), actorType: game.i18n.localize('TYPES.Actor.' + actor.type) }));
-        continue;
+        ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.cantDropItem', { itemType: game.i18n.localize('TYPES.Item.' + nItm.type), actorType: game.i18n.localize('TYPES.Actor.' + actor.type) }))
+        continue
       }
 
       //Can't drop any items on a ship or farm
       if (actor.type === 'ship') {
-        ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.cantDropItem', { itemType: game.i18n.localize('TYPES.Item.' + nItm.type), actorType: game.i18n.localize('TYPES.Actor.' + actor.type) }));
-        continue;
+        ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.cantDropItem', { itemType: game.i18n.localize('TYPES.Item.' + nItm.type), actorType: game.i18n.localize('TYPES.Actor.' + actor.type) }))
+        continue
       }
 
       //Check for duplicate passions, histories, hit-locations and devotions
-      if (['passion', 'devotion', 'hitloc','history'].includes(nItm.type)) {
+      if (['passion', 'devotion', 'hitloc', 'history'].includes(nItm.type)) {
         let currentList = await actor.items.filter(i => i.flags.aov?.cidFlag?.id === nItmCidFlag)
         if (currentList.length > 0) {
-          ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.dupItem', { itemName: (nItm.name + "(" + nItmCidFlag + ")") }));
-          continue;
+          ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.dupItem', { itemName: (nItm.name + '(' + nItmCidFlag + ')') }))
+          continue
         }
       }
 
       //If a specialised skill then ask for specialisation
       if (['skill'].includes(nItm.type)) {
-        if (nItm.system.specSkill && (nItm.system.specialisation === "" || nItm.system.specialisation === game.i18n.localize('AOV.specify'))) {
+        if (nItm.system.specSkill && (nItm.system.specialisation === '' || nItm.system.specialisation === game.i18n.localize('AOV.specify'))) {
           nItm = await this._getSpecialism(nItm, actor)
           nItmCidFlag = nItm.flags.aov?.cidFlag?.id
         }
@@ -88,18 +93,18 @@ export class AOVActorItemDrop {
 
       //Check for duplicate skills, but not specialised skills that have a specialisation name added
       if (['skill'].includes(nItm.type)) {
-        if (!nItm.system.specSkill || (nItm.system.specSkill && (nItm.system.specialisation != "" && nItm.system.specialisation != game.i18n.localize('AOV.specify')))) {
+        if (!nItm.system.specSkill || (nItm.system.specSkill && (nItm.system.specialisation != '' && nItm.system.specialisation != game.i18n.localize('AOV.specify')))) {
           let currentList = await actor.items.filter(i => i.flags.aov?.cidFlag?.id === nItmCidFlag)
           if (currentList.length > 0) {
-            ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.dupItem', { itemName: (nItm.name + "(" + nItmCidFlag + ")") }));
-            continue;
+            ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.dupItem', { itemName: (nItm.name + '(' + nItmCidFlag + ')') }))
+            continue
           }
         }
       }
 
       //If adding a skill and it's a character then calculate the base score
       if (actor.type === 'character' && nItm.type === 'skill') {
-        nItm.system.base = await this._AOVcalcBase(nItm, actor);
+        nItm.system.base = await this._AOVcalcBase(nItm, actor)
       }
 
       //If it's a weapon
@@ -113,7 +118,7 @@ export class AOVActorItemDrop {
             let extraSkill = await game.aov.cid.fromCID(nItm.system.skillCID)
             if (extraSkill.length > 0) {
               let xItm = extraSkill[0].toObject()
-              xItm.system.base = await this._AOVcalcBase(xItm, actor);
+              xItm.system.base = await this._AOVcalcBase(xItm, actor)
               newItemData.push(xItm)
             }
           }
@@ -128,7 +133,7 @@ export class AOVActorItemDrop {
             let extraSkill = await game.aov.cid.fromCID(nItm.system.skills[0].cid)
             if (extraSkill.length > 0) {
               let xItm = extraSkill[0].toObject()
-              xItm.system.base = await this._AOVcalcBase(xItm, actor);
+              xItm.system.base = await this._AOVcalcBase(xItm, actor)
               newItemData.push(xItm)
             }
           }
@@ -144,7 +149,7 @@ export class AOVActorItemDrop {
       if (nItm.type === 'homeland') {
         let addHome = await AOVActorItemDrop._dropHomeland(nItm, actor)
         if (!addHome) {
-          ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.selectionFailed', { type: game.i18n.localize('TYPES.Item.' + nItm.type) }));
+          ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.selectionFailed', { type: game.i18n.localize('TYPES.Item.' + nItm.type) }))
           continue
         }
       }
@@ -153,7 +158,7 @@ export class AOVActorItemDrop {
       if (nItm.type === 'history') {
         let addHistory = await AOVActorItemDrop._dropHistory(nItm, actor)
         if (!addHistory) {
-          ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.selectionFailed', { type: game.i18n.localize('TYPES.Item.' + nItm.type) }));
+          ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.selectionFailed', { type: game.i18n.localize('TYPES.Item.' + nItm.type) }))
           continue
         }
         nItm.system.source = 'history'
@@ -163,30 +168,40 @@ export class AOVActorItemDrop {
       //If we've got this far then the item can be added
       //
       //
-      newItemData.push(nItm);
+      newItemData.push(nItm)
     }
-    return (newItemData);
+    return (newItemData)
   }
 
   //Set base percentage of skill
-  static async _AOVcalcBase(item, actor) {
+  /**
+   *
+   * @param item
+   * @param actor
+   */
+  static async _AOVcalcBase (item, actor) {
     let base = 0
     switch (item.system.baseVal) {
-      case "dex2":
+      case 'dex2':
         return actor.system.abilities.dex.total * 2
-      case "dex3":
+      case 'dex3':
         return actor.system.abilities.dex.total * 3
     }
     return item.system.base
   }
 
   //Activities from adding a Species
-  static async _dropSpecies(itm, actor) {
+  /**
+   *
+   * @param itm
+   * @param actor
+   */
+  static async _dropSpecies (itm, actor) {
     let changes = {}
     let newHitLocs = []
     //Update dice formulae and min/max values
     for (let [key, ability] of Object.entries(itm.system.abilities)) {
-      if (ability.formula != "") {
+      if (ability.formula != '') {
         changes = Object.assign(changes, {
           [`system.abilities.${key}.formula`]: ability.formula,
           [`system.abilities.${key}.min`]: ability.min,
@@ -210,7 +225,12 @@ export class AOVActorItemDrop {
   }
 
   //Activities from adding a Homeland
-  static async _dropHomeland(itm, actor) {
+  /**
+   *
+   * @param itm
+   * @param actor
+   */
+  static async _dropHomeland (itm, actor) {
 
     //Get the selected skills
     let picks = 6
@@ -225,10 +245,10 @@ export class AOVActorItemDrop {
       let tempSkill = (await game.aov.cid.fromCIDBest({ cid: skillOpt.cid }))[0]
       if (tempSkill) { selectOptions.push({ id: skillOpt.cid, selected: false, name: tempSkill.name, bonus: 25 }) }
     }
-    selectOptions = selectOptions.sort(function (a, b) { return a.name.localeCompare(b.name) });
+    selectOptions = selectOptions.sort(function (a, b) { return a.name.localeCompare(b.name) })
 
     // Get the selections via dialog
-    let selectedSkill = await SkillsSelectDialog.create(selectOptions, picks, game.i18n.localize('AOV.skills'),"")
+    let selectedSkill = await SkillsSelectDialog.create(selectOptions, picks, game.i18n.localize('AOV.skills'), '')
     if (!selectedSkill) {
       return false
     }
@@ -247,8 +267,8 @@ export class AOVActorItemDrop {
             let tempSkill = (await game.aov.cid.fromCIDBest({ cid: skillOpt.cid }))[0]
             if (tempSkill) { groupSkills.push({ id: skillOpt.cid, selected: false, name: tempSkill.name, bonus: 25 }) }
           }
-          groupSkills = groupSkills.sort(function (a, b) { return a.name.localeCompare(b.name) });
-          selectedSkill = await SkillsSelectDialog.create(groupSkills, newSkill.system.picks, game.i18n.localize('AOV.weapons'),"")
+          groupSkills = groupSkills.sort(function (a, b) { return a.name.localeCompare(b.name) })
+          selectedSkill = await SkillsSelectDialog.create(groupSkills, newSkill.system.picks, game.i18n.localize('AOV.weapons'), '')
           if (!selectedSkill) {
             return false
           }
@@ -270,12 +290,12 @@ export class AOVActorItemDrop {
     for (let nItm of skillList) {
 
       //If a specialism skill and specialism is blank
-      if (nItm.system.specSkill && (nItm.system.specialisation === "" || nItm.system.specialisation === game.i18n.localize('AOV.specify'))) {
+      if (nItm.system.specSkill && (nItm.system.specialisation === '' || nItm.system.specialisation === game.i18n.localize('AOV.specify'))) {
         nItm = await this._getSpecialism(nItm, actor)
       }
 
       //Check if skill exists on actor
-      let actorItem = await (actor.items.filter(i => i.flags.aov?.cidFlag?.id === nItm.flags.aov?.cidFlag?.id))[0];
+      let actorItem = await (actor.items.filter(i => i.flags.aov?.cidFlag?.id === nItm.flags.aov?.cidFlag?.id))[0]
       if (actorItem) {
         updateItems.push({ _id: actorItem._id, 'system.home': nItm.system.home })
       } else {
@@ -291,13 +311,13 @@ export class AOVActorItemDrop {
         updateItems.push({ _id: currentList[0]._id, 'system.home': 60 })
       } else {
       //Otherwsie add the passion
-      let newPass = (await game.aov.cid.fromCIDBest({ cid: passion.cid }))[0]
-      if (newPass) {
-        let newPassion = foundry.utils.duplicate(newPass)
-        newPassion.system.home = 60
-        addItems.push(newPassion)
+        let newPass = (await game.aov.cid.fromCIDBest({ cid: passion.cid }))[0]
+        if (newPass) {
+          let newPassion = foundry.utils.duplicate(newPass)
+          newPassion.system.home = 60
+          addItems.push(newPassion)
+        }
       }
-    }
     }
     for (let equip of itm.system.equipment) {
       let newEquip = (await game.aov.cid.fromCIDBest({ cid: equip.cid }))[0]
@@ -316,31 +336,41 @@ export class AOVActorItemDrop {
 
 
   //Get Specialism Name for Specialism Skill
-  static async _getSpecialism(newSkill, actor) {
+  /**
+   *
+   * @param newSkill
+   * @param actor
+   */
+  static async _getSpecialism (newSkill, actor) {
     let title = game.i18n.format('AOV.getSpecialism', { entity: newSkill.name })
     const dlg = await AOVDialog.input(
       {
         window: { title: title },
-        content: `<input class="centre" type="text" name="entry">`,
+        content: '<input class="centre" type="text" name="entry">',
         ok: {
-          label: game.i18n.localize("AOV.confirm"),
-        },
+          label: game.i18n.localize('AOV.confirm')
+        }
       }
-    );
+    )
     if (dlg) {
       newSkill.system.specialisation = dlg.entry
       let cidName = newSkill.system.mainName + ' (' + dlg.entry + ')'
-      newSkill.flags.aov.cidFlag.id = "i.skill." + await AOVUtilities.toKebabCase(cidName)
+      newSkill.flags.aov.cidFlag.id = 'i.skill.' + await AOVUtilities.toKebabCase(cidName)
       newSkill.name = cidName
     }
     return newSkill
   }
 
   //Activities from adding a History
-  static async _dropHistory(itm, actor) {
+  /**
+   *
+   * @param itm
+   * @param actor
+   */
+  static async _dropHistory (itm, actor) {
     let newItems = []
     let updateItems = []
-    let brief = "<p><strong>" + itm.name + "</strong></p><p>" + itm.system.description+ "</p>"
+    let brief = '<p><strong>' + itm.name + '</strong></p><p>' + itm.system.description+ '</p>'
 
     for (let nSkill of itm.system.skills) {
 
@@ -358,8 +388,8 @@ export class AOVActorItemDrop {
           if (tempSkill) {
             groupSkills.push({ id: skillOpt.cid, selected: false, name: tempSkill.name, bonus: 0 }) }
         }
-        groupSkills = groupSkills.sort(function (a, b) { return a.name.localeCompare(b.name) });
-        let selectedSkill = await SkillsSelectDialog.create(groupSkills, grpSkill.system.picks, game.i18n.localize('AOV.chooseBonus') +": " + nSkill.bonus + "%",brief)
+        groupSkills = groupSkills.sort(function (a, b) { return a.name.localeCompare(b.name) })
+        let selectedSkill = await SkillsSelectDialog.create(groupSkills, grpSkill.system.picks, game.i18n.localize('AOV.chooseBonus') +': ' + nSkill.bonus + '%', brief)
         if (!selectedSkill) {
           continue
         }
@@ -372,7 +402,7 @@ export class AOVActorItemDrop {
         if (picked === 'i.skill.ride') {
           bonusFormula = '-1D4'
           picked = 'i.skill.worship-freyr'
-          let existSkill = await actor.items.filter(itm=>itm.type==='skill').filter(itm=>itm.flags.aov?.cidFlag?.id === 'i.skill.ride')
+          let existSkill = await actor.items.filter(itm => itm.type==='skill').filter(itm => itm.flags.aov?.cidFlag?.id === 'i.skill.ride')
           if(existSkill.length>0) {
             updateItems.push({ _id: existSkill[0]._id, 'system.history': existSkill[0].system.history + 15 })
           } else {
@@ -391,9 +421,9 @@ export class AOVActorItemDrop {
 
       let bonusRoll = new Roll(bonusFormula)
       await bonusRoll.evaluate()
-      let existSkill = await actor.items.filter(itm=>itm.type==='skill').filter(itm=>itm.flags.aov?.cidFlag?.id === picked)
+      let existSkill = await actor.items.filter(itm => itm.type==='skill').filter(itm => itm.flags.aov?.cidFlag?.id === picked)
       if(existSkill.length>0) {
-          updateItems.push({ _id: existSkill[0]._id, 'system.history': existSkill[0].system.history + bonusRoll.total })
+        updateItems.push({ _id: existSkill[0]._id, 'system.history': existSkill[0].system.history + bonusRoll.total })
       } else {
         let newSkill = (await game.aov.cid.fromCIDBest({ cid: picked }))[0]
         if (newSkill) {
@@ -406,20 +436,20 @@ export class AOVActorItemDrop {
 
     for (let nPass of itm.system.passions) {
       let bonusFormula = nPass.bonus
-      if (bonusFormula === "") {
-        bonusFormula = "60"
+      if (bonusFormula === '') {
+        bonusFormula = '60'
       }
       let bonusRoll = new Roll(bonusFormula)
       await bonusRoll.evaluate()
 
-      let existPass = await actor.items.filter(itm=>itm.type==='passion').filter(itm=>itm.flags.aov?.cidFlag?.id === nPass.cid)
+      let existPass = await actor.items.filter(itm => itm.type==='passion').filter(itm => itm.flags.aov?.cidFlag?.id === nPass.cid)
       if(existPass.length>0) {
         let newBonus = bonusRoll.total
-        if (nPass.bonus === "") {
-          newBonus = Math.max(60-existPass[0].system.history,10)
-         }
-         let update = Math.min(Math. max(100-existPass[0].system.total,0), newBonus)
-          updateItems.push({ _id: existPass[0]._id, 'system.history': existPass[0].system.history + update })
+        if (nPass.bonus === '') {
+          newBonus = Math.max(60-existPass[0].system.history, 10)
+        }
+        let update = Math.min(Math. max(100-existPass[0].system.total, 0), newBonus)
+        updateItems.push({ _id: existPass[0]._id, 'system.history': existPass[0].system.history + update })
       } else {
         let newPass = (await game.aov.cid.fromCIDBest({ cid: nPass.cid }))[0]
         if (newPass) {
@@ -441,12 +471,12 @@ export class AOVActorItemDrop {
 
     if (itm.system.reputation) {
       if (!Roll.validate(itm.system.reputation)) {
-          ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.invalidFormula', { type: game.i18n.localize('TYPES.Item.history') }));
+        ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.invalidFormula', { type: game.i18n.localize('TYPES.Item.history') }))
       } else {
         let repRoll = new Roll(itm.system.reputation)
         await repRoll.evaluate()
         let newRep = repRoll.total + actor.system.reputation.history
-        await actor.update({'system.reputation.history' : newRep})
+        await actor.update({ 'system.reputation.history' : newRep })
       }
 
     }

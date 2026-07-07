@@ -1,0 +1,43 @@
+_key: '!items!30zCopmemj74RzeF'
+_id: 30zCopmemj74RzeF
+name: Myth Lore
+type: skill
+folder: null
+img: systems/aov/art-assets/anvil.svg
+_stats:
+  coreVersion: '13.348'
+  createdTime: 1751569087452
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1757317425094
+  systemId: aov
+  systemVersion: '13.12'
+effects: []
+flags:
+  aov:
+    cidFlag:
+      id: i.skill.myth-lore
+      lang: en
+      priority: 0
+ownership:
+  default: 0
+sort: 0
+system:
+  base: 10
+  baseVal: fixed
+  category: knw
+  common: true
+  description: ''
+  effects: 0
+  gmNotes: ''
+  home: 0
+  mainName: Myth Lore
+  noXP: false
+  pers: 0
+  specSkill: false
+  specialisation: ''
+  weaponCat: ''
+  weaponType: ''
+  xp: 0
+  xpCheck: false

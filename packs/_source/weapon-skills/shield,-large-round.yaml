@@ -1,0 +1,43 @@
+_key: '!items!LpiAGkTjVH3UkROD'
+_id: LpiAGkTjVH3UkROD
+name: Shield, Large Round
+type: skill
+folder: null
+img: systems/aov/art-assets/anvil.svg
+_stats:
+  coreVersion: '13.348'
+  createdTime: 1751569087478
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1757317472887
+  systemId: aov
+  systemVersion: '13.12'
+effects: []
+flags:
+  aov:
+    cidFlag:
+      id: i.skill.shield-large-round
+      lang: en
+      priority: 0
+ownership:
+  default: 0
+sort: 0
+system:
+  base: 15
+  baseVal: fixed
+  category: cbt
+  common: true
+  description: ''
+  effects: 0
+  gmNotes: ''
+  home: 0
+  mainName: Shield, Large Round
+  noXP: false
+  pers: 0
+  specSkill: false
+  specialisation: ''
+  weaponCat: i.weaponcat.shield
+  weaponType: melee
+  xp: 0
+  xpCheck: false

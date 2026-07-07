@@ -1,15 +1,21 @@
 
-import { AOVUtilities } from "../apps/utilities.mjs"
-import { AOVCIDActorUpdateItems } from "../cid/cid-actor-update-items.mjs"
-import { AOVDamage } from "../apps/damage.mjs"
+import { AOVUtilities } from '../apps/utilities.mjs'
+import { AOVCIDActorUpdateItems } from '../cid/cid-actor-update-items.mjs'
+import { AOVDamage } from '../apps/damage.mjs'
 
 
 class AOVMenuLayer extends (foundry.canvas?.layers?.InteractionLayer ?? InteractionLayer) {
-  constructor() {
+  /**
+   *
+   */
+  constructor () {
     super()
   }
 
-  static get layerOptions() {
+  /**
+   *
+   */
+  static get layerOptions () {
     return foundry.utils.mergeObject(super.layerOptions, {
       name: 'aovmenu'
     })
@@ -17,7 +23,11 @@ class AOVMenuLayer extends (foundry.canvas?.layers?.InteractionLayer ?? Interact
 }
 
 export class AOVMenu {
-  static getButtons(controls) {
+  /**
+   *
+   * @param controls
+   */
+  static getButtons (controls) {
     canvas.aovgmtools = new AOVMenuLayer()
     const isGM = game.user.isGM
     const menu = {
@@ -91,7 +101,7 @@ export class AOVMenu {
           active: game.settings.get('aov', 'victoryEnabled'),
           title: 'AOV.victoryPhase',
           onChange: async toggle => await AOVUtilities.toggleVictory(toggle)
-        },
+        }
       }
     }
     if (Array.isArray(controls)) {
@@ -108,7 +118,13 @@ export class AOVMenu {
     }
   }
 
-  static renderControls(app, html, data) {
+  /**
+   *
+   * @param app
+   * @param html
+   * @param data
+   */
+  static renderControls (app, html, data) {
     const isGM = game.user.isGM
     const gmMenu = html.querySelector('.fa-solid fa-hammer')?.parentNode
     if (gmMenu && !gmMenu.classList.contains('aovmenu')) {

@@ -1,0 +1,35 @@
+_key: '!items!UYzDEm2zRCIodeOt'
+_id: UYzDEm2zRCIodeOt
+name: Right Arm
+type: hitloc
+folder: null
+img: systems/aov/art-assets/arm-bandage.svg
+_stats:
+  coreVersion: '13.346'
+  createdTime: 1751569087438
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1754457586813
+  systemId: aov
+  systemVersion: '13.6'
+effects: []
+flags:
+  aov:
+    cidFlag:
+      id: i.hitloc.right-arm
+      lang: en
+      priority: 0
+ownership:
+  default: 0
+sort: 0
+system:
+  description: ''
+  gmNotes: ''
+  gridPos: 4
+  highRoll: 15
+  hpMod: -1
+  locType: limb
+  lowRoll: 13
+  npcAP: 0
+  npcDmg: 0

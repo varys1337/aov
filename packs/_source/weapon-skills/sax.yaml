@@ -1,0 +1,43 @@
+_key: '!items!uC4mvjhWGK48nzky'
+_id: uC4mvjhWGK48nzky
+name: Sax
+type: skill
+folder: null
+img: systems/aov/art-assets/anvil.svg
+_stats:
+  coreVersion: '13.348'
+  createdTime: 1751569087478
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1757317470423
+  systemId: aov
+  systemVersion: '13.12'
+effects: []
+flags:
+  aov:
+    cidFlag:
+      id: i.skill.sax
+      lang: en
+      priority: 0
+ownership:
+  default: 0
+sort: 0
+system:
+  base: 10
+  baseVal: fixed
+  category: cbt
+  common: true
+  description: ''
+  effects: 0
+  gmNotes: ''
+  home: 0
+  mainName: Sax
+  noXP: false
+  pers: 0
+  specSkill: false
+  specialisation: ''
+  weaponCat: i.weaponcat.sword-1-h
+  weaponType: melee
+  xp: 0
+  xpCheck: false

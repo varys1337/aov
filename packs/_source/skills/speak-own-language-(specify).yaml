@@ -1,0 +1,43 @@
+_key: '!items!y9RfSFxxnoWH9ebf'
+_id: y9RfSFxxnoWH9ebf
+name: Speak Own Language (Specify)
+type: skill
+folder: null
+img: systems/aov/art-assets/anvil.svg
+_stats:
+  coreVersion: '13.348'
+  createdTime: 1751569087456
+  duplicateSource: null
+  exportSource: null
+  lastModifiedBy: PackAgeOfVikings
+  modifiedTime: 1757317442441
+  systemId: aov
+  systemVersion: '13.12'
+effects: []
+flags:
+  aov:
+    cidFlag:
+      id: i.skill.speak-other-language
+      lang: en
+      priority: 0
+ownership:
+  default: 0
+sort: 0
+system:
+  base: 50
+  baseVal: fixed
+  category: com
+  common: true
+  description: ''
+  effects: 0
+  gmNotes: ''
+  home: 0
+  mainName: Speak Own Language
+  noXP: false
+  pers: 0
+  specSkill: true
+  specialisation: Specify
+  weaponCat: ''
+  weaponType: ''
+  xp: 0
+  xpCheck: false
