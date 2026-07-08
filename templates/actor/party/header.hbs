@@ -1,0 +1,24 @@
+<header class="party sheet-header draggable">
+  <div class="party-header">
+    <div class="charNameHeader">
+      <div class="header-fields actorName-grid">
+        <div class="bold">{{localize "AOV.name"}}</div>
+        <div class="document-name">
+          <input class="stat-input" name="name" type="text" value="{{actor.name}}">
+        </div>
+      </div>
+    </div>
+
+    {{#if showLogo}}
+      <img class="img-centre aovlogo">
+    {{/if}}
+
+    <div class="party-header-controls right">
+      <a class="icon20" data-action="openWiki" data-tooltip="{{localize 'AOV.openWiki'}}">
+        <i class="fas fa-circle-question"></i>
+      </a>
+    </div>
+  </div>
+
+  <div class="party-separator"><img class="img-centre aovline"></div>
+</header>

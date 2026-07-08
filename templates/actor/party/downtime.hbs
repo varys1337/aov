@@ -1,0 +1,193 @@
+<section class="party tab downtime {{tab.cssClass}}" data-group="primary" data-tab="downtime">
+  <section class="party-downtime-tools">
+    <div class="party-downtime-view-tabs">
+      {{#each downtimeViews as |view|}}
+        <button class="{{#if view.active}}active{{/if}}" type="button" data-action="partySetDowntimeView" data-downtime-view="{{view.id}}">
+          <i class="{{view.icon}}"></i> {{localize view.label}}
+        </button>
+      {{/each}}
+    </div>
+
+    {{#if isGM}}
+      <div class="party-tool-grid">
+        <button type="button" data-action="partyApplyHealingRate"><i class="fas fa-briefcase-medical"></i> {{localize "AOV.Party.ApplyHealingRate"}}</button>
+        <button type="button" data-action="partyResetAugments"><i class="fas fa-hand-holding-magic"></i> {{localize "AOV.Party.ResetAugments"}}</button>
+      </div>
+    {{else}}
+      <p class="party-empty">{{localize "AOV.Party.GMOnlyTools"}}</p>
+    {{/if}}
+  </section>
+
+  {{#if isDowntimeSummary}}
+    <section class="party-summary-grid">
+      <section class="party-downtime-checklist party-summary-panel">
+        <div class="party-downtime-heading">
+          <h3>{{localize downtimeTitle}}</h3>
+          {{#if isGM}}
+            <button class="party-clear-flags-button" type="button" data-action="partyClearDowntimeFlags" data-tooltip="{{localize 'AOV.Party.ClearDowntimeFlags'}}">
+              <i class="fas fa-eraser"></i> {{localize "AOV.Party.ClearFlagsShort"}}
+            </button>
+          {{/if}}
+        </div>
+
+        {{#if downtime.length}}
+          <div class="party-downtime-header party-summary-header">
+            <div>{{localize "AOV.character"}}</div>
+            <div>{{localize "AOV.Party.Augments"}}</div>
+            <div>{{localize "TYPES.Item.wound"}}</div>
+          </div>
+
+          {{#each downtime as |row|}}
+            <div class="party-downtime-row party-summary-row" data-uuid="{{row.uuid}}">
+              <div class="party-downtime-character">
+                <img src="{{row.img}}" data-action="viewPartyDocument" data-uuid="{{row.uuid}}">
+                <a class="rollable truncate" data-action="viewPartyDocument" data-uuid="{{row.uuid}}" data-tooltip="{{row.name}}">{{row.name}}</a>
+                <span>{{row.actorTypeLabel}}</span>
+              </div>
+              <div class="party-downtime-cell">
+                <strong>{{row.augmentUses}}</strong>
+                <span>{{localize "AOV.Party.Augments"}}</span>
+              </div>
+              <div class="party-downtime-cell {{#if row.untreatedWounds}}party-warning{{/if}}">
+                <strong>{{row.wounds}}</strong>
+                {{#if row.isCharacter}}
+                  <span>{{localize "AOV.untreated"}} {{row.untreatedWounds}}</span>
+                {{else}}
+                  <span>{{localize "AOV.damageAbbr"}}</span>
+                {{/if}}
+              </div>
+            </div>
+          {{/each}}
+        {{else}}
+          <p class="party-empty">{{localize "AOV.Party.EmptyCharacters"}}</p>
+        {{/if}}
+      </section>
+
+      <section class="party-summary-panel party-skill-overview">
+        <div class="party-downtime-heading">
+          <h3>{{localize "AOV.Party.SkillOverview"}}</h3>
+        </div>
+
+        {{#if skillOverview.length}}
+          <div class="party-skill-header">
+            <div>{{localize "TYPES.Item.skill"}}</div>
+            <div>{{localize "AOV.Party.Best"}}</div>
+            <div>{{localize "AOV.Party.Actor"}}</div>
+            <div>{{localize "AOV.Party.KnownBy"}}</div>
+          </div>
+
+          {{#each skillOverview as |skill|}}
+            <div class="party-skill-row">
+              <div class="truncate" data-tooltip="{{skill.label}}">{{skill.label}}</div>
+              <strong class="party-skill-score">{{skill.best}}</strong>
+              <div class="truncate" data-tooltip="{{skill.bestActor}}">{{skill.bestActor}}</div>
+              <div class="party-skill-count" data-tooltip-html="{{{skill.knownByTooltip}}}">{{skill.count}}</div>
+            </div>
+          {{/each}}
+        {{else}}
+          <p class="party-empty">{{localize "AOV.Party.EmptySkillOverview"}}</p>
+        {{/if}}
+      </section>
+    </section>
+  {{else}}
+    <section class="party-downtime-checklist">
+      <div class="party-downtime-heading">
+        <h3>{{localize downtimeTitle}}</h3>
+      </div>
+
+      {{#if downtime.length}}
+        <div class="party-downtime-header" style="grid-template-columns: {{downtimeGridColumns}};">
+          {{#each downtimeColumns as |column|}}
+            <div>{{localize column.label}}</div>
+          {{/each}}
+        </div>
+
+        {{#each downtime as |row|}}
+          <div class="party-downtime-row" data-uuid="{{row.uuid}}" style="grid-template-columns: {{@root.downtimeGridColumns}};">
+            {{#each @root.downtimeColumns as |column|}}
+              {{#if (eq column.id "actor")}}
+                <div class="party-downtime-character">
+                  <img src="{{row.img}}" data-action="viewPartyDocument" data-uuid="{{row.uuid}}">
+                  <a class="rollable truncate" data-action="viewPartyDocument" data-uuid="{{row.uuid}}" data-tooltip="{{row.name}}">{{row.name}}</a>
+                  <span>{{row.actorTypeLabel}}</span>
+                </div>
+              {{/if}}
+
+              {{#if (eq column.id "xp")}}
+                <div class="party-downtime-cell">
+                  <strong>{{row.xpChecks}}</strong>
+                  <span>{{localize "AOV.Party.Augments"}} {{row.augmentUses}}</span>
+                </div>
+              {{/if}}
+
+              {{#if (eq column.id "experience")}}
+                <div class="party-downtime-cell {{#if row.flags.expImprov}}party-ready{{/if}}">
+                  {{#if row.isCharacter}}{{#if @root.isGM}}<button type="button" data-action="partyRunExperience" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}
+                  <span>{{#if row.isCharacter}}{{#if row.flags.expImprov}}{{localize "AOV.active"}}{{else}}{{localize "AOV.inactive"}}{{/if}}{{else}}{{localize "AOV.Party.NPCSummaryOnly"}}{{/if}}</span>
+                </div>
+              {{/if}}
+
+              {{#if (eq column.id "training")}}
+                <div class="party-downtime-cell {{#if row.flags.improv}}party-ready{{/if}}">
+                  {{#if row.isCharacter}}{{#if @root.isGM}}
+                    <button type="button" data-action="partyRunTraining" data-uuid="{{row.uuid}}">{{localize "AOV.training"}}</button>
+                    <button type="button" data-action="partyRunResearch" data-uuid="{{row.uuid}}">{{localize "AOV.research"}}</button>
+                  {{/if}}{{/if}}
+                  <span>{{#if row.isCharacter}}{{#if row.flags.improv}}{{localize "AOV.active"}}{{else}}{{localize "AOV.inactive"}}{{/if}}{{else}}{{localize "AOV.Party.NPCSummaryOnly"}}{{/if}}</span>
+                </div>
+              {{/if}}
+
+              {{#if (eq column.id "worship")}}
+                <div class="party-downtime-cell {{#if row.flags.worship}}party-ready{{/if}}">
+                  {{#if row.isCharacter}}{{#if @root.isGM}}<button type="button" data-action="partyRunWorship" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}
+                  <span>{{#if row.isCharacter}}{{#if row.flags.worship}}{{localize "AOV.active"}}{{else}}{{localize "AOV.inactive"}}{{/if}}{{else}}{{localize "AOV.Party.NPCSummaryOnly"}}{{/if}}</span>
+                </div>
+              {{/if}}
+
+              {{#if (eq column.id "farming")}}
+                <div class="party-downtime-cell {{#if row.flags.farming}}party-ready{{/if}}" data-tooltip="{{row.farms}}">
+                  {{#if row.isCharacter}}{{#if @root.isGM}}<button type="button" data-action="partyRunFarmCircumstance" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}
+                  <span>{{#if row.isCharacter}}{{#if row.flags.farming}}{{localize "AOV.active"}}{{else}}{{localize "AOV.inactive"}}{{/if}}{{else}}{{localize "AOV.Party.NPCSummaryOnly"}}{{/if}}</span>
+                </div>
+              {{/if}}
+
+              {{#if (eq column.id "vadprod")}}
+                <div class="party-downtime-cell {{#if row.flags.vadprod}}party-ready{{/if}}">
+                  {{#if row.isCharacter}}{{#if @root.isGM}}<button type="button" data-action="partyRunVadmalProduction" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}
+                  <span>{{#if row.isCharacter}}{{#if row.flags.vadprod}}{{localize "AOV.active"}}{{else}}{{localize "AOV.inactive"}}{{/if}}{{else}}{{localize "AOV.Party.NPCSummaryOnly"}}{{/if}}</span>
+                </div>
+              {{/if}}
+
+              {{#if (eq column.id "aging")}}
+                <div class="party-downtime-cell {{#if row.agingRequired}}party-warning{{/if}} {{#if row.flags.aging}}party-ready{{/if}}">
+                  {{#if row.isCharacter}}{{#if @root.isGM}}<button type="button" data-action="partyRunAging" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}
+                  <span>{{#if row.isCharacter}}{{localize "AOV.ageAbbr"}} {{row.age}}{{else}}{{localize "AOV.Party.NPCSummaryOnly"}}{{/if}}</span>
+                </div>
+              {{/if}}
+
+              {{#if (eq column.id "family")}}
+                <div class="party-downtime-cell {{#if row.flags.family}}party-ready{{/if}}">
+                  {{#if row.isCharacter}}{{#if @root.isGM}}<button type="button" data-action="partyRunFamily" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}
+                  <span>{{#if row.isCharacter}}{{#if row.flags.family}}{{localize "AOV.active"}}{{else}}{{localize "AOV.inactive"}}{{/if}}{{else}}{{localize "AOV.Party.NPCSummaryOnly"}}{{/if}}</span>
+                </div>
+              {{/if}}
+
+              {{#if (eq column.id "wounds")}}
+                <div class="party-downtime-cell {{#if row.untreatedWounds}}party-warning{{/if}}">
+                  <strong>{{row.wounds}}</strong>
+                  {{#if row.isCharacter}}
+                    <span>{{localize "AOV.untreated"}} {{row.untreatedWounds}}</span>
+                  {{else}}
+                    <span>{{localize "AOV.damageAbbr"}}</span>
+                  {{/if}}
+                </div>
+              {{/if}}
+            {{/each}}
+          </div>
+        {{/each}}
+      {{else}}
+        <p class="party-empty">{{localize "AOV.Party.EmptyCharacters"}}</p>
+      {{/if}}
+    </section>
+  {{/if}}
+</section>

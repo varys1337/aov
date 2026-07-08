@@ -1,0 +1,170 @@
+<section class="party tab assets {{tab.cssClass}}" data-group="primary" data-tab="assets">
+  <div class="party-assets-grid">
+    <section class="party-asset-section party-equipment-section">
+      <h3>{{localize "AOV.Party.SharedEquipment"}}</h3>
+
+      <ol class="party-equipment-list">
+        <li class="item gear-header primBackCol party-weapon-row">
+          <div class="left">{{localize "AOV.Party.Weapons"}}</div>
+          <div class="centre">{{localize "AOV.damageAbbr"}}</div>
+          <div class="centre">{{localize "AOV.damageType"}}</div>
+          <div class="centre">{{localize "AOV.hpAbbr"}}</div>
+          <div class="centre">{{localize "AOV.encumbranceAbbr"}}</div>
+          <div class="centre">{{localize "AOV.quantityAbbr"}}</div>
+          <div class="centre">
+            {{#if @root.editable}}
+              <a data-action="createDoc" data-document-class="Item" data-type="weapon" data-tooltip="{{localize 'AOV.createDoc' type=(localize 'TYPES.Item.weapon')}}">
+                <i class="fas fa-plus"></i>
+              </a>
+            {{/if}}
+          </div>
+        </li>
+        {{#each assets.weapons as |item|}}
+          <li class="item party-weapon-row" data-item-id="{{item.id}}" data-drag="true" data-document-class="Item">
+            <div class="gear-name left rollable" data-action="viewDoc">{{item.name}}</div>
+            <div class="gear-name centre">{{item.damage}}</div>
+            <div class="gear-name centre truncate">{{item.damageType}}</div>
+            <div class="gear-name centre">{{item.hp.value}}/{{item.hp.max}}</div>
+            <div class="gear-name centre">{{item.enc}}</div>
+            <div class="gear-name centre"><input class="gear-input party-item-quantity" type="number" value="{{item.quantity}}"></div>
+            <div class="gear-controls centre">
+              <a data-action="deleteDoc" data-tooltip="{{localize 'AOV.deleteDoc' type=(localize 'TYPES.Item.weapon')}}"><i class="fas fa-trash"></i></a>
+            </div>
+          </li>
+        {{else}}
+          <li class="party-empty">{{localize "AOV.Party.EmptyWeapons"}}</li>
+        {{/each}}
+
+        <li class="item gear-header secBackCol party-armour-row">
+          <div class="left">{{localize "AOV.Party.Armour"}}</div>
+          <div class="centre">{{localize "AOV.hitLocations"}}</div>
+          <div class="centre">{{localize "AOV.armourPointsAbbr"}}</div>
+          <div class="centre">{{localize "AOV.encumbranceAbbr"}}</div>
+          <div class="centre">{{localize "AOV.quantityAbbr"}}</div>
+          <div class="centre">
+            {{#if @root.editable}}
+              <a data-action="createDoc" data-document-class="Item" data-type="armour" data-tooltip="{{localize 'AOV.createDoc' type=(localize 'TYPES.Item.armour')}}">
+                <i class="fas fa-plus"></i>
+              </a>
+            {{/if}}
+          </div>
+        </li>
+        {{#each assets.armours as |item|}}
+          <li class="item party-armour-row" data-item-id="{{item.id}}" data-drag="true" data-document-class="Item">
+            <div class="gear-name left rollable" data-action="viewDoc">{{item.name}}</div>
+            <div class="gear-name centre">{{item.locations}}</div>
+            <div class="gear-name centre">{{item.ap}}</div>
+            <div class="gear-name centre">{{item.enc}}</div>
+            <div class="gear-name centre"><input class="gear-input party-item-quantity" type="number" value="{{item.quantity}}"></div>
+            <div class="gear-controls centre">
+              <a data-action="deleteDoc" data-tooltip="{{localize 'AOV.deleteDoc' type=(localize 'TYPES.Item.armour')}}"><i class="fas fa-trash"></i></a>
+            </div>
+          </li>
+        {{else}}
+          <li class="party-empty">{{localize "AOV.Party.EmptyArmour"}}</li>
+        {{/each}}
+
+        <li class="item gear-header terBackCol party-gear-row">
+          <div class="left">{{localize "AOV.Party.Gear"}}</div>
+          <div class="centre">{{localize "AOV.encumbranceAbbr"}}</div>
+          <div class="centre">{{localize "AOV.quantityAbbr"}}</div>
+          <div class="centre">{{localize "AOV.value"}}</div>
+          <div class="centre">
+            {{#if @root.editable}}
+              <a data-action="createDoc" data-document-class="Item" data-type="gear" data-tooltip="{{localize 'AOV.createDoc' type=(localize 'TYPES.Item.gear')}}">
+                <i class="fas fa-plus"></i>
+              </a>
+            {{/if}}
+          </div>
+        </li>
+        {{#each assets.gear as |item|}}
+          <li class="item party-gear-row" data-item-id="{{item.id}}" data-drag="true" data-document-class="Item">
+            <div class="gear-name left rollable" data-action="viewDoc">{{item.name}}</div>
+            <div class="gear-name centre">{{item.enc}}</div>
+            <div class="gear-name centre"><input class="gear-input party-item-quantity" type="number" value="{{item.quantity}}"></div>
+            <div class="gear-name centre">{{item.value}}</div>
+            <div class="gear-controls centre">
+              <a data-action="deleteDoc" data-tooltip="{{localize 'AOV.deleteDoc' type=(localize 'TYPES.Item.gear')}}"><i class="fas fa-trash"></i></a>
+            </div>
+          </li>
+        {{else}}
+          <li class="party-empty">{{localize "AOV.Party.EmptyEquipment"}}</li>
+        {{/each}}
+      </ol>
+    </section>
+
+    <aside class="party-asset-sidebar">
+      <section class="party-asset-section">
+        <h3>{{localize "AOV.Party.Ships"}}</h3>
+        {{#each assets.ships as |ship|}}
+          <article class="party-linked-card {{#unless ship.valid}}party-invalid{{/unless}}" data-uuid="{{ship.uuid}}">
+            <img src="{{ship.img}}" data-action="viewPartyDocument" data-uuid="{{ship.uuid}}">
+            <div>
+              <div class="party-card-title">
+                <a class="rollable" data-action="viewPartyDocument" data-uuid="{{ship.uuid}}">{{ship.name}}</a>
+                {{#if @root.isGM}}
+                  <a data-action="removePartyShip" data-uuid="{{ship.uuid}}" data-tooltip="{{localize 'AOV.Party.UnlinkShip'}}"><i class="fas fa-link-slash"></i></a>
+                {{/if}}
+              </div>
+              {{#if ship.valid}}
+                <div class="party-linked-stats">
+                  <span>{{ship.shipType}} {{ship.hullType}}</span>
+                  <span>{{localize "AOV.ship.hullQualityAbbr"}} {{ship.hullQuality}}</span>
+                  <span>{{localize "AOV.ship.seaWorthyAbbr"}} {{ship.seaworthy.value}}/{{ship.seaworthy.max}}</span>
+                  <span>{{localize "AOV.ship.structuralPointsAbbr"}} {{ship.sp.value}}/{{ship.sp.max}}</span>
+                  <span>{{localize "AOV.ship.capacityAbbr"}} {{ship.cargo}}</span>
+                  <span>{{localize "AOV.windSpeed"}} {{ship.wind}}</span>
+                  <span>{{localize "AOV.ship.captain"}} {{ship.captain}}</span>
+                  <span>{{localize "AOV.ship.helmsman"}} {{ship.helmsman}}</span>
+                  <span>{{localize "AOV.ship.boatShip"}} {{ship.boat}}</span>
+                  <span>{{localize "AOV.ship.navigate"}} {{ship.navigate}}</span>
+                </div>
+                <div class="party-crew-grid">
+                  {{#each ship.crew as |crew|}}
+                    <span>{{crew.label}} {{crew.value}}/{{crew.min}}</span>
+                  {{/each}}
+                </div>
+              {{else}}
+                <p class="party-empty">{{localize "AOV.Party.InvalidReference"}}</p>
+              {{/if}}
+            </div>
+          </article>
+        {{else}}
+          <p class="party-empty">{{localize "AOV.Party.EmptyShips"}}</p>
+        {{/each}}
+      </section>
+
+      <section class="party-asset-section">
+        <h3>{{localize "AOV.Party.Farms"}}</h3>
+        {{#each assets.farms as |farm|}}
+          <article class="party-linked-card {{#unless farm.valid}}party-invalid{{/unless}}" data-uuid="{{farm.uuid}}">
+            <img src="{{farm.img}}" data-action="viewPartyDocument" data-uuid="{{farm.uuid}}">
+            <div>
+              <div class="party-card-title">
+                <a class="rollable" data-action="viewPartyDocument" data-uuid="{{farm.uuid}}">{{farm.name}}</a>
+                {{#if @root.isGM}}
+                  <a data-action="removePartyFarm" data-uuid="{{farm.uuid}}" data-tooltip="{{localize 'AOV.Party.UnlinkFarm'}}"><i class="fas fa-link-slash"></i></a>
+                {{/if}}
+              </div>
+              {{#if farm.valid}}
+                <div class="party-linked-stats">
+                  <span>{{localize "AOV.farmType"}} {{farm.farmType}}</span>
+                  <span>{{localize "AOV.size"}} {{farm.size}}</span>
+                  <span>{{localize "AOV.status"}} {{farm.status}}</span>
+                  <span>{{localize "AOV.value"}} {{farm.value}}</span>
+                  <span>{{localize "AOV.cattle"}} {{farm.cattle}}</span>
+                  <span>{{localize "AOV.sheep"}} {{farm.sheep}}</span>
+                  <span>{{localize "AOV.horses"}} {{farm.horses}}</span>
+                </div>
+              {{else}}
+                <p class="party-empty">{{localize "AOV.Party.InvalidReference"}}</p>
+              {{/if}}
+            </div>
+          </article>
+        {{else}}
+          <p class="party-empty">{{localize "AOV.Party.EmptyFarms"}}</p>
+        {{/each}}
+      </section>
+    </aside>
+  </div>
+</section>

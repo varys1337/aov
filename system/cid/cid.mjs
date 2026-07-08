@@ -512,8 +512,7 @@ export class CID {
     const gameProperty = CID.gamePropertyLookup[type]
     if (!gameProperty) {
       ui.notifications.warn(game.i18n.format('AOV.CIDFlag.error.incorrect.type'))
-      console.log('aov | ', cid)
-      throw new Error()
+      throw new Error(`AOV | Invalid CID type "${type}" in "${cid}"`)
     }
     return gameProperty
   }
@@ -543,8 +542,7 @@ export class CID {
     const documentType = CID.documentNameLookup[type]
     if (!documentType) {
       ui.notifications.warn(game.i18n.format('AOV.CIDFlag.error.incorrect.type'))
-      console.log('aov | ', cid)
-      throw new Error()
+      throw new Error(`AOV | Invalid CID document type "${type}" in "${cid}"`)
     }
     return documentType
   }

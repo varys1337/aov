@@ -1,0 +1,51 @@
+<form class="aov">
+  <div>
+    <ol class="op-list">
+      <div class="dice-roll">
+        <li class="actor-roll">
+          <img class="open-actor" src="{{particImg}}" height="53" width="53" data-tooltip="{{particName}}" />
+          <div class="roll-details">
+            <div class="header">
+              <div class="name">
+                <span class="tag">{{localize "AOV.Party.HealingReport"}}: {{particName}}</span>
+              </div>
+            </div>
+          </div>
+        </li>
+      </div>
+
+      {{#each reports as |report|}}
+        <li class="actor-roll">
+          <img class="open-actor" src="{{report.actorImg}}" height="36" width="36" data-tooltip="{{report.actorName}}" />
+          <div class="roll-details">
+            <div class="header">
+              <div class="name">
+                <span class="tag">{{report.actorName}} ({{localize "AOV.healRateAbbr"}} {{report.healRate}})</span>
+              </div>
+            </div>
+          </div>
+        </li>
+
+        {{#if report.results.length}}
+          {{#each report.results as |result|}}
+            <div>
+              <span class="bold truncate">
+                {{result.locName}}: {{result.damage}} {{localize "AOV.damageAbbr"}} -
+                {{result.healed}} {{localize "AOV.healingAbbr"}} =
+                {{result.newDam}}
+                {{#if result.fullyHealed}} ({{localize "AOV.woundFullyHealed"}}){{/if}}
+              </span>
+            </div>
+          {{/each}}
+        {{else}}
+          <div>
+            <span class="bold truncate">
+              {{localize "AOV.Party.NoWoundsHealed"}}
+              ({{#if (eq report.actorType "npc")}}{{localize "AOV.hitLocations"}}{{else}}{{localize "TYPES.Item.wound"}}{{/if}}: {{report.woundCount}})
+            </span>
+          </div>
+        {{/if}}
+      {{/each}}
+    </ol>
+  </div>
+</form>

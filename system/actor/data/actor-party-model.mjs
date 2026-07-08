@@ -10,9 +10,54 @@ export default class AOVPartyModel extends AOVActorBaseModel {
     const requiredInteger = { required: true, nullable: false, integer: true }
     const schema = super.defineSchema()
 
-    schema.members = new fields.ArrayField(new fields.ObjectField()) // Holds an Array of Actor UUIDs for party members
+    const actorReference = () => new fields.SchemaField({
+      uuid: new fields.StringField({ required: true, blank: true })
+    })
+
+    /*
+     * system.members is the one party roster for character and NPC Actor UUIDs.
+     * Roster cards, downtime summary rows, and party-scoped workflows all derive
+     * from this UUID list so those surfaces cannot drift apart.
+     */
+    schema.members = new fields.ArrayField(actorReference(), { initial: [] })
+
+    /*
+     * Farms and ships are linked by Actor UUID rather than embedded or copied.
+     * Both sibling arrays get explicit initials because party sheet asset updates
+     * write system.assets atomically and expect both branches to exist.
+     */
+    schema.assets = new fields.SchemaField({
+      farms: new fields.ArrayField(actorReference(), { initial: [] }),
+      ships: new fields.ArrayField(actorReference(), { initial: [] })
+    })
 
     return schema
+  }
+
+  /**
+   *
+   * @param source
+   */
+  static migrateData (source) {
+    source = super.migrateData?.(source) ?? source
+    source.members = AOVPartyModel.#normalizeReferences(source.members)
+    source.assets ??= {}
+    source.assets.farms = AOVPartyModel.#normalizeReferences(source.assets.farms)
+    source.assets.ships = AOVPartyModel.#normalizeReferences(source.assets.ships)
+    return source
+  }
+
+  /**
+   *
+   * @param references
+   */
+  static #normalizeReferences (references) {
+    if (!Array.isArray(references)) return []
+    return references.map((reference) => {
+      if (typeof reference === 'string') return { uuid: reference }
+      if (reference?.uuid) return { uuid: reference.uuid }
+      return null
+    }).filter((reference) => reference?.uuid)
   }
 
   /**
