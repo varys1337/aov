@@ -1,5 +1,5 @@
 import AOVDialog from '../setup/aov-dialog.mjs'
-//import { AOVActiveEffect } from '../apps/active-effects.mjs'
+import { AOVActiveEffect } from '../apps/active-effects.mjs'
 
 export class AOVActiveEffectSheet {
   /**
@@ -113,7 +113,7 @@ export class AOVActiveEffectSheet {
    * @param event
    */
   static async _onAddItemEffect (event) {
-    this.document.createEmbeddedDocuments('ActiveEffect', [{ name: ActiveEffect.defaultName({ parent: this.document }) }])
+    await this.document.createEmbeddedDocuments('ActiveEffect', [{ name: ActiveEffect.defaultName({ parent: this.document }) }])
   }
 
   /**

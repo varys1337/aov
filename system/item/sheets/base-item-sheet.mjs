@@ -1,4 +1,4 @@
-import { CIDEditor } from '../../cid/cid-editor.mjs'
+import { getCIDFrameButton, openCIDEditor } from '../../cid/cid-button.mjs'
 
 const { api, sheets } = foundry.applications
 
@@ -9,12 +9,11 @@ export class AoVItemSheet extends api.HandlebarsApplicationMixin(sheets.ItemShee
    */
   constructor (options = {}) {
     super(options)
-    this._dragDrop = this._createDragDropHandlers();        
   }
 
   static DEFAULT_OPTIONS = {
     classes: ['aov', 'sheet', 'item'],
-    dragDrop: [{ dragSelector: '[data-drag]', dropSelector: '.droppable' }],      
+    dragDrop: [{ dragSelector: '[data-drag]', dropSelector: '.droppable' }],
     position: {
       width: 610,
       height: 520
@@ -37,21 +36,11 @@ export class AoVItemSheet extends api.HandlebarsApplicationMixin(sheets.ItemShee
    *
    * @param options
    */
-  async _renderFrame (options) {
-    const frame = await super._renderFrame(options)
-    //define button
-    const sheetCID = this.item.flags?.aov?.cidFlag
-    const noId = (typeof sheetCID === 'undefined' || typeof sheetCID.id === 'undefined' || sheetCID.id === '')
-    //add button
-    const label = game.i18n.localize('AOV.CIDFlag.id')
-    const cidEditor = `<button type="button" class="header-control icon fa-solid fa-fingerprint ${noId ? 'edit-cid-warning' : 'edit-cid-exisiting'}"
-        data-action="editCid" data-tooltip="${label}" aria-label="${label}"></button>`
-    let el = this.window.close
-    while (el.previousElementSibling.localName === 'button') {
-      el = el.previousElementSibling
-    }
-    el.insertAdjacentHTML('beforebegin', cidEditor)
-    return frame
+  _getFrameButtons (options) {
+    const buttons = super._getFrameButtons(options)
+    const cidButton = getCIDFrameButton(this.document, 'editCid')
+    if (cidButton) buttons.unshift(cidButton)
+    return buttons
   }
 
   /**
@@ -103,8 +92,8 @@ export class AoVItemSheet extends api.HandlebarsApplicationMixin(sheets.ItemShee
       current,
       type: 'image',
       redirectToRoot: img ? [img] : [],
-      callback: (path) => {
-        this.document.update({ [attr]: path })
+      callback: async (path) => {
+        await this.document.update({ [attr]: path })
       },
       top: this.position.top + 39,
       left: this.position.left + 9
@@ -120,7 +109,7 @@ export class AoVItemSheet extends api.HandlebarsApplicationMixin(sheets.ItemShee
   static _onEditCid (event) {
     event.stopPropagation() // Don't trigger other events
     if (event.detail > 1) return // Ignore repeated clicks
-    new CIDEditor({ document: this.document }, {}).render(true, { focus: true })
+    openCIDEditor(this.document)
   }
 
   // Toggle something on the item
@@ -129,7 +118,7 @@ export class AoVItemSheet extends api.HandlebarsApplicationMixin(sheets.ItemShee
    * @param event
    * @param target
    */
-  static _onItemToggle (event, target) {
+  static async _onItemToggle (event, target) {
     event.preventDefault()
     let checkProp = {}
     const prop = target.dataset.property
@@ -137,10 +126,10 @@ export class AoVItemSheet extends api.HandlebarsApplicationMixin(sheets.ItemShee
       checkProp = { [`system.${prop}`]: !this.item.system[prop] }
     } else { return }
 
-    this.item.update(checkProp)
+    await this.item.update(checkProp)
 
     if (prop === 'specSkill') {
-      AoVItemSheet.skillChangeName(this.item)
+      await AoVItemSheet.skillChangeName(this.item)
     }
   }
 
@@ -172,80 +161,4 @@ export class AoVItemSheet extends api.HandlebarsApplicationMixin(sheets.ItemShee
       })
     }
   }
-
- //-----------------------DRAG DROP-----------------------------------
-
-  _canDragStart(selector) {
-    // game.user fetches the current user
-    return this.isEditable;
-  }
-
-  _canDragDrop(selector) {
-    // game.user fetches the current user
-    return this.isEditable;
-  }
-
-
-  _onDragStart(event) {
-    const li = event.currentTarget;
-    if ('link' in event.target.dataset) return;
-
-    let dragData = null;
-
-    // Active Effect
-    if (li.dataset.effectId) {
-      const effect = this.item.effects.get(li.dataset.effectId);
-      if (!effect) return;
-      dragData = effect.toDragData();
-    }
-
-    if (!dragData) return;
-
-    // Set data transfer
-    event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
-  }
-
-  _onDragOver(event) {}
-
-  //Handle the dropping of ActiveEffect data onto an Item Sheet
-  async _onDropActiveEffect(event, effect) {
-    let newEffect = effect.toObject();
-    newEffect.transfer = true
-    const item = this.document;
-    if ( !this.isEditable || !item.isOwner || (item === effect.parent) ) return null;
-    const result = await ActiveEffect.implementation.create(newEffect, {parent: item});
-    return result ?? null;
-  }
-
-   async _onDropItem(event, data) {
-    if (!this.item.isOwner) return false;
-  }
-
-   async _onDropFolder(event, data) {
-    if (!this.item.isOwner) return [];
-  }
-
-   get dragDrop() {
-    return this._dragDrop;
-  }
-
-  // This is marked as private because there's no real need
-  // for subclasses or external hooks to mess with it directly
-  _dragDrop;
-
-   _createDragDropHandlers() {
-    return this.options.dragDrop.map((d) => {
-      d.permissions = {
-        dragstart: this._canDragStart.bind(this),
-        drop: this._canDragDrop.bind(this),
-      };
-      d.callbacks = {
-        dragstart: this._onDragStart.bind(this),
-        dragover: this._onDragOver.bind(this),
-        drop: this._onDrop.bind(this),
-      };
-      return new foundry.applications.ux.DragDrop.implementation(d);
-    });
-  }
-
 }

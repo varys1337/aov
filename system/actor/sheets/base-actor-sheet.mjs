@@ -1,5 +1,5 @@
 const { api, sheets } = foundry.applications
-import { CIDEditor } from '../../cid/cid-editor.mjs'
+import { getCIDFrameButton, openCIDEditor, renderCIDDocumentSheet } from '../../cid/cid-button.mjs'
 import { AOVActorItemDrop } from '../actor-item-drop.mjs'
 import { AOVActor } from '../actor.mjs'
 import { AOVRollType } from '../../apps/roll-types.mjs'
@@ -84,28 +84,15 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
     }
   }
 
-
-
-  //Add CID Editor Button as seperate icon on the Window header
   /**
    *
    * @param options
    */
-  async _renderFrame (options) {
-    const frame = await super._renderFrame(options)
-    //define CID button
-    const sheetCID = this.actor.flags?.aov?.cidFlag
-    const noId = (typeof sheetCID === 'undefined' || typeof sheetCID.id === 'undefined' || sheetCID.id === '')
-    //add button
-    const label = game.i18n.localize('AOV.CIDFlag.id')
-    const cidEditor = `<button type="button" class="header-control icon fa-solid fa-fingerprint ${noId ? 'edit-cid-warning' : 'edit-cid-exisiting'}"
-        data-action="editCid" data-tooltip="${label}" aria-label="${label}"></button>`
-    let el = this.window.close
-    while (el.previousElementSibling.localName === 'button') {
-      el = el.previousElementSibling
-    }
-    el.insertAdjacentHTML('beforebegin', cidEditor)
-    return frame
+  _getFrameButtons (options) {
+    const buttons = super._getFrameButtons(options)
+    const cidButton = getCIDFrameButton(this.document, 'editCid')
+    if (cidButton) buttons.unshift(cidButton)
+    return buttons
   }
 
 
@@ -150,7 +137,7 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
     if (id) {
       const doc = this.document.effects.get(id)
       if (doc) {
-        doc.update({
+        await doc.update({
           disabled: !doc.disabled
         })
       }
@@ -190,7 +177,7 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
    * @param target
    */
   static async _createEffect (event, target) {
-    this.document.createEmbeddedDocuments('ActiveEffect', [{ name: ActiveEffect.defaultName({ parent: this.document }) }])
+    await this.document.createEmbeddedDocuments('ActiveEffect', [{ name: ActiveEffect.defaultName({ parent: this.document }) }])
   }
 
   //Clear All Direct Effects
@@ -279,8 +266,8 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
       current,
       type: 'image',
       redirectToRoot: img ? [img] : [],
-      callback: (path) => {
-        this.document.update({ [attr]: path })
+      callback: async (path) => {
+        await this.document.update({ [attr]: path })
       },
       top: this.position.top + 39,
       left: this.position.left + 9
@@ -296,7 +283,7 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
   static _onEditCid (event) {
     event.stopPropagation() // Don't trigger other events
     if (event.detail > 1) return // Ignore repeated clicks
-    new CIDEditor({ document: this.document }, {}).render(true, { focus: true })
+    openCIDEditor(this.document)
   }
 
   // View Embedded Document
@@ -362,7 +349,7 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
    * @param event
    * @param target
    */
-  static _toggleActor (event, target) {
+  static async _toggleActor (event, target) {
     event.stopPropagation()
     let checkProp={}
     let prop = target.dataset.property
@@ -371,7 +358,7 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
     } else {
       return
     }
-    this.actor.update(checkProp)
+    await this.actor.update(checkProp)
   }
 
 
@@ -381,7 +368,7 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
    * @param event
    * @param target
    */
-  static _itemToggle (event, target) {
+  static async _itemToggle (event, target) {
     event.stopImmediatePropagation()
     let checkProp = {}
     const prop = target.dataset.property
@@ -394,7 +381,7 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
       if (newVal > 3) { newVal = 1 }
       checkProp = { 'system.equipStatus': newVal }
     } else { return }
-    item.update(checkProp)
+    await item.update(checkProp)
   }
 
   //Create an Embedded Document
@@ -433,13 +420,7 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
         'flags.aov.cidFlag.lang': game.i18n.lang,
         'flags.aov.cidFlag.priority': 0
       })
-      const html = $(newItem.sheet.element).find('header.window-header .edit-cid-warning,header.window-header .edit-cid-exisiting')
-      if (html.length) {
-        html.css({
-          color: (key ? 'orange' : 'red')
-        })
-      }
-      newItem.sheet.render()
+      await renderCIDDocumentSheet(newItem)
     }
   }
 

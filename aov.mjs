@@ -9,12 +9,14 @@ import CreateToken from './system/hooks/create-token.mjs'
 import RenderChatMessageHTML from './system/hooks/render-chat-message.mjs'
 import RenderRegionConfig from './system/hooks/render-region-config.mjs'
 import RenderActiveEffectConfig from './system/hooks/render-active-effect-config.mjs'
+import { registerPartyRefreshHooks } from './system/hooks/party-refresh.mjs'
 
 import Init from './system/hooks/init.mjs';
 import Ready from './system/hooks/ready.mjs';
 
 Hooks.once('init', Init);
 Hooks.once('ready', Ready);
+registerPartyRefreshHooks();
 Hooks.on('drawNote', drawNote);
 Hooks.on('getSceneControlButtons', AOVMenu.getButtons);
 Hooks.on('renderSceneControls', renderSceneControls);

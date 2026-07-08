@@ -25,24 +25,63 @@ export class AOVDamage {
     game.socket.emit('system.aov', {
       type: 'healChar'
     })
-    AOVUtilities.updateCharSheets(false)
+    await AOVUtilities.updateCharSheets(false)
   }
 
 
   /**
+   * Apply weekly wound healing to one character/NPC and return a structured report.
    *
-   * @param actor
+   * The party sheet uses the same rule implementation as the global healing
+   * phase but suppresses per-character chat cards so it can publish a single
+   * aggregate report. The default options preserve the legacy public behavior:
+   * calling `healrateChar(actor)` still updates character wounds and posts the
+   * existing character healing chat card whenever at least one wound is reduced.
+   * @param {Actor} actor                    A character or NPC Actor to heal.
+   * @param {object} [options]
+   * @param {boolean} [options.createChat]  Create the legacy character card.
+   * @returns {Promise<object>}              Structured healing report data.
    */
-  static async healrateChar (actor) {
+  static async healrateChar (actor, { createChat = true } = {}) {
 
-    let updateItems = []
-    let deleteItems = []
-    let healing = []
-    let hitLocs = actor.items.filter(itm => itm.type==='hitloc')
+    const report = await AOVDamage.#applyHealRate(actor)
+
+    if (createChat && report.results.length > 0) {
+      const msgData = {
+        particName: actor.name,
+        particImg: actor.img,
+        results: report.results
+      }
+      const rolls = {}
+      const html = await foundry.applications.handlebars.renderTemplate('systems/aov/templates/chat/character-healing.hbs', msgData)
+      await AOVCharCreate.showStats(html, rolls, game.i18n.localize('AOV.weeklyHealing'), actor._id)
+    }
+    return report
+  }
+
+  /**
+   * Shared weekly healing implementation for single-character, NPC, and party
+   * workflows. Characters heal wound Items using the legacy rule path. NPCs heal
+   * `npcDmg` on hit-location Items because they do not use embedded wound Items.
+   * The returned rows are intentionally verbose so aggregate chat cards can show
+   * the starting damage, healing applied, ending damage, and fully healed rows.
+   * @param {Actor} actor  A character or NPC Actor that should be healed.
+   * @returns {Promise<object>}
+   */
+  static async #applyHealRate (actor) {
+    if (actor.type === 'npc') return AOVDamage.#applyNpcHealRate(actor)
+
+    const updateItems = []
+    const deleteItems = []
+    const healing = []
+    const hitLocs = actor.items.filter(itm => itm.type==='hitloc')
+    const woundCount = actor.items.filter(itm => itm.type==='wound').length
+
     for (let hitLoc of hitLocs) {
-      let wounds = actor.items.filter(itm => itm.type==='wound').filter(wItm => wItm.system.hitLocId === hitLoc._id)
+      const wounds = actor.items.filter(itm => itm.type==='wound').filter(wItm => wItm.system.hitLocId === hitLoc._id)
       if (wounds.length <1) {continue}
-      //Sort the wounds by damage value
+
+      // Apply healing to the smallest wounds first, matching the original rule path.
       wounds.sort(function (a, b) {
         let x = a.system.damage
         let y = b.system.damage
@@ -50,42 +89,111 @@ export class AOVDamage {
         if (x > y) { return 1 };
         return 0
       })
-      let healTot = actor.system.healRate
+
+      let healTot = Math.max(Number(actor.system.healRate ?? 0), 0)
       for (let wound of wounds) {
-        updateItems.push ({ _id: wound._id, 'system.treated': true })
-        let heal = Math.min(wound.system.damage, healTot)
-        let damage = wound.system.damage - heal
+        const startingDamage = Number(wound.system.damage ?? 0)
+        const heal = Math.min(startingDamage, healTot)
+        const damage = startingDamage - heal
         healTot = healTot - heal
+        const fullyHealed = heal > 0 && damage < 1
+
         if (heal > 0) {
           healing.push({
             locName: hitLoc.name,
-            damage: wound.system.damage,
+            damage: startingDamage,
             healed: heal,
-            newDam: damage
+            newDam: damage,
+            fullyHealed
           })
         }
-        if (damage < 1) {
+
+        if (fullyHealed) {
           deleteItems.push(wound.id)
         } else {
-          updateItems.push ({ _id: wound._id, 'system.damage': damage })
+          updateItems.push ({
+            _id: wound._id,
+            'system.damage': damage,
+            'system.treated': true
+          })
         }
       }
     }
-    await Item.updateDocuments(updateItems, { parent: actor })
-    await Item.deleteDocuments(deleteItems, { parent: actor })
 
-    if (healing.length > 0) {
-      //Create Chat Message
-      let msgData = {
-        particName: actor.name,
-        particImg: actor.img,
-        results: healing
-      }
-      let rolls = {}
-      let html = await foundry.applications.handlebars.renderTemplate('systems/aov/templates/chat/character-healing.hbs', msgData)
-      let msg = await AOVCharCreate.showStats(html, rolls, game.i18n.localize('AOV.weeklyHealing'), actor._id)
+    if (updateItems.length) await Item.updateDocuments(updateItems, { parent: actor })
+    if (deleteItems.length) await Item.deleteDocuments(deleteItems, { parent: actor })
+
+    return {
+      actor,
+      actorName: actor.name,
+      actorImg: actor.img,
+      actorUuid: actor.uuid,
+      actorType: actor.type,
+      healRate: actor.system.healRate,
+      woundCount,
+      results: healing,
+      noHealing: healing.length === 0
     }
-    return
+  }
+
+  /**
+   * Apply weekly healing to NPC hit-location damage.
+   *
+   * NPCs do not own wound Items. Their current injury state is the `npcDmg`
+   * value on hit-location Items, so party healing reduces those values directly
+   * and reports rows in the same shape as character wound healing.
+   * @param {Actor} actor  An NPC Actor whose hit-location damage should heal.
+   * @returns {Promise<object>}
+   */
+  static async #applyNpcHealRate (actor) {
+    const updateItems = []
+    const healing = []
+    const damagedLocations = actor.items
+      .filter(itm => itm.type === 'hitloc')
+      .filter(itm => Number(itm.system.npcDmg ?? 0) > 0)
+      .sort(function (a, b) {
+        let x = Number(a.system.npcDmg ?? 0)
+        let y = Number(b.system.npcDmg ?? 0)
+        if (x < y) { return -1 };
+        if (x > y) { return 1 };
+        return 0
+      })
+
+    let healTot = Math.max(Number(actor.system.healRate ?? 0), 0)
+    for (let hitLoc of damagedLocations) {
+      if (healTot < 1) break
+      const startingDamage = Number(hitLoc.system.npcDmg ?? 0)
+      const heal = Math.min(startingDamage, healTot)
+      const damage = startingDamage - heal
+      healTot = healTot - heal
+      if (heal < 1) continue
+
+      healing.push({
+        locName: hitLoc.name,
+        damage: startingDamage,
+        healed: heal,
+        newDam: damage,
+        fullyHealed: damage < 1
+      })
+      updateItems.push({
+        _id: hitLoc._id,
+        'system.npcDmg': damage
+      })
+    }
+
+    if (updateItems.length) await Item.updateDocuments(updateItems, { parent: actor })
+
+    return {
+      actor,
+      actorName: actor.name,
+      actorImg: actor.img,
+      actorUuid: actor.uuid,
+      actorType: actor.type,
+      healRate: actor.system.healRate,
+      woundCount: damagedLocations.length,
+      results: healing,
+      noHealing: healing.length === 0
+    }
   }
 
   /**

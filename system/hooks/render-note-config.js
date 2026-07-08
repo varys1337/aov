@@ -2,21 +2,23 @@
  * Render Hook
  * @param {ApplicationV2} application
  * @param {HTMLElement} element
- * @param {ApplicationRenderContext} context
- * @param {ApplicationRenderOptions} options
  */
-export default function (application, element, context, options) {
+/* global game */
+export default function (application, element) {
   const hideBackground = application.document.getFlag('aov', 'hide-background') ?? false
-  const formGroup = element.querySelector('[name=texture\\.tint]').closest('div.form-group')
-  const newGroup = document.createElement('div')
+  const tint = element.querySelector("[name='texture.tint']")
+  const formGroup = tint?.closest('div.form-group')
+  if (!formGroup) return
+  if (element.querySelector("[name='flags.aov.hide-background']")) return
+
+  const newGroup = element.ownerDocument.createElement('div')
   newGroup.classList.add('form-group')
-  formGroup.after(newGroup)
-  const label = document.createElement('label')
+  const label = element.ownerDocument.createElement('label')
   label.setAttribute('for', application.id + '-hide-background')
   label.innerText = game.i18n.localize('AOV.mapNoteNoBackground')
-  const div = document.createElement('div')
+  const div = element.ownerDocument.createElement('div')
   div.classList.add('form-fields')
-  const input = document.createElement('input')
+  const input = element.ownerDocument.createElement('input')
   input.type = 'checkbox'
   input.name = 'flags.aov.hide-background'
   input.checked = hideBackground

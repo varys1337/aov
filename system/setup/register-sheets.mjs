@@ -26,15 +26,7 @@ export function registerSheets () {
 
 
   const { sheets } = foundry.applications
-  let { collections } = foundry.documents
-
-  /* // FoundryVTT V12 */
-  if (typeof collections === 'undefined') {
-    collections = {
-      Actors: Actors,
-      Items: Items
-    }
-  }
+  const { collections } = foundry.documents
 
   collections.Actors.unregisterSheet('core', sheets.ActorSheetV2)
   collections.Actors.registerSheet('aov', AoVCharacterSheet, {

@@ -1,5 +1,6 @@
 .app .header-button.edit-cid-warning,
-.application .window-header .header-control.edit-cid-warning {
+.application .window-header .header-control.edit-cid-warning,
+.application .window-header .header-control.invalid-cid {
   color: red;
 }
 

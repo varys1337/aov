@@ -1027,6 +1027,13 @@ button.resolve.cardbutton {
   width: 100%;
 }
 
+.aov .owner-only:not([data-aov-visible="true"]),
+.aov .gm-visible-only:not([data-aov-visible="true"]),
+.aov .owner-only[data-aov-pending-visibility="true"],
+.aov .gm-visible-only[data-aov-pending-visibility="true"] {
+  display: none;
+}
+
 .aov .result-success {
   color:var(--aov-chat-success);
   width: 18px;

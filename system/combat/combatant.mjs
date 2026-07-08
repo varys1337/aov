@@ -12,7 +12,7 @@ export class AoVCombatant extends Combatant {
     if (game.settings.get('aov', 'combatToken')) {
       let parent = await fromUuid('Actor.'+this.actorId)
       if (game.user.isGM) {
-        AoVCombatant.updateImage( this.uuid, parent.img)
+        await AoVCombatant.updateImage( this.uuid, parent.img)
       } else {
         const availableGM = game.users.find(d => d.active && d.isGM)?.id
         if (availableGM) {

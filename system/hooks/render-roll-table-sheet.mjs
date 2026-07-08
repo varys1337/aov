@@ -1,7 +1,5 @@
-import { CIDEditor } from '../cid/cid-editor.mjs'
+import { insertCIDFrameButton } from '../cid/cid-button.mjs'
 
 export default function (application, element, context, options) {
-  CIDEditor.addCIDSheetHeaderButton(application, element)
+  insertCIDFrameButton(application, element)
 }
-
-

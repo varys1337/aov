@@ -154,7 +154,7 @@ export class AOVUtilities {
     game.socket.emit('system.aov', {
       type: 'updateChar'
     })
-    AOVUtilities.updateCharSheets(true)
+    await AOVUtilities.updateCharSheets(true)
   }
 
   /**
@@ -178,7 +178,7 @@ export class AOVUtilities {
     game.socket.emit('system.aov', {
       type: 'updateCharCreate'
     })
-    AOVUtilities.updateCharCreate()
+    await AOVUtilities.updateCharCreate()
   }
 
   /**
@@ -213,7 +213,7 @@ export class AOVUtilities {
     game.socket.emit('system.aov', {
       type: 'updateChar'
     })
-    AOVUtilities.updateCharSheets(true)
+    await AOVUtilities.updateCharSheets(true)
 
     if(state) {
       const confirm = await AOVDialog.confirm({
@@ -254,12 +254,12 @@ export class AOVUtilities {
    *
    * @param lock
    */
-  static updateCharSheets (lock) {
+  static async updateCharSheets (lock) {
     if (game.user.isGM) {
       for (const a of game.actors.contents) {
         if (a?.type === 'character' && a?.sheet && a?.sheet?.rendered) {
           if (lock) {
-            a.update({ 'system.flags.locked': true })
+            await a.update({ 'system.flags.locked': true })
           }
           a.render(false)
         }
@@ -268,7 +268,7 @@ export class AOVUtilities {
       for (const a of game.actors.contents) {
         if (a.isOwner) {
           if (lock) {
-            a.update({ 'system.flags.locked': true })
+            await a.update({ 'system.flags.locked': true })
           }
           a.render(false)
         }

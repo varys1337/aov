@@ -12,11 +12,14 @@ export default class AOVDialog extends foundry.applications.api.DialogV2 {
   }
   /**
    *
+   * @param context
+   * @param options
    */
-  async _postRender () {
-    let check = this.element.querySelector('#skill-select-form')
-    if (check) {
-      this.element.querySelector('.window-content').scrollTop = 0
-    }
+  async _postRender (context, options) {
+    await super._postRender(context, options)
+
+    const check = this.element.querySelector('#skill-select-form')
+    const content = this.element.querySelector('.window-content')
+    if (check && content) content.scrollTop = 0
   }
 }

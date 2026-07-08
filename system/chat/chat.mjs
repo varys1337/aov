@@ -13,22 +13,58 @@ export class AOVChat{
    */
   static async renderMessageHook (message, html) {
     ui.chat.scrollBottom()
-    html.querySelectorAll('.cardbutton').forEach(b => b.addEventListener('click', AOVCheck.triggerChatButton))
-    if (!game.user.isGM) {
-      const ownerOnly = html.querySelectorAll('.owner-only')
-      for (const zone of ownerOnly) {
-        const actor = await AOVactorDetails._getParticipant(zone.dataset.particId, zone.dataset.particType)
-        if ((actor && !actor.isOwner) || (!actor && !game.user.isGM)) {
-          zone.style.display = 'none'
-        }
-      }
+    AOVChat.#bindCardButtons(html)
+
+    const ownerOnly = html.querySelectorAll('.owner-only')
+    const gmVisibleOnly = html.querySelectorAll('.gm-visible-only')
+    AOVChat.#hideVisibilityZones(ownerOnly)
+    if (!game.user.isGM) AOVChat.#hideVisibilityZones(gmVisibleOnly)
+
+    if (game.user.isGM) {
+      AOVChat.#showVisibilityZones(ownerOnly)
+      AOVChat.#showVisibilityZones(gmVisibleOnly)
+      return
     }
 
-    const gmVisibleOnly = await html.querySelectorAll('.gm-visible-only')
-    for (const elem of gmVisibleOnly) {
-      if (!(game.user.isGM)) elem.style.display = 'none'
+    for (const zone of ownerOnly) {
+      const actor = await AOVactorDetails._getParticipant(zone.dataset.particId, zone.dataset.particType)
+      if (actor?.isOwner) AOVChat.#showVisibilityZones([zone])
     }
+  }
 
-    return
+  /**
+   *
+   * @param html
+   */
+  static #bindCardButtons (html) {
+    for (const button of html.querySelectorAll('.cardbutton')) {
+      if (button.dataset.aovBound === 'true') continue
+      button.dataset.aovBound = 'true'
+      button.addEventListener('click', AOVCheck.triggerChatButton)
+    }
+  }
+
+  /**
+   *
+   * @param zones
+   */
+  static #hideVisibilityZones (zones) {
+    for (const zone of zones) {
+      zone.hidden = true
+      delete zone.dataset.aovVisible
+      zone.dataset.aovPendingVisibility = 'true'
+    }
+  }
+
+  /**
+   *
+   * @param zones
+   */
+  static #showVisibilityZones (zones) {
+    for (const zone of zones) {
+      zone.dataset.aovVisible = 'true'
+      zone.hidden = false
+      delete zone.dataset.aovPendingVisibility
+    }
   }
 }

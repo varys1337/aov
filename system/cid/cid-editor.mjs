@@ -1,6 +1,7 @@
 //CHAOSIUM ID EDITOR
 import { AOV } from '../setup/config.mjs'
 import { AOVUtilities } from '../apps/utilities.mjs'
+import { renderCIDDocumentSheet } from './cid-button.mjs'
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api
 
 export class CIDEditor extends HandlebarsApplicationMixin(ApplicationV2) {
@@ -45,48 +46,12 @@ export class CIDEditor extends HandlebarsApplicationMixin(ApplicationV2) {
 
   /**
    *
-   * @param application
-   * @param element
-   */
-  static addCIDSheetHeaderButton (application, element) {
-    if (!element.querySelector('button.header-control.fa-solid.fa-fingerprint')) {
-      application.options.actions.cid = {
-        handler: (event, element) => {
-          event.preventDefault()
-          event.stopPropagation()
-          if (event.detail > 1) return // Ignore repeated clicks
-          if (event.button === 2 && (application.document.flags.aov?.cidFlag?.id ?? false)) {
-            game.clipboard.copyPlainText(application.document.flags.aov.cidFlag.id)
-            ui.notifications.info('AOV.WhatCopiedClipboard', { format: { what: game.i18n.localize('AOV.CIDFlag.key') }, console: false })
-          } else {
-            new CIDEditor({ document: application.document }, {}).render(true, { focus: true })
-          }
-        },
-        buttons: [0, 2]
-      }
-      const copyUuid = element.querySelector('button.header-control.fa-solid.fa-passport')
-      if (copyUuid) {
-        const button = document.createElement('button')
-        button.type = 'button'
-        button.classList = 'header-control fa-solid fa-fingerprint icon'
-        if (!(application.document.flags.aov?.cidFlag?.id ?? false)) {
-          button.classList.add('invalid-cid')
-        }
-        button.dataset.action = 'cid'
-        button.dataset.tooltip = 'AOV.CIDFlag.id'
-        copyUuid.after(button)
-      }
-    }
-  }
-
-  /**
-   *
    * @param options
    */
   async _prepareContext (options) {
 
     this.document = this.options.document
-    const sheetData = await super._prepareContext()
+    const sheetData = await super._prepareContext(options)
     sheetData.objtype = this.document.type
     sheetData.objid = this.document.id
     sheetData.objuuid = this.document.uuid
@@ -169,26 +134,32 @@ export class CIDEditor extends HandlebarsApplicationMixin(ApplicationV2) {
    * @param context
    * @param options
    */
-  _onRender (context, options) {
-    if (this.element.querySelector('input[name=_existing')) {
-      this.element.querySelector('input[name=_existing').addEventListener('change', function (e) {
-        const obj = $(this)
-        const prefix = obj.data('prefix')
-        let value = obj.val()
+  async _onRender (context, options) {
+    await super._onRender(context, options)
+
+    const existing = this.element.querySelector('input[name="_existing"]')
+    if (existing && existing.dataset.aovBound !== 'true') {
+      existing.dataset.aovBound = 'true'
+      existing.addEventListener('change', event => {
+        const prefix = event.currentTarget.dataset.prefix ?? ''
+        let value = event.currentTarget.value
         if (value !== '') {
           value = prefix + AOVUtilities.toKebabCase(value)
         }
-        let target = document.querySelector('input[name=id]')
+        let target = this.element.querySelector('input[name="id"]')
+        if (!target) return
         target.value = value
       })
     }
 
 
-    if (this.element.querySelector('select[name=known]')) {
-      this.element.querySelector('select[name=known]').addEventListener('change', function (e) {
-        const obj = $(this)
-        let value = obj.val()
-        let target = document.querySelector('input[name=id]')
+    const known = this.element.querySelector('select[name="known"]')
+    if (known && known.dataset.aovBound !== 'true') {
+      known.dataset.aovBound = 'true'
+      known.addEventListener('change', event => {
+        let value = event.currentTarget.value
+        let target = this.element.querySelector('input[name="id"]')
+        if (!target) return
         target.value = value
       })
     }
@@ -201,7 +172,7 @@ export class CIDEditor extends HandlebarsApplicationMixin(ApplicationV2) {
    * @param target
    */
   static async copyToClip (event, target) {
-    await AOVUtilities.copyToClipboard($(target).siblings('input').val())
+    await AOVUtilities.copyToClipboard(target.parentElement?.querySelector('input')?.value ?? '')
   }
 
   /**
@@ -219,12 +190,7 @@ export class CIDEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       'flags.aov.cidFlag.lang': lang,
       'flags.aov.cidFlag.priority': priority
     })
-    const html = $(this.document.sheet.element).find('header.window-header .edit-cid-warning,header.window-header .edit-cid-exisiting')
-    if (html.length) {
-      html.css({
-        color: (guess ? 'var(--color-text-light-highlight)' : 'red')
-      })
-    }
+    await renderCIDDocumentSheet(this.document)
     this.render()
   }
 
@@ -244,12 +210,7 @@ export class CIDEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       'flags.aov.cidFlag.lang': lang,
       'flags.aov.cidFlag.priority': priority
     })
-    const html = $(this.document.sheet.element).find('header.window-header .edit-cid-warning,header.window-header .edit-cid-exisiting')
-    if (html.length) {
-      html.css({
-        color: (id ? 'var(--color-text-light-highlight)' : 'red')
-      })
-    }
+    await renderCIDDocumentSheet(this.document)
     this.render()
   }
 

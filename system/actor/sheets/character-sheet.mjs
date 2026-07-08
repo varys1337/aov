@@ -594,7 +594,7 @@ export class AoVCharacterSheet extends AoVActorSheet {
     const newQuantity = event.currentTarget.value
     const itemId = event.currentTarget.closest('.item').dataset.itemId
     const item = this.actor.items.get(itemId)
-    item.update({ 'system.quantity': newQuantity })
+    await item.update({ 'system.quantity': newQuantity })
   }
 
   //Edit Skills Inline

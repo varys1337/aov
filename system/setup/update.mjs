@@ -66,6 +66,7 @@ export async function updateWorld ({ bypassVersionCheck = false } = {}) {
   }
 
   await game.settings.set('aov', 'systemVersion', targetVersion)
+  logMigration(`World migration complete. System version set to ${targetVersion}.`)
 }
 
 export async function updateDialog (msg, data) {
@@ -85,13 +86,14 @@ export async function updateDialog (msg, data) {
 }
 
 export async function damTypeUpdate () {
+  let updated = 0
   //Update World Items
   for (let item of game.items) {
     if (item.type != 'weapon') { continue }
     if (item.system.weaponType === 'missile') {
-      await item.update({ 'system.damMod': 'n' })
+      updated += await updateDamageModifier(item, 'n')
     } else if (item.system.weaponType === 'thrown') {
-      await item.update({ 'system.damMod': 'h' })
+      updated += await updateDamageModifier(item, 'h')
     }
   }
 
@@ -100,9 +102,9 @@ export async function damTypeUpdate () {
     for (let item of actor.items) {
       if (item.type != 'weapon') { continue }
       if (item.system.weaponType === 'missile') {
-        await item.update({ 'system.damMod': 'n' })
+        updated += await updateDamageModifier(item, 'n')
       } else if (item.system.weaponType === 'thrown') {
-        await item.update({ 'system.damMod': 'h' })
+        updated += await updateDamageModifier(item, 'h')
       }
     }
   }
@@ -115,17 +117,19 @@ export async function damTypeUpdate () {
       for (let item of token.delta.items) {
         if (item.type != 'weapon') { continue }
         if (item.system.weaponType === 'missile') {
-          await item.update({ 'system.damMod': 'n' })
+          updated += await updateDamageModifier(item, 'n')
         } else if (item.system.weaponType === 'thrown') {
-          await item.update({ 'system.damMod': 'h' })
+          updated += await updateDamageModifier(item, 'h')
         }
       }
     }
   }
-  return
+  logMigration(`Damage type migration updated ${updated} weapon item(s).`)
+  return updated
 }
 
 export async function charStartStats () {
+  let updated = 0
   //Update Items in World Actors
   for (let actor of game.actors) {
     if (actor.type != 'character') {continue}
@@ -146,26 +150,30 @@ export async function charStartStats () {
         })
       }
     }
+    if (!Object.keys(changes).length) { continue }
     await actor.update(changes)
+    updated += 1
   }
+  logMigration(`Character start stats migration updated ${updated} actor(s).`)
+  return updated
 }
 
 export async function skillNameUpdate () {
-  console.log('Skill Name Update')
+  let updated = 0
   //Update Items in World
   for (let item of game.items) {
     if (item.type != 'skill') {continue}
     if (item.system.mainName != '') {continue}
-    console.log(item.name)
-    item.update ({ 'system.mainName': item.name })
+    await item.update({ 'system.mainName': item.name })
+    updated += 1
   }
   //Update Skills in Actors
   for (let actor of game.actors) {
     for (let item of actor.items) {
       if (item.type != 'skill') {continue}
       if (item.system.mainName != '') {continue}
-      console.log(item.name)
-      item.update ({ 'system.mainName': item.name })
+      await item.update({ 'system.mainName': item.name })
+      updated += 1
     }
   }
   // Update Items in  Scenes [Token] Actors
@@ -175,11 +183,24 @@ export async function skillNameUpdate () {
       for (let item of token.delta.items) {
         if (item.type != 'skill') { continue }
         if (item.system.mainName != '') {continue}
-        console.log(item.name)
-        item.update ({ 'system.mainName': item.name })
+        await item.update({ 'system.mainName': item.name })
+        updated += 1
       }
     }
   }
+  logMigration(`Skill name migration updated ${updated} skill item(s).`)
+  return updated
 
+}
+
+async function updateDamageModifier (item, damMod) {
+  if (item.system.damMod === damMod) return 0
+  await item.update({ 'system.damMod': damMod })
+  return 1
+}
+
+function logMigration (message) {
+  if (!game.user?.isGM) return
+  console.info(`AOV | ${message}`)
 }
 

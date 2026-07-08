@@ -4,22 +4,26 @@ import { AOVCIDActorUpdateItems } from '../cid/cid-actor-update-items.mjs'
 import { AOVDamage } from '../apps/damage.mjs'
 
 
-class AOVMenuLayer extends (foundry.canvas?.layers?.InteractionLayer ?? InteractionLayer) {
-  /**
-   *
-   */
-  constructor () {
-    super()
+let AOVMenuLayer
+
+function getAOVMenuLayer () {
+  const InteractionLayer = foundry.canvas?.layers?.InteractionLayer
+  if (!InteractionLayer) {
+    return null
   }
 
-  /**
-   *
-   */
-  static get layerOptions () {
-    return foundry.utils.mergeObject(super.layerOptions, {
-      name: 'aovmenu'
-    })
+  AOVMenuLayer ??= class AOVMenuLayer extends InteractionLayer {
+    /**
+     *
+     */
+    static get layerOptions () {
+      return foundry.utils.mergeObject(super.layerOptions, {
+        name: 'aovmenu'
+      })
+    }
   }
+
+  return AOVMenuLayer
 }
 
 export class AOVMenu {
@@ -28,7 +32,16 @@ export class AOVMenu {
    * @param controls
    */
   static getButtons (controls) {
-    canvas.aovgmtools = new AOVMenuLayer()
+    const MenuLayer = getAOVMenuLayer()
+    if (!MenuLayer) {
+      console.warn('AOV | InteractionLayer unavailable; GM tools menu not registered.')
+      return
+    }
+
+    if (!canvas.aovgmtools) {
+      canvas.aovgmtools = new MenuLayer()
+    }
+
     const isGM = game.user.isGM
     const menu = {
       name: 'aovmenu',

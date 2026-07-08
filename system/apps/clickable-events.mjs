@@ -1,4 +1,3 @@
-/* global canvas CONFIG CONST DocumentSheetConfig foundry fromUuid game NotesLayer RegionBehavior TokenLayer */
 import ChaosiumCanvasInterfaceAmbientLightToggle from './chaosium-canvas-interface-ambient-light-toggle.mjs'
 import ChaosiumCanvasInterfaceDrawingToggle from './chaosium-canvas-interface-drawing-toggle.mjs'
 import ChaosiumCanvasInterfaceMapPinToggle from './chaosium-canvas-interface-map-pin-toggle.mjs'
@@ -7,6 +6,7 @@ import ChaosiumCanvasInterfacePlaySound from './chaosium-canvas-interface-play-s
 import ChaosiumCanvasInterfaceToScene from './chaosium-canvas-interface-to-scene.mjs'
 import ChaosiumCanvasInterfaceTileToggle from './chaosium-canvas-interface-tile-toggle.mjs'
 import ChaosiumCanvasInterface from './chaosium-canvas-interface.mjs'
+import { registerClickableRegionTokenLayerAdapter } from './clickable-events-tokenlayer-adapter.mjs'
 
 export default class AOVClickableEvents extends foundry.data.regionBehaviors.RegionBehaviorType {
   /**
@@ -51,107 +51,9 @@ export default class AOVClickableEvents extends foundry.data.regionBehaviors.Reg
       }
     )
 
-    const polyfillTokenLayer = foundry.canvas.layers.TokenLayer
-
-    const oldOnClickLeft = polyfillTokenLayer.prototype._onClickLeft
-    polyfillTokenLayer.prototype._onClickLeft = function (event) {
-      oldOnClickLeft.call(this, event)
-      if (canvas.activeLayer instanceof polyfillTokenLayer) {
-        const destination = canvas.activeLayer.toLocal(event)
-        const level = canvas.level.id
-        for (const region of canvas.scene.regions.contents) {
-          if (region.levels.size === 0 || region.levels.has(level)) {
-            const behaviors = region.behaviors.filter(
-              (b) =>
-                !b.disabled &&
-                (b.system instanceof AOVClickableEvents || b.system instanceof ChaosiumCanvasInterface) &&
-                region.object.document.polygonTree.testPoint(destination)
-            )
-            if (behaviors) {
-              behaviors.map(async (b) => {
-                if (
-                  (await b.system._handleMouseOverEvent()) === true &&
-                  typeof b.system._handleLeftClickEvent === 'function'
-                ) {
-                  await b.system._handleLeftClickEvent()
-                }
-              })
-            }
-          }
-        }
-      }
-    }
-
-    const oldOnClickRight = polyfillTokenLayer.prototype._onClickRight
-    polyfillTokenLayer.prototype._onClickRight = function (event) {
-      oldOnClickRight.call(this, event)
-      if (canvas.activeLayer instanceof polyfillTokenLayer) {
-        const destination = canvas.activeLayer.toLocal(event)
-        const level = canvas.level.id
-        for (const region of canvas.scene.regions.contents) {
-          if (region.levels.size === 0 || region.levels.has(level)) {
-            const behaviors = region.behaviors.filter(
-              (b) =>
-                !b.disabled &&
-                (b.system instanceof AOVClickableEvents || b.system instanceof ChaosiumCanvasInterface) &&
-                region.object.document.polygonTree.testPoint(destination)
-            )
-            if (behaviors) {
-              behaviors.map(async (b) => {
-                if (
-                  (await b.system._handleMouseOverEvent()) === true &&
-                  typeof b.system._handleRightClickEvent === 'function'
-                ) {
-                  await b.system._handleRightClickEvent()
-                }
-              })
-            }
-          }
-        }
-      }
-    }
-
-    document.body.addEventListener('mousemove', async function (event) {
-      if (canvas.activeLayer instanceof polyfillTokenLayer) {
-        const pointer = canvas?.app?.renderer?.events?.pointer
-        if (!pointer) {
-          return
-        }
-        const level = canvas.level.id
-        const destination = canvas.activeLayer.toLocal(event)
-        let setPointer = false
-        for (const region of canvas.scene.regions.contents) {
-          if (region.levels.size === 0 || region.levels.has(level)) {
-            const behaviors = region.behaviors.filter(
-              (b) =>
-                !b.disabled &&
-                (b.system instanceof AOVClickableEvents || b.system instanceof ChaosiumCanvasInterface) &&
-                region.object.document.polygonTree.testPoint(destination)
-            )
-            if (behaviors) {
-              setPointer = (
-                await Promise.all(
-                  behaviors.map(async (doc) => {
-                    const r = await doc.system._handleMouseOverEvent()
-                    if (r === true) {
-                      return true
-                    }
-                    if (r !== false) {
-                      console.error(doc.uuid + ' did not return a boolean')
-                    }
-                    return false
-                  })
-                )
-              ).reduce((c, b) => c || b, setPointer)
-            }
-          }
-        }
-        if (setPointer) {
-          document.getElementById('board').style.cursor = 'pointer'
-        } else {
-          document.getElementById('board').style.cursor = ''
-        }
-      }
+    registerClickableRegionTokenLayerAdapter({
+      clickableEventsType: AOVClickableEvents,
+      canvasInterfaceType: ChaosiumCanvasInterface
     })
   }
 
@@ -216,22 +118,7 @@ export default class AOVClickableEvents extends foundry.data.regionBehaviors.Reg
    * @param {string} docUuid
    */
   static async ClickRegionLeftUuid (docUuid) {
-    const doc = await fromUuid(docUuid)
-    if (doc) {
-      doc.behaviors
-        .filter((b) => !b.disabled)
-        .filter((b) => b.system instanceof AOVClickableEvents || b.system instanceof ChaosiumCanvasInterface)
-        .map(async (b) => {
-          if (
-            (await b.system._handleMouseOverEvent()) === true &&
-            typeof b.system._handleLeftClickEvent === 'function'
-          ) {
-            await b.system._handleLeftClickEvent()
-          }
-        })
-    } else {
-      console.error('RegionUuid ' + docUuid + ' not loaded')
-    }
+    await AOVClickableEvents.#clickRegionUuid(docUuid, '_handleLeftClickEvent')
   }
 
   /**
@@ -239,22 +126,31 @@ export default class AOVClickableEvents extends foundry.data.regionBehaviors.Reg
    * @param {string} docUuid
    */
   static async ClickRegionRightUuid (docUuid) {
+    await AOVClickableEvents.#clickRegionUuid(docUuid, '_handleRightClickEvent')
+  }
+
+  /**
+   *
+   * @param docUuid
+   * @param handlerName
+   */
+  static async #clickRegionUuid (docUuid, handlerName) {
     const doc = await fromUuid(docUuid)
-    if (doc) {
-      doc.behaviors
-        .filter((b) => !b.disabled)
-        .filter((b) => b.system instanceof AOVClickableEvents || b.system instanceof ChaosiumCanvasInterface)
-        .map(async (b) => {
-          if (
-            (await b.system._handleMouseOverEvent()) === true &&
-            typeof b.system._handleRightClickEvent === 'function'
-          ) {
-            await b.system._handleRightClickEvent()
-          }
-        })
-    } else {
+    if (!doc) {
       console.error('RegionUuid ' + docUuid + ' not loaded')
+      return
     }
+
+    const behaviors = (doc.behaviors ?? [])
+      .filter((b) => !b.disabled)
+      .filter((b) => b.system instanceof AOVClickableEvents || b.system instanceof ChaosiumCanvasInterface)
+    await Promise.all(
+      behaviors.map(async (b) => {
+        if ((await b.system._handleMouseOverEvent()) === true && typeof b.system[handlerName] === 'function') {
+          await b.system[handlerName]()
+        }
+      })
+    )
   }
 
   /**

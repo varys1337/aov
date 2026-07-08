@@ -52,7 +52,6 @@ export default class AOVActorBaseModel extends AOVDataModel {
     schema.beserkerOpt = new fields.BooleanField({ initial: false })  //Can the actor go beserk
     schema.beserkerStat = new fields.BooleanField({ initial: false })  //Is the actor go beserk
     schema.powResist = new fields.NumberField({ ...requiredInteger, initial: 0 })  //Magical Defence bonus
-    schema.parryBonus = new fields.NumberField({ ...requiredInteger, initial: 0 })  //Parry bonus
     schema.sizSpecial = new fields.NumberField({ ...requiredInteger, initial: 0 })  //Reverse SIZ adjustment for HP Calc
 
     // Iterate over ability names and create a new SchemaField for each.

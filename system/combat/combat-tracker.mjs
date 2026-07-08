@@ -1,6 +1,6 @@
 import AOVDialog from '../setup/aov-dialog.mjs'
 
-export class AoVCombatTracker extends (foundry.applications?.sidebar?.tabs?.CombatTracker ?? CombatTracker) {
+export class AoVCombatTracker extends foundry.applications.sidebar.tabs.CombatTracker {
   /**
    *
    * @param options
@@ -53,10 +53,16 @@ export class AoVCombatTracker extends (foundry.applications?.sidebar?.tabs?.Comb
   /**
    *
    * @param context
-   * @param _options
+   * @param options
    */
-  _onRender (context, _options) {
-    this.element.querySelectorAll('.adjustInit').forEach(n => n.addEventListener('click', this.adjustInit.bind(this)))
+  async _onRender (context, options) {
+    await super._onRender(context, options)
+
+    for (const button of this.element.querySelectorAll('.adjustInit')) {
+      if (button.dataset.aovBound === 'true') continue
+      button.dataset.aovBound = 'true'
+      button.addEventListener('click', this.adjustInit.bind(this))
+    }
   }
 
   /**
@@ -70,7 +76,7 @@ export class AoVCombatTracker extends (foundry.applications?.sidebar?.tabs?.Comb
     let value = await AoVCombatTracker.adjDex(combatant.name, combatant.initiative)
     if (value) {
       if (game.user.isGM) {
-        AoVCombatTracker.updateInit( combatant.uuid, combatant.initiative-value)
+        await AoVCombatTracker.updateInit( combatant.uuid, combatant.initiative-value)
       } else {
         const availableGM = game.users.find(d => d.active && d.isGM)?.id
         if (availableGM) {

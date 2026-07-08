@@ -3,14 +3,10 @@ import { AOVSystemSocket } from '../apps/socket.mjs'
 import { updateWorld } from '../setup/update.mjs'
 
 
-export default function Ready () {
+export default async function Ready () {
   game.socket.on('system.aov', async data => {
     AOVSystemSocket.callSocket(data)
   })
-
-  Scene.prototype._onClickDocumentLink = function (event) {
-    this.view() }
-
 
   console.log('///////////////////////////////////')
   console.log('//  Age of Vikings System Ready  //')
@@ -28,7 +24,7 @@ export default function Ready () {
   )
   const needsUpdate = foundry.utils.isNewerVersion(game.system.version, currentVersion ?? '0')
   if (needsUpdate) {
-    updateWorld()
+    await updateWorld()
   }
 
 }

@@ -1,6 +1,7 @@
 import { CID } from '../cid/cid.mjs'
 import { AOVSelectLists } from '../apps/select-lists.mjs'
 import { AOVActorItemDrop } from './actor-item-drop.mjs'
+import { renderCIDDocumentSheet } from '../cid/cid-button.mjs'
 
 export class AOVActor extends Actor {
 
@@ -19,7 +20,7 @@ export class AOVActor extends Actor {
     this.system.cidFlagItems = {}
     for (const i of this.items) {
       if (i.flags.aov?.cidFlag?.id) {
-        const parts = i.flags.aov?.cidFlag?.id.match(/^([^\.]+)\.([^\.]+)\.([^\.]+)$/)
+        const parts = i.flags.aov?.cidFlag?.id.match(/^([^.]+)\.([^.]+)\.([^.]+)$/)
         if (parts) {
           if (typeof this.system.cidFlagItems[parts[1]] === 'undefined') {
             this.system.cidFlagItems[parts[1]] = {}
@@ -230,8 +231,6 @@ export class AOVActor extends Actor {
     //Calculate ENC penalites
     this._eNCPenalty (actorData)
 
-    //Check to see if Actor is in a visible party and if so re-render the party sheet, function is asynchronous but does not alter actorData
-    this._updateParty(actorData)
   }
 
   //Prepare NPC specific data
@@ -463,13 +462,7 @@ export class AOVActor extends Actor {
             'flags.aov.cidFlag.lang': game.i18n.lang,
             'flags.aov.cidFlag.priority': priority
           })
-          const html = $(actor.sheet.element).find('header.window-header .edit-cid-warning,header.window-header .edit-cid-exisiting')
-          if (html.length) {
-            html.css({
-              color: (tempID ? 'orange' : 'red')
-            })
-          }
-          actor.render()
+          await renderCIDDocumentSheet(actor)
         }
       }
     }
@@ -894,19 +887,23 @@ export class AOVActor extends Actor {
     await this.update(checkProp)
   }
 
-  //Rerender Party Sheet if actor is in it
+  // Rerender open party sheets that include this actor.
   /**
    *
-   * @param actorData
+   * @param actor
    */
-  async _updateParty (actorData) {
-    try {
-      const parties = game.actors.filter(actr => actr.type==='party' && actr.sheet.rendered && actr.system.members.find(m => m.uuid === actorData.uuid))
-      for (const party of parties) {
-        await party.render()
-      }
-    } catch (e) {
-      // Called before sheet is ready
+  static async refreshRenderedPartiesForActor (actor) {
+    if (!actor?.uuid) return
+    const parties = game.actors.filter((party) => {
+      if (party.type !== 'party') return false
+      if (!party.sheet?.rendered) return false
+      if (party.system.members?.some((member) => member.uuid === actor.uuid)) return true
+      if (party.system.assets?.farms?.some((farm) => farm.uuid === actor.uuid)) return true
+      if (party.system.assets?.ships?.some((ship) => ship.uuid === actor.uuid)) return true
+      return false
+    })
+    for (const party of parties) {
+      await party.sheet.render(false)
     }
   }
 

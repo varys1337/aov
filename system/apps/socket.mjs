@@ -18,13 +18,13 @@ export class AOVSystemSocket {
     if (!!data.to && game.userId !== data.to) { return }
     switch (data.type) {
       case 'updateChar':
-        AOVUtilities.updateCharSheets(true)  //True locks the character sheet
+        await AOVUtilities.updateCharSheets(true)  //True locks the character sheet
         break
       case 'updateCharCreate':
-        AOVUtilities.updateCharCreate()
+        await AOVUtilities.updateCharCreate()
         break
       case 'healChar':
-        AOVUtilities.updateCharSheets(false)  //False doesn't lock the character sheet
+        await AOVUtilities.updateCharSheets(false)  //False doesn't lock the character sheet
         break
       case 'REAdd':
         if (data.to === game.user.id) {
@@ -80,13 +80,10 @@ export class AOVSystemSocket {
         game.settings.set('core', NotesLayer.TOGGLE_SETTING, data.toggle === true)
         break
       case 'combatantImage':
-        AoVCombatant.updateImage(data.value.combatantUuid, data.value.img)
+        await AoVCombatant.updateImage(data.value.combatantUuid, data.value.img)
         break
       case 'combatantInit':
-        AoVCombatTracker.updateInit(data.value.combatantUuid, data.value.initiative)
-        break
-      case 'toggleMapNotes':
-        game.settings.set('core', NotesLayer.TOGGLE_SETTING, data.toggle === true)
+        await AoVCombatTracker.updateInit(data.value.combatantUuid, data.value.initiative)
         break
     }
   }
