@@ -651,6 +651,28 @@ nav.aov.characterSmall.tabs [data-tab]{
   align-items: center;
 }
 
+.aov.party .party-header-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-self: end;
+  gap: 6px;
+}
+
+.aov.party .party-header-controls .icon20 {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.aov.party .party-compact-toggle.active {
+  color: var(--aov-title-font-colour);
+}
+
+.aov.party .party-clear-flags-control {
+  color: var(--aov-primary-font-colour);
+}
+
 .aov.party .actorName-grid {
   font-size: var(--aov-title-font-size);
   display: grid;
@@ -666,12 +688,23 @@ nav.aov.characterSmall.tabs [data-tab]{
   padding: 0 20px 5px;
 }
 
+.aov.party nav.sheet-tabs.tabs .aovTab label {
+  font-size: 1.25em;
+}
+
 .aov.party .tab.party {
   flex: 1 1 0;
   padding: 0 20px 15px;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
+  min-height: 0;
+}
+
+.aov.party .party-downtime-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   min-height: 0;
 }
 
@@ -822,9 +855,177 @@ nav.aov.characterSmall.tabs [data-tab]{
   display: grid;
   grid-template-columns: minmax(480px, 1.1fr) minmax(520px, 0.95fr);
   gap: 10px;
-  align-items: start;
+  align-items: stretch;
+  height: 100%;
+  min-height: 0;
   min-width: 0;
   max-width: 100%;
+}
+
+.aov.party .party-compact-sections {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.aov.party .party-compact-assets-columns {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+}
+
+.aov.party .party-compact-section {
+  min-width: 0;
+}
+
+.aov.party .party-compact-section h3 {
+  margin: 0 0 8px;
+  color: var(--aov-title-font-colour);
+  font-size: var(--aov-heading-font-size);
+}
+
+.aov.party .party-compact-assets-columns .party-compact-section h3 {
+  text-align: center;
+}
+
+.aov.party .party-compact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(78px, 88px));
+  gap: 8px;
+  align-items: start;
+}
+
+.aov.party .party-compact-characters {
+  grid-template-columns: repeat(auto-fill, minmax(101px, 114px));
+  gap: 12px;
+  padding: 4px;
+}
+
+.aov.party .party-compact-assets {
+  grid-template-columns: repeat(auto-fill, minmax(66px, 75px));
+}
+
+.aov.party .party-compact-tile {
+  aspect-ratio: 1;
+  border: 1px solid var(--aov-primary-font-colour);
+  background: rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  min-width: 0;
+}
+
+.aov.party .party-compact-tile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 0;
+  cursor: pointer;
+}
+
+.aov.party .party-compact-character-tile {
+  position: relative;
+}
+
+.aov.party .party-compact-character-footer {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: grid;
+  gap: 2px;
+  padding: 3px 4px;
+  background: rgba(0, 0, 0, 0.78);
+  color: var(--aov-primary-font-colour);
+  font-size: 0.72rem;
+  line-height: 1.1;
+}
+
+.aov.party .party-compact-character-footer > a {
+  color: inherit;
+  font-weight: bold;
+}
+
+.aov.party .party-compact-character-vitals {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  color: var(--aov-secondary-font-colour);
+}
+
+.aov.party .party-compact-downtime-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 8px;
+  align-items: start;
+  min-width: 0;
+}
+
+.aov.party .party-compact-downtime-card {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 8px;
+  border: 1px solid var(--aov-primary-font-colour);
+  background: rgba(0, 0, 0, 0.12);
+  padding: 5px;
+  min-width: 0;
+}
+
+.aov.party .party-compact-downtime-card > img {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border: 1px solid var(--aov-primary-font-colour);
+  cursor: pointer;
+}
+
+.aov.party .party-compact-downtime-main {
+  display: grid;
+  gap: 5px;
+  align-content: start;
+  min-width: 0;
+}
+
+.aov.party .party-compact-downtime-main > a {
+  min-width: 0;
+  font-weight: bold;
+}
+
+.aov.party .party-compact-downtime-stats,
+.aov.party .party-compact-action-grid {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.aov.party .party-compact-downtime-stats {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.aov.party .party-compact-downtime-stats span,
+.aov.party .party-compact-action-cell span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.aov.party .party-compact-action-cell {
+  display: grid;
+  gap: 2px;
+  justify-items: center;
+  align-content: center;
+  min-width: 0;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.35);
+  padding: 3px 2px;
+  text-align: center;
+}
+
+.aov.party .party-compact-action-cell button {
+  width: 100%;
+  min-height: 24px;
+  line-height: 1.1;
+}
+
+.aov.party.party-compact .tab.party {
+  padding-bottom: 10px;
 }
 
 .aov.party .party-equipment-section {
@@ -834,6 +1035,21 @@ nav.aov.characterSmall.tabs [data-tab]{
 .aov.party .party-asset-section {
   padding: 6px;
   min-width: 0;
+}
+
+.aov.party .party-asset-scroll-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 100%;
+}
+
+.aov.party .party-asset-scroll-body {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
 }
 
 .aov.party .party-asset-section h3,
@@ -895,7 +1111,9 @@ nav.aov.characterSmall.tabs [data-tab]{
   display: grid;
   grid-column: 1;
   grid-row: 1;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
   gap: 10px;
+  min-height: 0;
   min-width: 0;
 }
 
@@ -940,8 +1158,8 @@ nav.aov.characterSmall.tabs [data-tab]{
 
 .aov.party .party-tool-grid button,
 .aov.party .party-downtime-view-tabs button,
-.aov.party .party-clear-flags-button,
 .aov.party .party-downtime-cell button,
+.aov.party .party-compact-action-cell button,
 .aov.party .party-icon-button {
   color: var(--aov-primary-font-colour);
   border: 1px solid var(--aov-primary-font-colour);
@@ -965,11 +1183,35 @@ nav.aov.characterSmall.tabs [data-tab]{
   display: grid;
   grid-template-columns: minmax(360px, 0.42fr) minmax(420px, 0.58fr);
   gap: 14px;
-  align-items: start;
+  align-items: stretch;
+  flex: 1 1 0;
+  min-height: 0;
 }
 
 .aov.party .party-summary-panel {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
+  min-height: 0;
+  max-height: 100%;
+}
+
+.aov.party .party-summary-body {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+}
+
+.aov.party .party-summary-count-cell,
+.aov.party .party-summary-header div {
+  text-align: center;
+}
+
+.aov.party .party-summary-count-cell {
+  justify-items: center;
+  align-content: center;
 }
 
 .aov.party .party-downtime-heading {
@@ -982,14 +1224,6 @@ nav.aov.characterSmall.tabs [data-tab]{
 
 .aov.party .party-downtime-heading h3 {
   margin: 0;
-}
-
-.aov.party .party-clear-flags-button {
-  flex: 0 0 auto;
-  width: auto;
-  min-width: 112px;
-  padding: 2px 8px;
-  line-height: 1.2;
 }
 
 .aov.party .party-summary-header,
@@ -1123,6 +1357,10 @@ nav.aov.characterSmall.tabs [data-tab]{
 
 @media (max-width: 780px) {
   .aov.party .party-assets-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .aov.party .party-compact-assets-columns {
     grid-template-columns: 1fr;
   }
 

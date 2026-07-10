@@ -17,6 +17,14 @@
       <a class="icon20" data-action="openWiki" data-tooltip="{{localize 'AOV.openWiki'}}">
         <i class="fas fa-circle-question"></i>
       </a>
+      <a class="icon20 party-compact-toggle {{#if partyCompactView}}active{{/if}}" data-action="togglePartyCompact" data-tooltip="{{localize 'AOV.Party.ToggleCompactView'}}" aria-label="{{localize partyCompactToggleLabel}}">
+        <i class="{{partyCompactToggleIcon}}"></i>
+      </a>
+      {{#if isGM}}
+        <a class="icon20 party-clear-flags-control" data-action="partyClearDowntimeFlags" data-tooltip="{{localize 'AOV.Party.ClearDowntimeFlags'}}" aria-label="{{localize 'AOV.Party.ClearDowntimeFlags'}}">
+          <i class="fas fa-eraser"></i>
+        </a>
+      {{/if}}
     </div>
   </div>
 

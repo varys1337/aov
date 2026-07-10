@@ -5,6 +5,10 @@ import { AoVActorSheet } from './base-actor-sheet.mjs'
 const PARTY_ITEM_TYPES = new Set(['armour', 'gear', 'weapon'])
 const PARTY_MEMBER_TYPES = new Set(['character', 'npc'])
 const PARTY_SKILL_OVERVIEW_LIMIT = 12
+const PARTY_FULL_WIDTH = 1220
+const PARTY_FULL_HEIGHT = 760
+const PARTY_COMPACT_WIDTH = 760
+const PARTY_COMPACT_HEIGHT = 520
 const DOWNTIME_VIEWS = Object.freeze({
   summary: {
     id: 'summary',
@@ -38,10 +42,11 @@ export class AoVPartySheet extends AoVActorSheet {
   static DEFAULT_OPTIONS = {
     classes: ['party', 'party-sheet'],
     position: {
-      width: 1220,
-      height: 900
+      width: PARTY_FULL_WIDTH,
+      height: PARTY_FULL_HEIGHT
     },
     actions: {
+      togglePartyCompact: this._onTogglePartyCompact,
       viewPartyDocument: this._onViewPartyDocument,
       removePartyCharacter: this._onRemovePartyCharacter,
       removePartyFarm: this._onRemovePartyFarm,
@@ -131,6 +136,15 @@ export class AoVPartySheet extends AoVActorSheet {
    */
   async _prepareContext (options) {
     const context = await super._prepareContext(options)
+    const partyCompactView = game.settings.get('aov', 'partyCompactView')
+    if (options.isFirstRender) {
+      options.position ??= {}
+      options.position.width = partyCompactView ? PARTY_COMPACT_WIDTH : PARTY_FULL_WIDTH
+      options.position.height = partyCompactView ? PARTY_COMPACT_HEIGHT : PARTY_FULL_HEIGHT
+    }
+    context.partyCompactView = partyCompactView
+    context.partyCompactToggleLabel = partyCompactView ? 'AOV.Party.FullView' : 'AOV.Party.CompactView'
+    context.partyCompactToggleIcon = partyCompactView ? 'fas fa-expand' : 'fas fa-compress'
     context.tabs = this._getTabs(options.parts)
     context.showHPVal = game.settings.get('aov', 'partyHPVal') || context.isGM
     context.characters = await this.#prepareMemberSummaries(context)
@@ -164,6 +178,7 @@ export class AoVPartySheet extends AoVActorSheet {
    * @param options
    */
   _onRender (context, options) {
+    this.element.classList.toggle('party-compact', context.partyCompactView)
     /*
      * The base AoV sheet stores drag/drop handlers as an array, while
      * ActorSheetV2 expects its own accessor shape. Bind the local handlers
@@ -173,6 +188,20 @@ export class AoVPartySheet extends AoVActorSheet {
     this.element.querySelectorAll('.party-item-quantity').forEach((node) => {
       node.addEventListener('change', this.#editQuantity.bind(this))
     })
+  }
+
+  /**
+   *
+   */
+  static async _onTogglePartyCompact () {
+    const partyCompactView = !game.settings.get('aov', 'partyCompactView')
+    await game.settings.set('aov', 'partyCompactView', partyCompactView)
+    await this.render(false)
+    this.setPosition({
+      width: partyCompactView ? PARTY_COMPACT_WIDTH : PARTY_FULL_WIDTH,
+      height: partyCompactView ? PARTY_COMPACT_HEIGHT : PARTY_FULL_HEIGHT
+    })
+    return this
   }
 
   /**
@@ -415,6 +444,7 @@ export class AoVPartySheet extends AoVActorSheet {
         augmentUses,
         wounds: wounds.length,
         untreatedWounds: isCharacter ? wounds.filter((item) => !item.system.treated).length : 0,
+        treatedWounds: isCharacter ? wounds.filter((item) => item.system.treated).length : 0,
         age: isCharacter ? actor.system.age : '',
         agingRequired: isCharacter && actor.system.age > 40,
         flags: {
@@ -477,9 +507,11 @@ export class AoVPartySheet extends AoVActorSheet {
         { id: 'family', label: 'AOV.family' }
       )
     } else {
-      columns.push({ id: 'augments', label: 'AOV.Party.Augments' })
+      columns.push(
+        { id: 'augments', label: 'AOV.Party.Augments' },
+        { id: 'wounds', label: 'TYPES.Item.wound' }
+      )
     }
-    columns.push({ id: 'wounds', label: 'TYPES.Item.wound' })
     return columns
   }
 
@@ -545,6 +577,8 @@ export class AoVPartySheet extends AoVActorSheet {
    * @param item
    */
   #isPartyOverviewSkill (item) {
+    const investedXp = Number(item.system.xp ?? 0)
+    if (item.system.common && investedXp > 0) return true
     const total = Number(item.system.total ?? 0)
     if (total <= 0) return false
     const threshold = Math.max(Number(item.system.base ?? 0), 15)

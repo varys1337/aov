@@ -1,5 +1,26 @@
 <section class="party tab characters {{tab.cssClass}}" data-group="primary" data-tab="characters">
-  {{#if characters.length}}
+  {{#if partyCompactView}}
+    {{#if characters.length}}
+      <div class="party-compact-grid party-compact-characters" aria-label="{{localize 'AOV.Party.CompactCharacters'}}">
+        {{#each characters as |character|}}
+          <article class="party-compact-tile party-compact-character-tile {{#unless character.valid}}party-invalid{{/unless}}" data-uuid="{{character.uuid}}" data-tooltip="{{character.name}}">
+            <img src="{{character.img}}" data-action="viewPartyDocument" data-uuid="{{character.uuid}}" alt="{{character.name}}">
+            <div class="party-compact-character-footer">
+              <a class="truncate" data-action="viewPartyDocument" data-uuid="{{character.uuid}}" data-tooltip="{{character.name}}">{{character.name}}</a>
+              {{#if character.valid}}
+                <div class="party-compact-character-vitals">
+                  <span>{{localize "AOV.hpAbbr"}} {{#if @root.showHPVal}}{{character.hp.value}}/{{character.hp.max}}{{else}}--{{/if}}</span>
+                  <span>{{localize "AOV.mpAbbr"}} {{#if @root.showHPVal}}{{character.mp.value}}/{{character.mp.max}}{{else}}--{{/if}}</span>
+                </div>
+              {{/if}}
+            </div>
+          </article>
+        {{/each}}
+      </div>
+    {{else}}
+      <p class="party-empty">{{localize "AOV.Party.EmptyCharacters"}}</p>
+    {{/if}}
+  {{else if characters.length}}
     <div class="party-character-list">
       {{#each characters as |character|}}
         <article class="party-character-card {{#unless character.valid}}party-invalid{{/unless}}" data-uuid="{{character.uuid}}">

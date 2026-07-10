@@ -107,4 +107,12 @@ export async function registerSettings () {
     type: Boolean,
     default: true
   })
+
+  game.settings.register('aov', 'partyCompactView', {
+    name: 'AOV.Party.CompactView',
+    scope: 'client',
+    config: false,
+    type: Boolean,
+    default: false
+  })
 }

@@ -277,13 +277,13 @@ export class  AOVCharDevelop {
     let devotions = await actor.items.filter(itm => itm.type==='devotion')
     if (!devotions) {return}
     for (let devotion of devotions) {
-      let success = false
-      let worship = (await actor.items.filter(itm => itm.flags.aov?.cidFlag?.id === devotion.system.skills[0].cid))[0]
+      const skillCid = devotion.system.skills?.[0]?.cid
+      if (!skillCid) { continue }
+      let worship = (await actor.items.filter(itm => itm.flags?.aov?.cidFlag?.id === skillCid))[0]
       if (!worship) {continue}
       let inc = new Roll('1D100')
       await inc.evaluate()
       await AOVCharDevelop.showDiceRoll(inc)
-      let rollResult = inc.total
       let config = await AOVCharDevelop.makeDiceRoll('1D100', worship.system.total)
       let dpMax = 0
       if (worship.system.total >= 60) {

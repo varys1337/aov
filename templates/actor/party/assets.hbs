@@ -1,9 +1,63 @@
 <section class="party tab assets {{tab.cssClass}}" data-group="primary" data-tab="assets">
-  <div class="party-assets-grid">
-    <section class="party-asset-section party-equipment-section">
-      <h3>{{localize "AOV.Party.SharedEquipment"}}</h3>
+  {{#if partyCompactView}}
+    <div class="party-compact-sections party-compact-assets-columns" aria-label="{{localize 'AOV.Party.CompactAssets'}}">
+      <section class="party-compact-section">
+        <h3>{{localize "AOV.Party.SharedEquipment"}}</h3>
+        <div class="party-compact-grid party-compact-assets">
+          {{#each assets.weapons as |item|}}
+            <article class="party-compact-tile item" data-item-id="{{item.id}}" data-document-class="Item" data-drag="true" data-tooltip="{{item.name}}">
+              <img src="{{item.img}}" data-action="viewDoc" alt="{{item.name}}">
+            </article>
+          {{/each}}
+          {{#each assets.armours as |item|}}
+            <article class="party-compact-tile item" data-item-id="{{item.id}}" data-document-class="Item" data-drag="true" data-tooltip="{{item.name}}">
+              <img src="{{item.img}}" data-action="viewDoc" alt="{{item.name}}">
+            </article>
+          {{/each}}
+          {{#each assets.gear as |item|}}
+            <article class="party-compact-tile item" data-item-id="{{item.id}}" data-document-class="Item" data-drag="true" data-tooltip="{{item.name}}">
+              <img src="{{item.img}}" data-action="viewDoc" alt="{{item.name}}">
+            </article>
+          {{/each}}
+        </div>
+      </section>
 
-      <ol class="party-equipment-list">
+      <section class="party-compact-section">
+        <h3>{{localize "AOV.Party.Ships"}}</h3>
+        {{#if assets.ships.length}}
+          <div class="party-compact-grid party-compact-assets">
+            {{#each assets.ships as |ship|}}
+              <article class="party-compact-tile {{#unless ship.valid}}party-invalid{{/unless}}" data-uuid="{{ship.uuid}}" data-tooltip="{{ship.name}}">
+                <img src="{{ship.img}}" data-action="viewPartyDocument" data-uuid="{{ship.uuid}}" alt="{{ship.name}}">
+              </article>
+            {{/each}}
+          </div>
+        {{else}}
+          <p class="party-empty">{{localize "AOV.Party.EmptyShips"}}</p>
+        {{/if}}
+      </section>
+
+      <section class="party-compact-section">
+        <h3>{{localize "AOV.Party.Farms"}}</h3>
+        {{#if assets.farms.length}}
+          <div class="party-compact-grid party-compact-assets">
+            {{#each assets.farms as |farm|}}
+              <article class="party-compact-tile {{#unless farm.valid}}party-invalid{{/unless}}" data-uuid="{{farm.uuid}}" data-tooltip="{{farm.name}}">
+                <img src="{{farm.img}}" data-action="viewPartyDocument" data-uuid="{{farm.uuid}}" alt="{{farm.name}}">
+              </article>
+            {{/each}}
+          </div>
+        {{else}}
+          <p class="party-empty">{{localize "AOV.Party.EmptyFarms"}}</p>
+        {{/if}}
+      </section>
+    </div>
+  {{else}}
+  <div class="party-assets-grid">
+    <section class="party-asset-section party-equipment-section party-asset-scroll-panel">
+      <h3>{{localize "AOV.Party.SharedEquipment"}}</h3>
+      <div class="party-asset-scroll-body">
+        <ol class="party-equipment-list">
         <li class="item gear-header primBackCol party-weapon-row">
           <div class="left">{{localize "AOV.Party.Weapons"}}</div>
           <div class="centre">{{localize "AOV.damageAbbr"}}</div>
@@ -90,13 +144,15 @@
         {{else}}
           <li class="party-empty">{{localize "AOV.Party.EmptyEquipment"}}</li>
         {{/each}}
-      </ol>
+        </ol>
+      </div>
     </section>
 
     <aside class="party-asset-sidebar">
-      <section class="party-asset-section">
+      <section class="party-asset-section party-asset-scroll-panel">
         <h3>{{localize "AOV.Party.Ships"}}</h3>
-        {{#each assets.ships as |ship|}}
+        <div class="party-asset-scroll-body">
+          {{#each assets.ships as |ship|}}
           <article class="party-linked-card {{#unless ship.valid}}party-invalid{{/unless}}" data-uuid="{{ship.uuid}}">
             <img src="{{ship.img}}" data-action="viewPartyDocument" data-uuid="{{ship.uuid}}">
             <div>
@@ -129,14 +185,16 @@
               {{/if}}
             </div>
           </article>
-        {{else}}
-          <p class="party-empty">{{localize "AOV.Party.EmptyShips"}}</p>
-        {{/each}}
+          {{else}}
+            <p class="party-empty">{{localize "AOV.Party.EmptyShips"}}</p>
+          {{/each}}
+        </div>
       </section>
 
-      <section class="party-asset-section">
+      <section class="party-asset-section party-asset-scroll-panel">
         <h3>{{localize "AOV.Party.Farms"}}</h3>
-        {{#each assets.farms as |farm|}}
+        <div class="party-asset-scroll-body">
+          {{#each assets.farms as |farm|}}
           <article class="party-linked-card {{#unless farm.valid}}party-invalid{{/unless}}" data-uuid="{{farm.uuid}}">
             <img src="{{farm.img}}" data-action="viewPartyDocument" data-uuid="{{farm.uuid}}">
             <div>
@@ -161,10 +219,12 @@
               {{/if}}
             </div>
           </article>
-        {{else}}
-          <p class="party-empty">{{localize "AOV.Party.EmptyFarms"}}</p>
-        {{/each}}
+          {{else}}
+            <p class="party-empty">{{localize "AOV.Party.EmptyFarms"}}</p>
+          {{/each}}
+        </div>
       </section>
     </aside>
   </div>
+  {{/if}}
 </section>
