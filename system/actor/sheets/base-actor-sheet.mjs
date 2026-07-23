@@ -144,6 +144,41 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
     }
   }
 
+  /**
+   * Prepare the shared equipment-storage context used by Farm and Ship sheets.
+   * @param {string} title Localization key for the storage surface title.
+   * @returns {{title: string, sections: object[]}}
+   */
+  _prepareEquipmentStorage (title) {
+    const sections = [
+      { type: 'weapon', label: 'AOV.Party.Weapons', items: [] },
+      { type: 'armour', label: 'AOV.Party.Armour', items: [] },
+      { type: 'gear', label: 'AOV.Party.Gear', items: [] }
+    ]
+    const sectionsByType = new Map(sections.map((section) => [section.type, section]))
+    for (const item of this.actor.items) {
+      const section = sectionsByType.get(item.type)
+      if (!section) continue
+      section.items.push({
+        id: item.id,
+        name: item.name,
+        img: item.img,
+        type: item.type,
+        typeLabel: game.i18n.localize(`TYPES.Item.${item.type}`),
+        quantity: item.system.quantity ?? 1,
+        enc: item.system.enc ?? 0,
+        currHP: item.system.currHP,
+        maxHP: item.system.maxHP,
+        map: item.system.map,
+        lowLoc: item.system.lowLoc,
+        highLoc: item.system.highLoc,
+        value: item.system.value
+      })
+    }
+    for (const section of sections) section.items.sort((a, b) => a.name.localeCompare(b.name))
+    return { title, sections }
+  }
+
   //View Active Effect
   /**
    *
@@ -331,7 +366,8 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
    * @param target
    */
   _getEmbeddedDocument (target) {
-    const docRow = target.closest('li[data-document-class]')
+    const docRow = target.closest('[data-document-class]')
+    if (!docRow) return null
     if (docRow.dataset.documentClass === 'Item') {
       return this.actor.items.get(docRow.dataset.itemId)
     } else if (docRow.dataset.documentClass === 'ActiveEffect') {
@@ -907,7 +943,8 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
    * @param event
    */
   _onDragStart (event) {
-    const docRow = event.currentTarget.closest('li')
+    const docRow = event.currentTarget.closest('[data-document-class]')
+    if (!docRow) return
     if ('link' in event.target.dataset) return
     // Chained operation
     let dragData = this._getEmbeddedDocument(docRow)?.toDragData()
@@ -985,9 +1022,23 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
       return false
     }
     const item = await Item.implementation.fromDropData(data)
+    if (!item) return false
     // Handle item sorting within the same Actor
     if (this.actor.uuid === item.parent?.uuid)
       return this._onSortItem(event, item)
+    // Items embedded in another Actor move transactionally. Directory and
+    // Compendium Items continue through the existing template-copy workflow.
+    if (item.parent?.documentName === 'Actor') {
+      const itemData = AOVActorItemDrop.prepareEmbeddedTransfer(item, this.actor)
+      if (!itemData) return false
+      return this._transferEmbeddedItem(
+        item,
+        () => this.actor.createEmbeddedDocuments('Item', [itemData]),
+        {
+          isTransferredItem: (createdItem) => createdItem.type === item.type && createdItem.name === item.name
+        }
+      )
+    }
     // Create the owned item
     return this._onDropItemCreate(item, event)
   }
@@ -1022,6 +1073,71 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
     itemData = await AOVActorItemDrop._AOVonDropItemCreate(itemData, this.actor)
     const list = await this.actor.createEmbeddedDocuments('Item', itemData)
     return list
+  }
+
+  /**
+   * Move an embedded Item into this Actor using a create-first transaction.
+   * If source deletion fails, every destination document created by the drop is
+   * removed so the operation cannot duplicate the Item or its supporting Items.
+   * @param {Item} item
+   * @param {Function} createDestination
+   * @param {object} options
+   * @param {Function} [options.isTransferredItem]
+   * @returns {Promise<Item[]|false>}
+   */
+  async _transferEmbeddedItem (item, createDestination, { isTransferredItem = null } = {}) {
+    const sourceActor = item.parent?.documentName === 'Actor' ? item.parent : null
+    if (!this.actor.isOwner || !sourceActor?.isOwner || !item.isOwner) {
+      ui.notifications.warn(game.i18n.localize('AOV.ItemTransfer.PermissionDenied'))
+      return false
+    }
+
+    let created = []
+    try {
+      const createdDocuments = await createDestination()
+      if (!Array.isArray(createdDocuments)) throw new Error('Destination creation did not return an Item array.')
+      created = createdDocuments
+      const transferredItemCreated = created.length > 0 && (
+        !isTransferredItem || created.some((createdItem) => isTransferredItem(createdItem))
+      )
+      if (!transferredItemCreated) throw new Error(`Destination Actor ${this.actor.uuid} did not create the transferred Item.`)
+    } catch (err) {
+      let rollbackFailed = false
+      if (created.length) {
+        try {
+          const rolledBack = await this.actor.deleteEmbeddedDocuments('Item', created.map((document) => document.id))
+          if (rolledBack.length !== created.length) throw new Error('Destination rollback did not delete every created Item.')
+        } catch (rollbackError) {
+          rollbackFailed = true
+          console.error('AOV | Item transfer creation rollback failed.', rollbackError)
+        }
+      }
+      console.error('AOV | Item transfer destination creation failed.', err)
+      ui.notifications.error(game.i18n.localize(
+        rollbackFailed ? 'AOV.ItemTransfer.RollbackFailed' : 'AOV.ItemTransfer.CreateFailed'
+      ))
+      return false
+    }
+
+    try {
+      const deleted = await sourceActor.deleteEmbeddedDocuments('Item', [item.id])
+      if (deleted.length !== 1) throw new Error(`Source Item ${item.uuid} was not deleted.`)
+      return created
+    } catch (err) {
+      let rollbackFailed = false
+      try {
+        const rolledBack = await this.actor.deleteEmbeddedDocuments('Item', created.map((document) => document.id))
+        if (rolledBack.length !== created.length) throw new Error('Destination rollback did not delete every created Item.')
+      } catch (rollbackError) {
+        rollbackFailed = true
+        console.error('AOV | Item transfer rollback failed.', rollbackError)
+      }
+      console.error('AOV | Item transfer source deletion failed.', err)
+      ui.notifications.error(game.i18n.localize(
+        rollbackFailed ? 'AOV.ItemTransfer.RollbackFailed' : 'AOV.ItemTransfer.DeleteFailed'
+      ))
+      return false
+    }
   }
 
   //Returns an array of DragDrop instances
@@ -1061,6 +1177,12 @@ export class AoVActorSheet extends api.HandlebarsApplicationMixin(sheets.ActorSh
   async DropActor (data) {
     let newActor = await fromUuid(data.uuid)
     if (!newActor) {return}
+    const supportedLink = (this.actor.type === 'character' && newActor.type === 'farm') ||
+      (this.actor.type === 'party' && newActor.type === 'character')
+    if (supportedLink && newActor.inCompendium) {
+      ui.notifications.warn(game.i18n.localize('AOV.Party.OnlyWorldActors'))
+      return false
+    }
     if (this.actor.type === 'character' && newActor.type === 'farm') {
       const farms = this.actor.system.farms ? foundry.utils.duplicate(this.actor.system.farms) : []
       //Check farm is not in farms list

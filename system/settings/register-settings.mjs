@@ -4,6 +4,7 @@ import { AOVGameYearSettings } from './settings-gameYear.mjs'
 import { AOVNPCSettings } from './settings-npcOptions.mjs'
 import { AOVCreateSettings } from './settings-creationOptions.mjs'
 import { AOVCombatSettings } from './settings-combatOptions.mjs'
+import { AOVPartySettings } from './settings-partyOptions.mjs'
 
 
 export async function registerSettings () {
@@ -46,6 +47,16 @@ export async function registerSettings () {
     restricted: false
   })
   AOVDisplaySettings.registerSettings()
+
+  //Party Settings Button
+  game.settings.registerMenu('aov', 'partyOptions', {
+    name: 'AOV.Settings.partyOptionsHint',
+    label: 'AOV.Settings.partyOptions',
+    icon: 'fas fa-users',
+    type: AOVPartySettings,
+    restricted: false
+  })
+  AOVPartySettings.registerSettings()
 
   //Combat Settings Button
   game.settings.registerMenu('aov', 'combatOptions', {

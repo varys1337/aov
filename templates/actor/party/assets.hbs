@@ -28,7 +28,10 @@
           <div class="party-compact-grid party-compact-assets">
             {{#each assets.ships as |ship|}}
               <article class="party-compact-tile {{#unless ship.valid}}party-invalid{{/unless}}" data-uuid="{{ship.uuid}}" data-tooltip="{{ship.name}}">
-                <img src="{{ship.img}}" data-action="viewPartyDocument" data-uuid="{{ship.uuid}}" alt="{{ship.name}}">
+                {{#if ship.valid}}<img src="{{ship.img}}" data-action="viewPartyDocument" data-uuid="{{ship.uuid}}" alt="{{ship.name}}">{{else}}<img src="{{ship.img}}" alt="{{ship.name}}">{{/if}}
+                {{#if @root.isGM}}
+                  <a class="party-compact-unlink" data-action="removePartyShip" data-uuid="{{ship.uuid}}" data-tooltip="{{localize 'AOV.Party.UnlinkShip'}}"><i class="fas fa-link-slash"></i></a>
+                {{/if}}
               </article>
             {{/each}}
           </div>
@@ -43,7 +46,10 @@
           <div class="party-compact-grid party-compact-assets">
             {{#each assets.farms as |farm|}}
               <article class="party-compact-tile {{#unless farm.valid}}party-invalid{{/unless}}" data-uuid="{{farm.uuid}}" data-tooltip="{{farm.name}}">
-                <img src="{{farm.img}}" data-action="viewPartyDocument" data-uuid="{{farm.uuid}}" alt="{{farm.name}}">
+                {{#if farm.valid}}<img src="{{farm.img}}" data-action="viewPartyDocument" data-uuid="{{farm.uuid}}" alt="{{farm.name}}">{{else}}<img src="{{farm.img}}" alt="{{farm.name}}">{{/if}}
+                {{#if @root.isGM}}
+                  <a class="party-compact-unlink" data-action="removePartyFarm" data-uuid="{{farm.uuid}}" data-tooltip="{{localize 'AOV.Party.UnlinkFarm'}}"><i class="fas fa-link-slash"></i></a>
+                {{/if}}
               </article>
             {{/each}}
           </div>
@@ -154,10 +160,10 @@
         <div class="party-asset-scroll-body">
           {{#each assets.ships as |ship|}}
           <article class="party-linked-card {{#unless ship.valid}}party-invalid{{/unless}}" data-uuid="{{ship.uuid}}">
-            <img src="{{ship.img}}" data-action="viewPartyDocument" data-uuid="{{ship.uuid}}">
+            {{#if ship.valid}}<img src="{{ship.img}}" data-action="viewPartyDocument" data-uuid="{{ship.uuid}}">{{else}}<img src="{{ship.img}}">{{/if}}
             <div>
               <div class="party-card-title">
-                <a class="rollable" data-action="viewPartyDocument" data-uuid="{{ship.uuid}}">{{ship.name}}</a>
+                {{#if ship.valid}}<a class="rollable" data-action="viewPartyDocument" data-uuid="{{ship.uuid}}">{{ship.name}}</a>{{else}}<span>{{ship.name}}</span>{{/if}}
                 {{#if @root.isGM}}
                   <a data-action="removePartyShip" data-uuid="{{ship.uuid}}" data-tooltip="{{localize 'AOV.Party.UnlinkShip'}}"><i class="fas fa-link-slash"></i></a>
                 {{/if}}
@@ -196,10 +202,10 @@
         <div class="party-asset-scroll-body">
           {{#each assets.farms as |farm|}}
           <article class="party-linked-card {{#unless farm.valid}}party-invalid{{/unless}}" data-uuid="{{farm.uuid}}">
-            <img src="{{farm.img}}" data-action="viewPartyDocument" data-uuid="{{farm.uuid}}">
+            {{#if farm.valid}}<img src="{{farm.img}}" data-action="viewPartyDocument" data-uuid="{{farm.uuid}}">{{else}}<img src="{{farm.img}}">{{/if}}
             <div>
               <div class="party-card-title">
-                <a class="rollable" data-action="viewPartyDocument" data-uuid="{{farm.uuid}}">{{farm.name}}</a>
+                {{#if farm.valid}}<a class="rollable" data-action="viewPartyDocument" data-uuid="{{farm.uuid}}">{{farm.name}}</a>{{else}}<span>{{farm.name}}</span>{{/if}}
                 {{#if @root.isGM}}
                   <a data-action="removePartyFarm" data-uuid="{{farm.uuid}}" data-tooltip="{{localize 'AOV.Party.UnlinkFarm'}}"><i class="fas fa-link-slash"></i></a>
                 {{/if}}

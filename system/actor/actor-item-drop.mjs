@@ -3,7 +3,127 @@ import AOVDialog from '../setup/aov-dialog.mjs'
 import { AOVUtilities } from '../apps/utilities.mjs'
 import { AOVSelectLists } from '../apps/select-lists.mjs'
 
+const EQUIPMENT_TYPES = new Set(['armour', 'gear', 'weapon'])
+const STORAGE_ACTOR_TYPES = new Set(['farm', 'party', 'ship'])
+const BLOCKED_TRANSFER_TYPES = new Set(['history', 'homeland', 'species', 'weaponcat'])
+const CID_REQUIRED_TRANSFER_TYPES = new Set(['devotion', 'npcpower', 'passion', 'rune', 'skill'])
+const CID_UNIQUE_TRANSFER_TYPES = new Set(['devotion', 'passion', 'skill'])
+const TRANSFER_DESTINATIONS = Object.freeze({
+  character: new Set([
+    'armour', 'devotion', 'family', 'gear', 'hitloc', 'passion', 'rune',
+    'runescript', 'seidur', 'skill', 'weapon', 'wound'
+  ]),
+  npc: new Set(['devotion', 'gear', 'hitloc', 'npcpower', 'passion', 'skill', 'weapon']),
+  party: EQUIPMENT_TYPES,
+  farm: new Set([...EQUIPMENT_TYPES, 'thrall']),
+  ship: EQUIPMENT_TYPES
+})
+
 export class AOVActorItemDrop {
+
+  /**
+   * Prepare an exact embedded-Item move without invoking template-copy rules.
+   * Returns null after notifying the user when the move is invalid.
+   * @param {Item} item
+   * @param {Actor} destinationActor
+   * @returns {object|null}
+   */
+  static prepareEmbeddedTransfer (item, destinationActor) {
+    const sourceActor = item.parent?.documentName === 'Actor' ? item.parent : null
+    if (!sourceActor || !destinationActor) return null
+
+    if (BLOCKED_TRANSFER_TYPES.has(item.type)) {
+      ui.notifications.warn(game.i18n.format('AOV.ItemTransfer.StructuralBlocked', {
+        type: game.i18n.localize(`TYPES.Item.${item.type}`)
+      }))
+      return null
+    }
+
+    const accepted = TRANSFER_DESTINATIONS[destinationActor.type]
+    if (!accepted?.has(item.type)) {
+      ui.notifications.warn(game.i18n.format('AOV.ItemTransfer.IncompatibleDestination', {
+        itemType: game.i18n.localize(`TYPES.Item.${item.type}`),
+        actorType: game.i18n.localize(`TYPES.Actor.${destinationActor.type}`)
+      }))
+      return null
+    }
+
+    if (item.type === 'thrall' && (sourceActor.type !== 'farm' || destinationActor.type !== 'farm')) {
+      ui.notifications.warn(game.i18n.localize('AOV.ItemTransfer.ThrallFarmOnly'))
+      return null
+    }
+    if (item.type === 'wound' && (sourceActor.type !== 'character' || destinationActor.type !== 'character')) {
+      ui.notifications.warn(game.i18n.localize('AOV.ItemTransfer.WoundCharacterOnly'))
+      return null
+    }
+    if (item.type === 'hitloc') {
+      if (sourceActor.type !== destinationActor.type) {
+        ui.notifications.warn(game.i18n.localize('AOV.ItemTransfer.HitLocationActorType'))
+        return null
+      }
+      if (sourceActor.items.some((sourceItem) => sourceItem.type === 'wound' && sourceItem.system.hitLocId === item.id)) {
+        ui.notifications.warn(game.i18n.localize('AOV.ItemTransfer.HitLocationHasWounds'))
+        return null
+      }
+    }
+
+    const cid = item.flags.aov?.cidFlag?.id
+    if (CID_REQUIRED_TRANSFER_TYPES.has(item.type) && !cid) {
+      ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.noCIDFlag', { itemName: item.name }))
+      return null
+    }
+    if (CID_UNIQUE_TRANSFER_TYPES.has(item.type) && destinationActor.items.some(
+      (destinationItem) => destinationItem.flags.aov?.cidFlag?.id === cid
+    )) {
+      ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.dupItem', { itemName: `${item.name}(${cid})` }))
+      return null
+    }
+    if (item.type === 'hitloc' && AOVActorItemDrop.#findMatchingHitLocations(item, destinationActor).length) {
+      ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.dupItem', { itemName: item.name }))
+      return null
+    }
+
+    const itemData = item.toObject()
+    delete itemData._id
+    if (STORAGE_ACTOR_TYPES.has(destinationActor.type) && EQUIPMENT_TYPES.has(item.type)) {
+      itemData.system.equipStatus = 3
+    }
+
+    if (item.type === 'wound') {
+      const sourceHitLocation = sourceActor.items.get(item.system.hitLocId)
+      const matches = sourceHitLocation
+        ? AOVActorItemDrop.#findMatchingHitLocations(sourceHitLocation, destinationActor)
+        : []
+      if (matches.length !== 1) {
+        ui.notifications.warn(game.i18n.localize('AOV.ItemTransfer.WoundHitLocationMissing'))
+        return null
+      }
+      itemData.system.hitLocId = matches[0].id
+    }
+
+    return itemData
+  }
+
+  /**
+   * Find destination hit locations by CID, then by an exact structural tuple.
+   * @param {Item} sourceHitLocation
+   * @param {Actor} destinationActor
+   * @returns {Item[]}
+   */
+  static #findMatchingHitLocations (sourceHitLocation, destinationActor) {
+    const hitLocations = destinationActor.items.filter((item) => item.type === 'hitloc')
+    const cid = sourceHitLocation.flags.aov?.cidFlag?.id
+    if (cid) {
+      const cidMatches = hitLocations.filter((item) => item.flags.aov?.cidFlag?.id === cid)
+      if (cidMatches.length) return cidMatches
+    }
+    return hitLocations.filter((item) => (
+      item.name === sourceHitLocation.name &&
+      item.system.lowRoll === sourceHitLocation.system.lowRoll &&
+      item.system.highRoll === sourceHitLocation.system.highRoll &&
+      item.system.locType === sourceHitLocation.system.locType
+    ))
+  }
 
   // Change default on Drop Item Create routine for requirements (single items and folder drop)-----------------------------------------------------------------
   /**
@@ -17,9 +137,11 @@ export class AOVActorItemDrop {
     for (let thisItem of itemData) {
       let nItm = thisItem.toObject()
       let nItmCidFlag = nItm.flags.aov?.cidFlag?.id
+      const isFarmThrall = actor.type === 'farm' && nItm.type === 'thrall'
+      const isStorageEquipment = ['farm', 'ship'].includes(actor.type) && EQUIPMENT_TYPES.has(nItm.type)
 
       //Can't drop certain types of items on any actors
-      if (['wound', 'runescript', 'seidur', 'thrall', 'family', 'weaponcat'].includes(nItm.type)) {
+      if (['wound', 'runescript', 'seidur', 'thrall', 'family', 'weaponcat'].includes(nItm.type) && !isFarmThrall) {
         ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.cantTransfer', { itemType: game.i18n.localize('TYPES.Item.' + nItm.type) }))
         continue
       }
@@ -45,7 +167,7 @@ export class AOVActorItemDrop {
       }
 
       //Check Dropped item has a Chaosium ID, if not then don't add it
-      if (!nItmCidFlag) {
+      if (!nItmCidFlag && !isFarmThrall && !isStorageEquipment) {
         ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.noCIDFlag', { itemName: nItm.name }))
         continue
       }
@@ -62,14 +184,14 @@ export class AOVActorItemDrop {
         continue
       }
 
-      //Only let thralls be dropped on farms
-      if (actor.type === 'farm' && !['thrall'].includes(nItm.type)) {
+      //Farms store physical equipment and Thralls only.
+      if (actor.type === 'farm' && !isFarmThrall && !isStorageEquipment) {
         ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.cantDropItem', { itemType: game.i18n.localize('TYPES.Item.' + nItm.type), actorType: game.i18n.localize('TYPES.Actor.' + actor.type) }))
         continue
       }
 
-      //Can't drop any items on a ship or farm
-      if (actor.type === 'ship') {
+      //Ships store physical equipment only.
+      if (actor.type === 'ship' && !isStorageEquipment) {
         ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.cantDropItem', { itemType: game.i18n.localize('TYPES.Item.' + nItm.type), actorType: game.i18n.localize('TYPES.Actor.' + actor.type) }))
         continue
       }
@@ -109,7 +231,7 @@ export class AOVActorItemDrop {
 
       //If it's a weapon
       if (nItm.type === 'weapon') {
-        //Set weapon current HP to Max
+        //Directory/template copies start at maximum HP.
         nItm.system.currHP = nItm.system.maxHP
         //Check if Character has the relevant skill and if not then add it
         if (actor.type === 'character') {
@@ -124,6 +246,8 @@ export class AOVActorItemDrop {
           }
         }
       }
+
+      if (isStorageEquipment) nItm.system.equipStatus = 3
 
       //If it's a devotion check to see if linked skill needs adding
       if (nItm.type === 'devotion') {

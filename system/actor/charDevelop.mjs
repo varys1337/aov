@@ -4,6 +4,7 @@ import { SkillsSelectDialog } from './skill-selector.mjs'
 import AOVDialog from '../setup/aov-dialog.mjs'
 import { AOVCheck } from '../apps/checks.mjs'
 import { COCard } from '../chat/combat-chat.mjs'
+import { notifyFarmReferenceErrors, resolveWorldFarms } from './farm-references.mjs'
 
 export class  AOVCharDevelop {
 
@@ -307,7 +308,12 @@ export class  AOVCharDevelop {
    *
    * @param actor
    */
-  static async farmCircRoll (actor) {
+  static async farmCircRoll (actor, { farms = null } = {}) {
+    if (!Array.isArray(farms)) {
+      const resolution = await resolveWorldFarms(actor, { requireOwner: true })
+      if (!resolution.ok) return notifyFarmReferenceErrors(resolution)
+      farms = resolution.farms
+    }
     let omen = game.settings.get('aov', 'omens')
     let omenAdj = 0
     let farmAdj = 0
@@ -330,12 +336,10 @@ export class  AOVCharDevelop {
         break
     }
     //Skyr Production Adjustment
-    let farms = actor.system.farms
     let cattle = 0
     let thralls = 0
     let status = 0
-    for (let farmid of farms) {
-      let farm = await fromUuid(farmid.uuid)
+    for (const farm of farms) {
       cattle = cattle + farm.system.cattle
       thralls = thralls + (await farm.items.filter(itm => itm.type === 'thrall').filter(itm => !itm.system.died)).length
     }
@@ -343,7 +347,7 @@ export class  AOVCharDevelop {
     let skyr = (cattle * 3) - actor.system.dependents - thralls - 1
     skyrAdj = Math.min(skyr, 0)*5
 
-    for (let farmid of farms) {
+    for (const farm of farms) {
       let result = {
         skyrAdj,
         omenAdj,
@@ -354,8 +358,6 @@ export class  AOVCharDevelop {
         farmSkillRoll: 0,
         farmSkillResult: 0
       }
-      let farm = await fromUuid(farmid.uuid)
-      if (!farm) {continue}
       //Previous Year Farm Adjustment
       switch (farm.system.status) {
         case 'famine':
@@ -478,15 +480,18 @@ export class  AOVCharDevelop {
    *
    * @param actor
    */
-  static async vadprod (actor) {
+  static async vadprod (actor, { farms = null } = {}) {
+    if (!Array.isArray(farms)) {
+      const resolution = await resolveWorldFarms(actor, { requireObserver: true })
+      if (!resolution.ok) return notifyFarmReferenceErrors(resolution)
+      farms = resolution.farms
+    }
     let vadmal = 0
-    let farms = actor.system.farms
     let sheep = 0
     let thralls = 0
     let status = 0
     let actUpd = {}
-    for (let farmid of farms) {
-      let farm = await fromUuid(farmid.uuid)
+    for (const farm of farms) {
       sheep = sheep + farm.system.sheep
       thralls = thralls + (await farm.items.filter(itm => itm.type === 'thrall').filter(itm => !itm.system.died)).length
     }

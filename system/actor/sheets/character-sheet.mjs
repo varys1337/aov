@@ -331,7 +331,7 @@ export class AoVCharacterSheet extends AoVActorSheet {
     //Not strictly items but get farm actors to get thrall items
     for (let farmUuid of this.document.system.farms) {
       let farm = await fromUuid(farmUuid.uuid)
-      if (!farm) {
+      if (!farm || farm.inCompendium || farm.type !== 'farm') {
         farms.push ({
           'name': 'Invalid',
           'uuid': farmUuid.uuid,
@@ -628,7 +628,7 @@ export class AoVCharacterSheet extends AoVActorSheet {
     event.stopImmediatePropagation()
     const itemId = event.currentTarget.closest('.item').dataset.itemId
     let viewDoc = await fromUuid(itemId)
-    if (viewDoc) viewDoc.sheet.render(true)
+    if (viewDoc && !viewDoc.inCompendium) viewDoc.sheet.render(true)
   }
 
   //Delete a Farm

@@ -1,0 +1,49 @@
+<section class="{{actor.type}} tab aov-equipment-storage {{tab.cssClass}}" data-group="primary" data-tab="{{tab.id}}">
+  <header class="aov-storage-header">
+    <h2>{{localize storage.title}}</h2>
+    {{#if (eq actor.type "ship")}}
+      <span>{{localize "AOV.ship.capacity"}}: {{actor.system.cargo}}</span>
+    {{/if}}
+  </header>
+
+  <div class="aov-storage-sections">
+    {{#each storage.sections as |section|}}
+      <section class="aov-storage-section">
+        <h3>{{localize section.label}}</h3>
+        {{#if section.items.length}}
+          <div class="aov-storage-grid">
+            {{#each section.items as |item|}}
+              <article class="item aov-storage-item" data-item-id="{{item.id}}" data-document-class="Item" data-drag="true">
+                <img src="{{item.img}}" data-action="viewDoc" alt="{{item.name}}">
+                <div class="aov-storage-item-main">
+                  <a class="rollable truncate" data-action="viewDoc" data-tooltip="{{item.name}}">{{item.name}}</a>
+                  <div class="aov-storage-item-stats">
+                    <span>{{localize "AOV.quantityAbbr"}} {{item.quantity}}</span>
+                    <span>{{localize "AOV.encumbranceAbbr"}} {{item.enc}}</span>
+                    {{#if (eq item.type "weapon")}}
+                      <span>{{localize "AOV.hpAbbr"}} {{item.currHP}}/{{item.maxHP}}</span>
+                    {{/if}}
+                    {{#if (eq item.type "armour")}}
+                      <span>{{localize "AOV.armourPointsAbbr"}} {{item.map}}</span>
+                      <span>{{localize "AOV.hitLocations"}} {{item.lowLoc}}-{{item.highLoc}}</span>
+                    {{/if}}
+                    {{#if (eq item.type "gear")}}
+                      <span>{{localize "AOV.value"}} {{item.value}}</span>
+                    {{/if}}
+                  </div>
+                </div>
+                {{#if @root.editable}}{{#unless @root.isLocked}}
+                  <a class="aov-storage-delete" data-action="deleteDoc" data-tooltip="{{localize 'AOV.deleteDoc' type=item.typeLabel}}">
+                    <i class="fas fa-trash"></i>
+                  </a>
+                {{/unless}}{{/if}}
+              </article>
+            {{/each}}
+          </div>
+        {{else}}
+          <p class="aov-storage-empty">{{localize "AOV.ItemTransfer.EmptyStorage"}}</p>
+        {{/if}}
+      </section>
+    {{/each}}
+  </div>
+</section>

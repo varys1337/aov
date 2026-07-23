@@ -22,6 +22,7 @@ export class AoVShipSheet extends AoVActorSheet {
     header: { template: 'systems/aov/templates/actor/ship.header.hbs' },
     tabs: { template: 'systems/aov/templates/generic/tab-navigation.hbs' },
     speeds: { template: 'systems/aov/templates/actor/ship.speeds.hbs' },
+    cargo: { template: 'systems/aov/templates/actor/equipment-storage.hbs', scrollable: [''] },
     log: { template: 'systems/aov/templates/actor/ship.log.hbs' }
   }
 
@@ -32,7 +33,7 @@ export class AoVShipSheet extends AoVActorSheet {
   _configureRenderOptions (options) {
     super._configureRenderOptions(options)
     //Common parts to the character - this is the order they are show on the sheet
-    options.parts = ['header', 'tabs', 'log', 'speeds']
+    options.parts = ['header', 'tabs', 'log', 'speeds', 'cargo']
   }
 
   /**
@@ -65,6 +66,10 @@ export class AoVShipSheet extends AoVActorSheet {
           tab.id = 'log'
           tab.label += 'log'
           break
+        case 'cargo':
+          tab.id = 'cargo'
+          tab.label += 'cargo'
+          break
       }
       if (this.tabGroups[tabGroup] === tab.id) tab.cssClass = 'active'
       tabs[partId] = tab
@@ -87,6 +92,7 @@ export class AoVShipSheet extends AoVActorSheet {
     context.half = context.system.sail[context.system.wind].half
     context.head = context.system.sail[context.system.wind].head
     await this._prepareItems(context)
+    context.storage = this._prepareEquipmentStorage('AOV.ItemTransfer.ShipCargo')
     return context
   }
 
@@ -94,6 +100,7 @@ export class AoVShipSheet extends AoVActorSheet {
   async _preparePartContext (partId, context) {
     switch (partId) {
       case 'speeds':
+      case 'cargo':
         context.tab = context.tabs[partId]
         break
       case 'log':

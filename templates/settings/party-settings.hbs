@@ -1,0 +1,67 @@
+<div class="aov settingsForm flexcol" autocomplete="off">
+  <h2 class="bold">{{localize 'AOV.Settings.partyOptions'}}</h2>
+
+  {{#if isGM}}
+    <h3>{{localize 'AOV.Settings.partyWorldOptions'}}</h3>
+
+    <div class="form-group">
+      <label class="bold">{{localize 'AOV.Settings.partyHPVal'}}</label>
+      <div class="form-fields" style="flex: 1;">
+        <input type="checkbox" {{checked worldSettings.partyHPVal.value}} name="partyHPVal">
+      </div>
+      <p class="settingNote">{{localize 'AOV.Settings.partyHPValHint'}}</p>
+    </div>
+
+    <br>
+
+    <div class="form-group">
+      <label class="bold">{{localize 'AOV.Settings.partyShowFullMemberStats'}}</label>
+      <div class="form-fields" style="flex: 1;">
+        <input type="checkbox" {{checked worldSettings.partyShowFullMemberStats.value}} name="partyShowFullMemberStats">
+      </div>
+      <p class="settingNote">{{localize 'AOV.Settings.partyShowFullMemberStatsHint'}}</p>
+    </div>
+
+    <br>
+
+    <div class="form-group">
+      <label class="bold">{{localize 'AOV.Settings.partyShowDowntime'}}</label>
+      <div class="form-fields" style="flex: 1;">
+        <input type="checkbox" {{checked worldSettings.partyShowDowntime.value}} name="partyShowDowntime">
+      </div>
+      <p class="settingNote">{{localize 'AOV.Settings.partyShowDowntimeHint'}}</p>
+    </div>
+
+    <hr>
+  {{/if}}
+
+  <h3>{{localize 'AOV.Settings.partyUserOptions'}}</h3>
+
+  <div class="form-group">
+    <label class="bold">{{localize 'AOV.Settings.partyUserHPVal'}}</label>
+    <div class="form-fields" style="flex: 1;">
+      <input type="checkbox" {{checked userSettings.partyUserHPVal.value}} name="partyUserHPVal">
+    </div>
+    <p class="settingNote">{{localize 'AOV.Settings.partyUserHPValHint'}}</p>
+  </div>
+
+  <br>
+
+  <div class="form-group">
+    <label class="bold">{{localize 'AOV.Settings.partyUserShowFullMemberStats'}}</label>
+    <div class="form-fields" style="flex: 1;">
+      <input type="checkbox" {{checked userSettings.partyUserShowFullMemberStats.value}} name="partyUserShowFullMemberStats">
+    </div>
+    <p class="settingNote">{{localize 'AOV.Settings.partyUserShowFullMemberStatsHint'}}</p>
+  </div>
+
+  <br>
+
+  <div class="form-group">
+    <label class="bold">{{localize 'AOV.Settings.partyUserShowDowntime'}}</label>
+    <div class="form-fields" style="flex: 1;">
+      <input type="checkbox" {{checked userSettings.partyUserShowDowntime.value}} name="partyUserShowDowntime">
+    </div>
+    <p class="settingNote">{{localize 'AOV.Settings.partyUserShowDowntimeHint'}}</p>
+  </div>
+</div>

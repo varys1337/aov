@@ -28,7 +28,7 @@
               {{#if (eq item.name 'blank')}}
                 <div></div>
               {{else}}
-                <li class="item hitlocCell" data-item-id='{{item._id}}' data-document-class='Item'>
+                <li class="item hitlocCell" data-item-id='{{item._id}}' data-document-class='Item' data-drag='true'>
                   <div class="upper rollable" data-action='viewDoc'>{{item.name}}</div>
                   {{#if ../isLocked}}
                     <div>{{item.system.label}}</div>
@@ -60,7 +60,7 @@
           <div class="hitLocDev">
             {{#each devHitLocs as |item id|}}
               {{#unless (eq item.name 'blank')}}
-                <li class="hitLocGridDev" data-item-id='{{item._id}}' data-document-class='Item'>
+                <li class="item hitLocGridDev" data-item-id='{{item._id}}' data-document-class='Item' data-drag='true'>
                   <div class="upper rollable" data-action='viewDoc'>{{item.name}}</div>
                   <div>{{item.system.label}}</div>
                   <div class='gear-controls centre'>
@@ -81,7 +81,7 @@
       <div class="woundsGrid">
 
         {{#each wounds as |item id|}}
-        <li class="item wounds-grid" data-item-id='{{item._id}}' data-document-class='Item'>
+        <li class="item wounds-grid" data-item-id='{{item._id}}' data-document-class='Item' data-drag='true'>
           <div class="rollable" data-action='viewDoc'>{{item.system.label}}</div>
           <div class="centre skill-inline"><input class="ability-cell centre" name='system.damage'
             type='number' value='{{item.system.damage}}' data-field="damage"/>

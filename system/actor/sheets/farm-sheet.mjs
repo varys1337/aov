@@ -25,6 +25,7 @@ export class AoVFarmSheet extends AoVActorSheet {
     location: { template: 'systems/aov/templates/actor/farm.location.hbs' },
     description: { template: 'systems/aov/templates/actor/farm.description.hbs' },
     thralls: { template: 'systems/aov/templates/actor/farm.thralls.hbs' },
+    storage: { template: 'systems/aov/templates/actor/equipment-storage.hbs', scrollable: [''] },
     gmTab: { template: 'systems/aov/templates/actor/farm.gmtab.hbs' }
   }
 
@@ -40,6 +41,7 @@ export class AoVFarmSheet extends AoVActorSheet {
     context.farmCircOptions = await AOVSelectLists.farmCircOptions()
     context.farmCircName = game.i18n.localize('AOV.FarmCirc.'+context.system.status)
     await this._prepareItems(context)
+    context.storage = this._prepareEquipmentStorage('AOV.ItemTransfer.FarmStorage')
     return context
   }
 
@@ -70,6 +72,7 @@ export class AoVFarmSheet extends AoVActorSheet {
       case 'details':
       case 'location':
       case 'thralls':
+      case 'storage':
         context.tab = context.tabs[partId]
         break
       case 'description':
@@ -132,6 +135,10 @@ export class AoVFarmSheet extends AoVActorSheet {
           tab.id = 'thralls'
           tab.label += 'Tabs.thralls'
           break
+        case 'storage':
+          tab.id = 'storage'
+          tab.label += 'Tabs.storage'
+          break
         case 'description':
           tab.id = 'description'
           tab.label += 'description'
@@ -154,7 +161,7 @@ export class AoVFarmSheet extends AoVActorSheet {
   _configureRenderOptions (options) {
     super._configureRenderOptions(options)
     //Only show GM tab if you are GM
-    options.parts = ['header', 'tabs', 'details', 'thralls', 'location', 'description']
+    options.parts = ['header', 'tabs', 'details', 'thralls', 'storage', 'location', 'description']
     if (game.user.isGM) {
       options.parts.push('gmTab')
     }

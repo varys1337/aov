@@ -25,9 +25,17 @@
           <div class="party-compact-downtime-grid" aria-label="{{localize 'AOV.Party.CompactDowntime'}}">
             {{#each downtime as |row|}}
               <article class="party-compact-downtime-card {{#if row.untreatedWounds}}party-warning{{/if}}" data-uuid="{{row.uuid}}">
-                <img src="{{row.img}}" data-action="viewPartyDocument" data-uuid="{{row.uuid}}" alt="{{row.name}}">
+                {{#if row.canOpen}}
+                  <img src="{{row.img}}" data-action="viewPartyDocument" data-uuid="{{row.uuid}}" alt="{{row.name}}">
+                {{else}}
+                  <img src="{{row.img}}" alt="{{row.name}}">
+                {{/if}}
                 <div class="party-compact-downtime-main">
-                  <a class="rollable truncate" data-action="viewPartyDocument" data-uuid="{{row.uuid}}" data-tooltip="{{row.name}}">{{row.name}}</a>
+                  {{#if row.canOpen}}
+                    <a class="rollable truncate" data-action="viewPartyDocument" data-uuid="{{row.uuid}}" data-tooltip="{{row.name}}">{{row.name}}</a>
+                  {{else}}
+                    <span class="truncate" data-tooltip="{{row.name}}">{{row.name}}</span>
+                  {{/if}}
                   <div class="party-compact-downtime-stats">
                     <span><strong>{{row.augmentUses}}</strong> {{localize "AOV.Party.Augments"}}</span>
                     <span>{{#if row.isCharacter}}{{#if row.untreatedWounds}}{{localize "AOV.Party.Untreated"}} {{row.untreatedWounds}}{{else}}{{localize "AOV.Party.Treated"}} {{row.treatedWounds}}{{/if}}{{else}}{{localize "AOV.damageAbbr"}} {{row.wounds}}{{/if}}</span>
@@ -40,9 +48,17 @@
           <div class="party-compact-downtime-grid party-compact-downtime-actions" aria-label="{{localize 'AOV.Party.CompactDowntime'}}">
             {{#each downtime as |row|}}
               <article class="party-compact-downtime-card" data-uuid="{{row.uuid}}">
-                <img src="{{row.img}}" data-action="viewPartyDocument" data-uuid="{{row.uuid}}" alt="{{row.name}}">
+                {{#if row.canOpen}}
+                  <img src="{{row.img}}" data-action="viewPartyDocument" data-uuid="{{row.uuid}}" alt="{{row.name}}">
+                {{else}}
+                  <img src="{{row.img}}" alt="{{row.name}}">
+                {{/if}}
                 <div class="party-compact-downtime-main">
-                  <a class="rollable truncate" data-action="viewPartyDocument" data-uuid="{{row.uuid}}" data-tooltip="{{row.name}}">{{row.name}}</a>
+                  {{#if row.canOpen}}
+                    <a class="rollable truncate" data-action="viewPartyDocument" data-uuid="{{row.uuid}}" data-tooltip="{{row.name}}">{{row.name}}</a>
+                  {{else}}
+                    <span class="truncate" data-tooltip="{{row.name}}">{{row.name}}</span>
+                  {{/if}}
                   <div class="party-compact-action-grid">
                     {{#each @root.downtimeColumns as |column|}}
                       {{#if (eq column.id "xp")}}
@@ -54,52 +70,52 @@
 
                       {{#if (eq column.id "experience")}}
                         <div class="party-compact-action-cell {{#if row.flags.expImprov}}party-ready{{/if}}">
-                          {{#if row.isCharacter}}{{#if @root.isGM}}<button type="button" data-action="partyRunExperience" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}
+                          {{#if row.isCharacter}}{{#if row.canRoll}}{{#if row.flags.expImprov}}<button type="button" data-action="partyRunExperience" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}{{/if}}
                           <span>{{localize "AOV.experience"}}: {{#if row.isCharacter}}{{#if row.flags.expImprov}}{{localize "AOV.active"}}{{else}}{{localize "AOV.inactive"}}{{/if}}{{else}}{{localize "AOV.Party.NPCSummaryOnly"}}{{/if}}</span>
                         </div>
                       {{/if}}
 
                       {{#if (eq column.id "training")}}
                         <div class="party-compact-action-cell {{#if row.flags.improv}}party-ready{{/if}}">
-                          {{#if row.isCharacter}}{{#if @root.isGM}}
+                          {{#if row.isCharacter}}{{#if row.canRoll}}{{#if row.flags.improv}}
                             <button type="button" data-action="partyRunTraining" data-uuid="{{row.uuid}}">{{localize "AOV.training"}}</button>
                             <button type="button" data-action="partyRunResearch" data-uuid="{{row.uuid}}">{{localize "AOV.research"}}</button>
-                          {{/if}}{{/if}}
+                          {{/if}}{{/if}}{{/if}}
                           <span>{{#if row.isCharacter}}{{#if row.flags.improv}}{{localize "AOV.active"}}{{else}}{{localize "AOV.inactive"}}{{/if}}{{else}}{{localize "AOV.Party.NPCSummaryOnly"}}{{/if}}</span>
                         </div>
                       {{/if}}
 
                       {{#if (eq column.id "worship")}}
                         <div class="party-compact-action-cell {{#if row.flags.worship}}party-ready{{/if}}">
-                          {{#if row.isCharacter}}{{#if @root.isGM}}<button type="button" data-action="partyRunWorship" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}
+                          {{#if row.isCharacter}}{{#if row.canRoll}}{{#if row.flags.worship}}<button type="button" data-action="partyRunWorship" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}{{/if}}
                           <span>{{localize "AOV.worship"}}: {{#if row.isCharacter}}{{#if row.flags.worship}}{{localize "AOV.active"}}{{else}}{{localize "AOV.inactive"}}{{/if}}{{else}}{{localize "AOV.Party.NPCSummaryOnly"}}{{/if}}</span>
                         </div>
                       {{/if}}
 
                       {{#if (eq column.id "farming")}}
                         <div class="party-compact-action-cell {{#if row.flags.farming}}party-ready{{/if}}" data-tooltip="{{row.farms}}">
-                          {{#if row.isCharacter}}{{#if @root.isGM}}<button type="button" data-action="partyRunFarmCircumstance" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}
+                          {{#if row.isCharacter}}{{#if row.canRunFarmCircumstance}}{{#if row.flags.farming}}<button type="button" data-action="partyRunFarmCircumstance" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}{{/if}}
                           <span>{{localize "AOV.farmCirc"}}: {{#if row.isCharacter}}{{#if row.flags.farming}}{{localize "AOV.active"}}{{else}}{{localize "AOV.inactive"}}{{/if}}{{else}}{{localize "AOV.Party.NPCSummaryOnly"}}{{/if}}</span>
                         </div>
                       {{/if}}
 
                       {{#if (eq column.id "vadprod")}}
                         <div class="party-compact-action-cell {{#if row.flags.vadprod}}party-ready{{/if}}">
-                          {{#if row.isCharacter}}{{#if @root.isGM}}<button type="button" data-action="partyRunVadmalProduction" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}
+                          {{#if row.isCharacter}}{{#if row.canRunVadmal}}{{#if row.flags.vadprod}}<button type="button" data-action="partyRunVadmalProduction" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}{{/if}}
                           <span>{{localize "AOV.vadmalProd"}}: {{#if row.isCharacter}}{{#if row.flags.vadprod}}{{localize "AOV.active"}}{{else}}{{localize "AOV.inactive"}}{{/if}}{{else}}{{localize "AOV.Party.NPCSummaryOnly"}}{{/if}}</span>
                         </div>
                       {{/if}}
 
                       {{#if (eq column.id "aging")}}
                         <div class="party-compact-action-cell {{#if row.agingRequired}}party-warning{{/if}} {{#if row.flags.aging}}party-ready{{/if}}">
-                          {{#if row.isCharacter}}{{#if @root.isGM}}<button type="button" data-action="partyRunAging" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}
+                          {{#if row.isCharacter}}{{#if row.canRoll}}{{#if row.flags.aging}}<button type="button" data-action="partyRunAging" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}{{/if}}
                           <span>{{localize "AOV.aging"}}: {{#if row.isCharacter}}{{localize "AOV.ageAbbr"}} {{row.age}}{{else}}{{localize "AOV.Party.NPCSummaryOnly"}}{{/if}}</span>
                         </div>
                       {{/if}}
 
                       {{#if (eq column.id "family")}}
                         <div class="party-compact-action-cell {{#if row.flags.family}}party-ready{{/if}}">
-                          {{#if row.isCharacter}}{{#if @root.isGM}}<button type="button" data-action="partyRunFamily" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}
+                          {{#if row.isCharacter}}{{#if row.canRoll}}{{#if row.flags.family}}<button type="button" data-action="partyRunFamily" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}{{/if}}
                           <span>{{localize "AOV.family"}}: {{#if row.isCharacter}}{{#if row.flags.family}}{{localize "AOV.active"}}{{else}}{{localize "AOV.inactive"}}{{/if}}{{else}}{{localize "AOV.Party.NPCSummaryOnly"}}{{/if}}</span>
                         </div>
                       {{/if}}
@@ -131,8 +147,13 @@
               {{#each downtime as |row|}}
                 <div class="party-downtime-row party-summary-row" data-uuid="{{row.uuid}}">
                   <div class="party-downtime-character">
-                    <img src="{{row.img}}" data-action="viewPartyDocument" data-uuid="{{row.uuid}}">
-                    <a class="rollable truncate" data-action="viewPartyDocument" data-uuid="{{row.uuid}}" data-tooltip="{{row.name}}">{{row.name}}</a>
+                    {{#if row.canOpen}}
+                      <img src="{{row.img}}" data-action="viewPartyDocument" data-uuid="{{row.uuid}}" alt="{{row.name}}">
+                      <a class="rollable truncate" data-action="viewPartyDocument" data-uuid="{{row.uuid}}" data-tooltip="{{row.name}}">{{row.name}}</a>
+                    {{else}}
+                      <img src="{{row.img}}" alt="{{row.name}}">
+                      <span class="truncate" data-tooltip="{{row.name}}">{{row.name}}</span>
+                    {{/if}}
                     <span>{{row.actorTypeLabel}}</span>
                   </div>
                   <div class="party-downtime-cell party-summary-count-cell">
@@ -204,8 +225,13 @@
               {{#each @root.downtimeColumns as |column|}}
                 {{#if (eq column.id "actor")}}
                   <div class="party-downtime-character">
-                    <img src="{{row.img}}" data-action="viewPartyDocument" data-uuid="{{row.uuid}}">
-                    <a class="rollable truncate" data-action="viewPartyDocument" data-uuid="{{row.uuid}}" data-tooltip="{{row.name}}">{{row.name}}</a>
+                    {{#if row.canOpen}}
+                      <img src="{{row.img}}" data-action="viewPartyDocument" data-uuid="{{row.uuid}}" alt="{{row.name}}">
+                      <a class="rollable truncate" data-action="viewPartyDocument" data-uuid="{{row.uuid}}" data-tooltip="{{row.name}}">{{row.name}}</a>
+                    {{else}}
+                      <img src="{{row.img}}" alt="{{row.name}}">
+                      <span class="truncate" data-tooltip="{{row.name}}">{{row.name}}</span>
+                    {{/if}}
                     <span>{{row.actorTypeLabel}}</span>
                   </div>
                 {{/if}}
@@ -219,52 +245,52 @@
 
                 {{#if (eq column.id "experience")}}
                   <div class="party-downtime-cell {{#if row.flags.expImprov}}party-ready{{/if}}">
-                    {{#if row.isCharacter}}{{#if @root.isGM}}<button type="button" data-action="partyRunExperience" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}
+                    {{#if row.isCharacter}}{{#if row.canRoll}}{{#if row.flags.expImprov}}<button type="button" data-action="partyRunExperience" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}{{/if}}
                     <span>{{#if row.isCharacter}}{{#if row.flags.expImprov}}{{localize "AOV.active"}}{{else}}{{localize "AOV.inactive"}}{{/if}}{{else}}{{localize "AOV.Party.NPCSummaryOnly"}}{{/if}}</span>
                   </div>
                 {{/if}}
 
                 {{#if (eq column.id "training")}}
                   <div class="party-downtime-cell {{#if row.flags.improv}}party-ready{{/if}}">
-                    {{#if row.isCharacter}}{{#if @root.isGM}}
+                    {{#if row.isCharacter}}{{#if row.canRoll}}{{#if row.flags.improv}}
                       <button type="button" data-action="partyRunTraining" data-uuid="{{row.uuid}}">{{localize "AOV.training"}}</button>
                       <button type="button" data-action="partyRunResearch" data-uuid="{{row.uuid}}">{{localize "AOV.research"}}</button>
-                    {{/if}}{{/if}}
+                    {{/if}}{{/if}}{{/if}}
                     <span>{{#if row.isCharacter}}{{#if row.flags.improv}}{{localize "AOV.active"}}{{else}}{{localize "AOV.inactive"}}{{/if}}{{else}}{{localize "AOV.Party.NPCSummaryOnly"}}{{/if}}</span>
                   </div>
                 {{/if}}
 
                 {{#if (eq column.id "worship")}}
                   <div class="party-downtime-cell {{#if row.flags.worship}}party-ready{{/if}}">
-                    {{#if row.isCharacter}}{{#if @root.isGM}}<button type="button" data-action="partyRunWorship" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}
+                    {{#if row.isCharacter}}{{#if row.canRoll}}{{#if row.flags.worship}}<button type="button" data-action="partyRunWorship" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}{{/if}}
                     <span>{{#if row.isCharacter}}{{#if row.flags.worship}}{{localize "AOV.active"}}{{else}}{{localize "AOV.inactive"}}{{/if}}{{else}}{{localize "AOV.Party.NPCSummaryOnly"}}{{/if}}</span>
                   </div>
                 {{/if}}
 
                 {{#if (eq column.id "farming")}}
                   <div class="party-downtime-cell {{#if row.flags.farming}}party-ready{{/if}}" data-tooltip="{{row.farms}}">
-                    {{#if row.isCharacter}}{{#if @root.isGM}}<button type="button" data-action="partyRunFarmCircumstance" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}
+                    {{#if row.isCharacter}}{{#if row.canRunFarmCircumstance}}{{#if row.flags.farming}}<button type="button" data-action="partyRunFarmCircumstance" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}{{/if}}
                     <span>{{#if row.isCharacter}}{{#if row.flags.farming}}{{localize "AOV.active"}}{{else}}{{localize "AOV.inactive"}}{{/if}}{{else}}{{localize "AOV.Party.NPCSummaryOnly"}}{{/if}}</span>
                   </div>
                 {{/if}}
 
                 {{#if (eq column.id "vadprod")}}
                   <div class="party-downtime-cell {{#if row.flags.vadprod}}party-ready{{/if}}">
-                    {{#if row.isCharacter}}{{#if @root.isGM}}<button type="button" data-action="partyRunVadmalProduction" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}
+                    {{#if row.isCharacter}}{{#if row.canRunVadmal}}{{#if row.flags.vadprod}}<button type="button" data-action="partyRunVadmalProduction" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}{{/if}}
                     <span>{{#if row.isCharacter}}{{#if row.flags.vadprod}}{{localize "AOV.active"}}{{else}}{{localize "AOV.inactive"}}{{/if}}{{else}}{{localize "AOV.Party.NPCSummaryOnly"}}{{/if}}</span>
                   </div>
                 {{/if}}
 
                 {{#if (eq column.id "aging")}}
                   <div class="party-downtime-cell {{#if row.agingRequired}}party-warning{{/if}} {{#if row.flags.aging}}party-ready{{/if}}">
-                    {{#if row.isCharacter}}{{#if @root.isGM}}<button type="button" data-action="partyRunAging" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}
+                    {{#if row.isCharacter}}{{#if row.canRoll}}{{#if row.flags.aging}}<button type="button" data-action="partyRunAging" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}{{/if}}
                     <span>{{#if row.isCharacter}}{{localize "AOV.ageAbbr"}} {{row.age}}{{else}}{{localize "AOV.Party.NPCSummaryOnly"}}{{/if}}</span>
                   </div>
                 {{/if}}
 
                 {{#if (eq column.id "family")}}
                   <div class="party-downtime-cell {{#if row.flags.family}}party-ready{{/if}}">
-                    {{#if row.isCharacter}}{{#if @root.isGM}}<button type="button" data-action="partyRunFamily" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}
+                    {{#if row.isCharacter}}{{#if row.canRoll}}{{#if row.flags.family}}<button type="button" data-action="partyRunFamily" data-uuid="{{row.uuid}}">{{localize "AOV.roll"}}</button>{{/if}}{{/if}}{{/if}}
                     <span>{{#if row.isCharacter}}{{#if row.flags.family}}{{localize "AOV.active"}}{{else}}{{localize "AOV.inactive"}}{{/if}}{{else}}{{localize "AOV.Party.NPCSummaryOnly"}}{{/if}}</span>
                   </div>
                 {{/if}}

@@ -1,53 +1,82 @@
 <section class="party tab characters {{tab.cssClass}}" data-group="primary" data-tab="characters">
-  {{#if partyCompactView}}
-    {{#if characters.length}}
-      <div class="party-compact-grid party-compact-characters" aria-label="{{localize 'AOV.Party.CompactCharacters'}}">
-        {{#each characters as |character|}}
-          <article class="party-compact-tile party-compact-character-tile {{#unless character.valid}}party-invalid{{/unless}}" data-uuid="{{character.uuid}}" data-tooltip="{{character.name}}">
-            <img src="{{character.img}}" data-action="viewPartyDocument" data-uuid="{{character.uuid}}" alt="{{character.name}}">
+  {{#if characters.length}}
+    <div class="{{#if partyCompactView}}party-compact-grid party-compact-characters{{else}}party-character-list{{/if}}" aria-label="{{localize 'AOV.Party.Characters'}}">
+      {{#each characters as |character|}}
+        {{#if @root.partyCompactView}}
+          <article class="party-compact-tile party-compact-character-tile {{#unless character.valid}}party-invalid{{/unless}}" {{#if character.uuid}}data-uuid="{{character.uuid}}"{{/if}}>
+            {{#if character.valid}}
+              {{#if character.canOpen}}
+                <img src="{{character.img}}" data-action="viewPartyDocument" data-uuid="{{character.uuid}}" alt="{{character.name}}">
+              {{else}}
+                <img src="{{character.img}}" alt="{{character.name}}">
+              {{/if}}
+            {{else}}
+              <img src="{{character.img}}" alt="{{character.name}}">
+            {{/if}}
             <div class="party-compact-character-footer">
-              <a class="truncate" data-action="viewPartyDocument" data-uuid="{{character.uuid}}" data-tooltip="{{character.name}}">{{character.name}}</a>
               {{#if character.valid}}
+                {{#if character.canOpen}}
+                  <a class="truncate" data-action="viewPartyDocument" data-uuid="{{character.uuid}}" data-tooltip="{{character.name}}">{{character.name}}</a>
+                {{else}}
+                  <span class="truncate" data-tooltip="{{character.name}}">{{character.name}}</span>
+                {{/if}}
                 <div class="party-compact-character-vitals">
-                  <span>{{localize "AOV.hpAbbr"}} {{#if @root.showHPVal}}{{character.hp.value}}/{{character.hp.max}}{{else}}--{{/if}}</span>
-                  <span>{{localize "AOV.mpAbbr"}} {{#if @root.showHPVal}}{{character.mp.value}}/{{character.mp.max}}{{else}}--{{/if}}</span>
+                  <div class="party-vital-bar party-hp-bar">
+                    <span class="party-vital-fill" style="width: {{character.hp.percent}}%;"></span>
+                    <span class="party-vital-label">{{localize "AOV.hpAbbr"}}{{#if character.showVitalValues}} {{character.hp.value}}/{{character.hp.max}}{{/if}}</span>
+                  </div>
+                  <div class="party-vital-bar party-mp-bar">
+                    <span class="party-vital-fill" style="width: {{character.mp.percent}}%;"></span>
+                    <span class="party-vital-label">{{localize "AOV.mpAbbr"}}{{#if character.showVitalValues}} {{character.mp.value}}/{{character.mp.max}}{{/if}}</span>
+                  </div>
+                </div>
+              {{else}}
+                <span class="truncate">{{character.name}}</span>
+              {{/if}}
+            </div>
+            {{#if @root.isGM}}{{#if character.uuid}}
+              <a class="party-compact-unlink" data-action="removePartyCharacter" data-uuid="{{character.uuid}}" data-tooltip="{{localize 'AOV.Party.UnlinkMember'}}">
+                <i class="fas fa-link-slash"></i>
+              </a>
+            {{/if}}{{/if}}
+          </article>
+        {{else if character.showFullDetails}}
+          <article class="party-character-card" data-uuid="{{character.uuid}}">
+            <div class="party-card-aside">
+              {{#if character.canOpen}}
+                <img src="{{character.img}}" data-action="viewPartyDocument" data-uuid="{{character.uuid}}" data-tooltip="{{localize 'AOV.viewOnly'}}">
+              {{else}}
+                <img src="{{character.img}}" alt="{{character.name}}">
+              {{/if}}
+              {{#if character.nameMean}}
+                <div class="party-card-side-notes">
+                  <div data-tooltip="{{character.nameMean}}"><strong>{{localize "AOV.nameMeanAbbr"}}:</strong> {{character.nameMean}}</div>
+                  {{#if character.persType}}<div data-tooltip="{{character.persType}}"><strong>{{localize "AOV.persTypeAbbrShort"}}:</strong> {{character.persType}}</div>{{/if}}
+                </div>
+              {{else if character.persType}}
+                <div class="party-card-side-notes">
+                  <div data-tooltip="{{character.persType}}"><strong>{{localize "AOV.persTypeAbbrShort"}}:</strong> {{character.persType}}</div>
                 </div>
               {{/if}}
             </div>
-          </article>
-        {{/each}}
-      </div>
-    {{else}}
-      <p class="party-empty">{{localize "AOV.Party.EmptyCharacters"}}</p>
-    {{/if}}
-  {{else if characters.length}}
-    <div class="party-character-list">
-      {{#each characters as |character|}}
-        <article class="party-character-card {{#unless character.valid}}party-invalid{{/unless}}" data-uuid="{{character.uuid}}">
-          <div class="party-card-aside">
-            <img src="{{character.img}}" data-action="viewPartyDocument" data-uuid="{{character.uuid}}" data-tooltip="{{localize 'AOV.viewOnly'}}">
-            {{#if character.valid}}
-              <div class="party-card-side-notes">
-                <div data-tooltip="{{character.nameMean}}"><strong>{{localize "AOV.nameMeanAbbr"}}:</strong> {{character.nameMean}}</div>
-                <div data-tooltip="{{character.persType}}"><strong>{{localize "AOV.persTypeAbbrShort"}}:</strong> {{character.persType}}</div>
+
+            <div class="party-character-main">
+              <div class="party-card-title">
+                {{#if character.canOpen}}
+                  <a class="rollable truncate" data-action="viewPartyDocument" data-uuid="{{character.uuid}}" data-tooltip="{{character.name}}">{{character.name}}</a>
+                {{else}}
+                  <span class="truncate" data-tooltip="{{character.name}}">{{character.name}}</span>
+                {{/if}}
+                {{#if @root.isGM}}
+                  <a class="party-card-control" data-action="removePartyCharacter" data-uuid="{{character.uuid}}" data-tooltip="{{localize 'AOV.Party.UnlinkMember'}}">
+                    <i class="fas fa-link-slash"></i>
+                  </a>
+                {{/if}}
               </div>
-            {{/if}}
-          </div>
 
-          <div class="party-character-main">
-            <div class="party-card-title">
-              <a class="rollable truncate" data-action="viewPartyDocument" data-uuid="{{character.uuid}}" data-tooltip="{{character.name}}">{{character.name}}</a>
-              {{#if @root.isGM}}
-                <a class="party-card-control" data-action="removePartyCharacter" data-uuid="{{character.uuid}}" data-tooltip="{{localize 'AOV.deleteDoc' type=(localize 'AOV.partyMember')}}">
-                  <i class="fas fa-trash"></i>
-                </a>
-              {{/if}}
-            </div>
-
-            {{#if character.valid}}
               <div class="party-character-identity">
                 <span data-tooltip="{{character.actorTypeLabel}}">{{character.actorTypeLabel}}</span>
-                <span data-tooltip="{{character.nickname}}">{{character.nickname}}</span>
+                {{#if character.nickname}}<span data-tooltip="{{character.nickname}}">{{character.nickname}}</span>{{/if}}
                 {{#if character.gender}}<span data-tooltip="{{character.gender}}">{{character.gender}}</span>{{/if}}
                 {{#if character.age}}<span>{{localize "AOV.ageAbbr"}} {{character.age}}</span>{{/if}}
                 {{#if character.spiritAn}}<span data-tooltip="{{character.spiritAn}}">{{character.spiritAn}}</span>{{/if}}
@@ -63,13 +92,17 @@
               </div>
 
               <div class="party-character-vitals">
-                <div class="party-stat">
-                  <span>{{localize "AOV.hpAbbr"}}</span>
-                  <strong>{{#if @root.showHPVal}}{{character.hp.value}}/{{character.hp.max}}{{else}}&nbsp;{{/if}}</strong>
+                <div class="party-stat party-vital-stat">
+                  <div class="party-vital-bar party-hp-bar">
+                    <span class="party-vital-fill" style="width: {{character.hp.percent}}%;"></span>
+                    <span class="party-vital-label">{{localize "AOV.hpAbbr"}}{{#if character.showVitalValues}} {{character.hp.value}}/{{character.hp.max}}{{/if}}</span>
+                  </div>
                 </div>
-                <div class="party-stat">
-                  <span>{{localize "AOV.mpAbbr"}}</span>
-                  <strong>{{#if @root.showHPVal}}{{character.mp.value}}/{{character.mp.max}}{{else}}&nbsp;{{/if}}</strong>
+                <div class="party-stat party-vital-stat">
+                  <div class="party-vital-bar party-mp-bar">
+                    <span class="party-vital-fill" style="width: {{character.mp.percent}}%;"></span>
+                    <span class="party-vital-label">{{localize "AOV.mpAbbr"}}{{#if character.showVitalValues}} {{character.mp.value}}/{{character.mp.max}}{{/if}}</span>
+                  </div>
                 </div>
                 <div class="party-stat"><span>{{localize "AOV.healRateAbbr"}}</span><strong>{{character.healRate}}</strong></div>
                 <div class="party-stat"><span>{{localize "AOV.dmgBonusAbbr"}}</span><strong>{{character.dmgBonus}}</strong></div>
@@ -77,19 +110,55 @@
                 <div class="party-stat"><span>{{localize "AOV.reputAbbr"}}</span><strong>{{character.reputation}}</strong></div>
                 <div class="party-stat"><span>{{localize "AOV.statusAbbr"}}</span><strong>{{character.status}}</strong></div>
                 <div class="party-stat {{#if character.enc.overloaded}}party-warning{{/if}}" data-tooltip="{{localize 'AOV.encHint'}} {{character.enc.penaltyLabel}}">
-                  <span>{{localize "AOV.encumbranceAbbr"}}</span>
-                  <strong>{{character.enc.actual}}/{{character.enc.max}}</strong>
+                  <span>{{localize "AOV.encumbranceAbbr"}}</span><strong>{{character.enc.actual}}/{{character.enc.max}}</strong>
                 </div>
               </div>
 
               <div class="party-character-notes">
                 <div data-tooltip="{{character.distFeaturesTooltip}}"><strong>{{localize "AOV.distFeaturesAbbrShort"}}:</strong> {{{character.distFeaturesHtml}}}</div>
               </div>
+            </div>
+          </article>
+        {{else}}
+          <article class="party-member-summary-card {{#unless character.valid}}party-invalid{{/unless}}" {{#if character.uuid}}data-uuid="{{character.uuid}}"{{/if}}>
+            {{#if character.valid}}
+              {{#if character.canOpen}}
+                <img src="{{character.img}}" data-action="viewPartyDocument" data-uuid="{{character.uuid}}" alt="{{character.name}}">
+              {{else}}
+                <img src="{{character.img}}" alt="{{character.name}}">
+              {{/if}}
             {{else}}
-              <p class="party-empty">{{localize "AOV.Party.InvalidReference"}}</p>
+              <img src="{{character.img}}" alt="{{character.name}}">
             {{/if}}
-          </div>
-        </article>
+            <div class="party-member-summary-main">
+              {{#if character.valid}}
+                {{#if character.canOpen}}
+                  <a class="rollable truncate" data-action="viewPartyDocument" data-uuid="{{character.uuid}}" data-tooltip="{{character.name}}">{{character.name}}</a>
+                {{else}}
+                  <span class="truncate" data-tooltip="{{character.name}}">{{character.name}}</span>
+                {{/if}}
+                <div class="party-member-summary-vitals">
+                  <div class="party-vital-bar party-hp-bar">
+                    <span class="party-vital-fill" style="width: {{character.hp.percent}}%;"></span>
+                    <span class="party-vital-label">{{localize "AOV.hpAbbr"}}{{#if character.showVitalValues}} {{character.hp.value}}/{{character.hp.max}}{{/if}}</span>
+                  </div>
+                  <div class="party-vital-bar party-mp-bar">
+                    <span class="party-vital-fill" style="width: {{character.mp.percent}}%;"></span>
+                    <span class="party-vital-label">{{localize "AOV.mpAbbr"}}{{#if character.showVitalValues}} {{character.mp.value}}/{{character.mp.max}}{{/if}}</span>
+                  </div>
+                </div>
+              {{else}}
+                <span class="truncate">{{character.name}}</span>
+                {{#unless character.restricted}}<span>{{localize "AOV.Party.InvalidReference"}}</span>{{/unless}}
+              {{/if}}
+            </div>
+            {{#if @root.isGM}}{{#if character.uuid}}
+              <a class="party-summary-unlink" data-action="removePartyCharacter" data-uuid="{{character.uuid}}" data-tooltip="{{localize 'AOV.Party.UnlinkMember'}}">
+                <i class="fas fa-link-slash"></i>
+              </a>
+            {{/if}}{{/if}}
+          </article>
+        {{/if}}
       {{/each}}
     </div>
   {{else}}

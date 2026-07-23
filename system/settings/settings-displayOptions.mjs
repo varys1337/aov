@@ -17,16 +17,6 @@ const SETTINGS = {
     type: Boolean,
     default: false,
     requiresReload: true
-  },
-
-  partyHPVal: {
-    name: 'AOV.Settings.partyHPVal',
-    hint: 'AOV.Settings.partyHPValHint',
-    scope: 'world',
-    config: false,
-    type: Boolean,
-    default: true,
-    requiresReload: true
   }
 }
 

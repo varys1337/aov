@@ -1,5 +1,7 @@
 import AOVDialog from '../../setup/aov-dialog.mjs'
+import { AOVActorItemDrop } from '../actor-item-drop.mjs'
 import { AOVPartyDowntime } from '../party-downtime.mjs'
+import { resolveWorldFarms } from '../farm-references.mjs'
 import { AoVActorSheet } from './base-actor-sheet.mjs'
 
 const PARTY_ITEM_TYPES = new Set(['armour', 'gear', 'weapon'])
@@ -89,7 +91,10 @@ export class AoVPartySheet extends AoVActorSheet {
    */
   _configureRenderOptions (options) {
     super._configureRenderOptions(options)
-    options.parts = ['header', 'tabs', 'characters', 'assets', 'downtime']
+    const showDowntime = this.#getPresentationSettings().showDowntime
+    options.parts = ['header', 'tabs', 'characters', 'assets']
+    if (showDowntime) options.parts.push('downtime')
+    else if (this.tabGroups.primary === 'downtime') this.tabGroups.primary = 'characters'
   }
 
   /**
@@ -136,6 +141,7 @@ export class AoVPartySheet extends AoVActorSheet {
    */
   async _prepareContext (options) {
     const context = await super._prepareContext(options)
+    const presentation = this.#getPresentationSettings()
     const partyCompactView = game.settings.get('aov', 'partyCompactView')
     if (options.isFirstRender) {
       options.position ??= {}
@@ -146,17 +152,19 @@ export class AoVPartySheet extends AoVActorSheet {
     context.partyCompactToggleLabel = partyCompactView ? 'AOV.Party.FullView' : 'AOV.Party.CompactView'
     context.partyCompactToggleIcon = partyCompactView ? 'fas fa-expand' : 'fas fa-compress'
     context.tabs = this._getTabs(options.parts)
-    context.showHPVal = game.settings.get('aov', 'partyHPVal') || context.isGM
-    context.characters = await this.#prepareMemberSummaries(context)
+    context.showDowntime = options.parts.includes('downtime')
+    context.characters = await this.#prepareMemberSummaries(context, presentation)
     context.assets = await this.#prepareAssetSummaries()
-    context.downtimeView = this.#getDowntimeView()
-    context.isDowntimeSummary = context.downtimeView === 'summary'
-    context.downtimeViews = this.#prepareDowntimeViews(context.downtimeView)
-    context.downtimeTitle = DOWNTIME_VIEWS[context.downtimeView].title
-    context.downtimeColumns = this.#prepareDowntimeColumns(context.downtimeView)
-    context.downtimeGridColumns = this.#prepareDowntimeGridColumns(context.downtimeColumns)
-    context.downtime = await this.#prepareDowntimeSummary()
-    context.skillOverview = await this.#prepareSkillOverview()
+    if (context.showDowntime) {
+      context.downtimeView = this.#getDowntimeView()
+      context.isDowntimeSummary = context.downtimeView === 'summary'
+      context.downtimeViews = this.#prepareDowntimeViews(context.downtimeView)
+      context.downtimeTitle = DOWNTIME_VIEWS[context.downtimeView].title
+      context.downtimeColumns = this.#prepareDowntimeColumns(context.downtimeView)
+      context.downtimeGridColumns = this.#prepareDowntimeGridColumns(context.downtimeColumns)
+      context.downtime = await this.#prepareDowntimeSummary(presentation)
+      context.skillOverview = await this.#prepareSkillOverview(presentation)
+    }
     return context
   }
 
@@ -205,27 +213,39 @@ export class AoVPartySheet extends AoVActorSheet {
   }
 
   /**
-   *
-   * @param context
+   * Prepare permission-aware Party member cards.
+   * @param {object} context Sheet context.
+   * @param {object} presentation Effective Party presentation settings.
+   * @returns {Promise<object[]>} Prepared member cards.
    */
-  async #prepareMemberSummaries (context) {
+  async #prepareMemberSummaries (context, presentation) {
     const members = []
     for (const reference of this.actor.system.members ?? []) {
-      const uuid = reference?.uuid
+      const uuid = this.#referenceUuid(reference)
       const actor = uuid ? await fromUuid(uuid) : null
-      if (!actor || !PARTY_MEMBER_TYPES.has(actor.type)) {
-        members.push(this.#invalidActorReference(uuid))
+      if (!actor || actor.inCompendium || !PARTY_MEMBER_TYPES.has(actor.type)) {
+        if (game.user.isGM) members.push(this.#invalidActorReference(uuid))
+        continue
+      }
+
+      const access = this.#getMemberAccess(actor, presentation)
+      if (access === 'limited') {
+        members.push(this.#prepareLimitedMember(actor, presentation))
         continue
       }
 
       if (actor.type === 'npc') {
-        members.push(await this.#prepareNpcMember(actor))
+        members.push(await this.#prepareNpcMember(actor, presentation))
         continue
       }
 
       const distFeatures = actor.system.distFeatures ?? ''
       members.push({
         valid: true,
+        restricted: false,
+        showFullDetails: access === 'full',
+        showVitalValues: presentation.showVitalValues,
+        canOpen: actor.testUserPermission(game.user, CONST.DOCUMENT_OWNERSHIP_LEVELS.LIMITED),
         isCharacter: true,
         isNpc: false,
         actorType: actor.type,
@@ -253,8 +273,8 @@ export class AoVPartySheet extends AoVActorSheet {
           label: game.i18n.localize(CONFIG.AOV.abilities[key]),
           value: actor.system.abilities[key]?.total ?? 0
         })),
-        hp: actor.system.hp,
-        mp: actor.system.mp,
+        hp: this.#prepareVital(actor.system.hp),
+        mp: this.#prepareVital(actor.system.mp),
         healRate: actor.system.healRate,
         dmgBonus: actor.system.dmgBonus,
         moveRate: actor.system.moveRate,
@@ -274,10 +294,12 @@ export class AoVPartySheet extends AoVActorSheet {
   }
 
   /**
-   *
-   * @param actor
+   * Prepare a full NPC Party card.
+   * @param {Actor} actor NPC Actor.
+   * @param {object} presentation Effective Party presentation settings.
+   * @returns {Promise<object>} Prepared NPC card.
    */
-  async #prepareNpcMember (actor) {
+  async #prepareNpcMember (actor, presentation) {
     const damagedLocations = actor.items.filter((item) => item.type === 'hitloc' && Number(item.system.npcDmg ?? 0) > 0)
     const totalDamage = damagedLocations.reduce((total, item) => total + Number(item.system.npcDmg ?? 0), 0)
     const featuresSource = actor.system.gmNotes || actor.system.description || ''
@@ -285,6 +307,10 @@ export class AoVPartySheet extends AoVActorSheet {
     const distFeaturesTooltip = this.#htmlToPlainText(featuresSource)
     return {
       valid: true,
+      restricted: false,
+      showFullDetails: true,
+      showVitalValues: presentation.showVitalValues,
+      canOpen: actor.testUserPermission(game.user, CONST.DOCUMENT_OWNERSHIP_LEVELS.LIMITED),
       isCharacter: false,
       isNpc: true,
       actorType: actor.type,
@@ -293,14 +319,14 @@ export class AoVPartySheet extends AoVActorSheet {
       id: actor.id,
       name: actor.name,
       img: actor.img,
-      nickname: game.i18n.localize('TYPES.Actor.npc'),
+      nickname: '',
       gender: '',
       age: '',
       spiritAn: actor.system.spiritAn,
       persType: actor.system.persType
         ? game.i18n.localize(`AOV.Personality.${actor.system.persType}`)
         : '',
-      nameMean: game.i18n.localize('TYPES.Actor.npc'),
+      nameMean: '',
       distFeatures: distFeaturesTooltip,
       distFeaturesHtml,
       distFeaturesTooltip,
@@ -309,11 +335,11 @@ export class AoVPartySheet extends AoVActorSheet {
         label: game.i18n.localize(CONFIG.AOV.abilities[key]),
         value: actor.system.abilities[key]?.total ?? 0
       })),
-      hp: {
+      hp: this.#prepareVital({
         value: actor.system.hp?.value ?? 0,
         max: actor.system.hp?.max ?? 0
-      },
-      mp: actor.system.mp,
+      }),
+      mp: this.#prepareVital(actor.system.mp),
       healRate: actor.system.healRate,
       dmgBonus: actor.system.dmgBonus,
       moveRate: actor.system.movement || actor.system.moveRate || actor.system.move?.base || '',
@@ -332,7 +358,9 @@ export class AoVPartySheet extends AoVActorSheet {
   }
 
   /**
-   *
+   * Prepare detailed Downtime rows for members with effective full access.
+   * @param {object} presentation Effective Party presentation settings.
+   * @returns {Promise<object[]>} Prepared Downtime rows.
    */
   async #prepareAssetSummaries () {
     const assets = {
@@ -350,10 +378,10 @@ export class AoVPartySheet extends AoVActorSheet {
     }
 
     for (const reference of this.actor.system.assets?.farms ?? []) {
-      const uuid = reference?.uuid
+      const uuid = this.#referenceUuid(reference)
       const farm = uuid ? await fromUuid(uuid) : null
-      if (!farm || farm.type !== 'farm') {
-        assets.farms.push(this.#invalidActorReference(uuid))
+      if (!farm || farm.inCompendium || farm.type !== 'farm') {
+        if (game.user.isGM) assets.farms.push(this.#invalidActorReference(uuid))
         continue
       }
       assets.farms.push({
@@ -372,10 +400,10 @@ export class AoVPartySheet extends AoVActorSheet {
     }
 
     for (const reference of this.actor.system.assets?.ships ?? []) {
-      const uuid = reference?.uuid
+      const uuid = this.#referenceUuid(reference)
       const ship = uuid ? await fromUuid(uuid) : null
-      if (!ship || ship.type !== 'ship') {
-        assets.ships.push(this.#invalidActorReference(uuid))
+      if (!ship || ship.inCompendium || ship.type !== 'ship') {
+        if (game.user.isGM) assets.ships.push(this.#invalidActorReference(uuid))
         continue
       }
       assets.ships.push({
@@ -412,34 +440,50 @@ export class AoVPartySheet extends AoVActorSheet {
   }
 
   /**
-   *
+   * Prepare the aggregate Skill Overview from effectively full Characters.
+   * @param {object} presentation Effective Party presentation settings.
+   * @returns {Promise<object[]>} Prepared skill overview rows.
    */
-  async #prepareDowntimeSummary () {
+  async #prepareDowntimeSummary (presentation) {
     /*
      * Downtime uses system.members as its only roster source. NPCs are shown in
      * summary rows, but seasonal actions stay character-only.
      */
     const rows = []
-    for (const actor of await this.#getPartyRoster()) {
+    for (const actor of await this.#getPartyRoster(true, presentation)) {
       const isCharacter = actor.type === 'character'
+      const canRoll = isCharacter && (game.user.isGM || actor.isOwner)
       const xpChecks = actor.items.filter((item) => ['skill', 'passion'].includes(item.type) && item.system.xpCheck).length
       const augmentUses = actor.items.filter((item) => ['skill', 'passion'].includes(item.type) && item.system.augment).length
       const wounds = isCharacter
         ? actor.items.filter((item) => item.type === 'wound')
         : actor.items.filter((item) => item.type === 'hitloc' && Number(item.system.npcDmg ?? 0) > 0)
       const farms = []
+      let canRunFarmCircumstance = false
+      let canRunVadmal = false
       if (isCharacter) {
-        for (const reference of actor.system.farms ?? []) {
-          const farm = reference?.uuid ? await fromUuid(reference.uuid) : null
-          farms.push(farm?.name ?? game.i18n.localize('AOV.invalid'))
-        }
+        const farmResolution = await resolveWorldFarms(actor)
+        farms.push(...farmResolution.farms.map((farm) => farm.name))
+        farms.push(...farmResolution.invalid.map(() => game.i18n.localize('AOV.invalid')))
+        canRunFarmCircumstance = canRoll && farmResolution.ok && (
+          game.user.isGM || farmResolution.farms.every((farm) => farm.isOwner)
+        )
+        canRunVadmal = canRoll && farmResolution.ok && (
+          game.user.isGM || farmResolution.farms.every((farm) => (
+            farm.testUserPermission(game.user, CONST.DOCUMENT_OWNERSHIP_LEVELS.OBSERVER)
+          ))
+        )
       }
       rows.push({
         uuid: actor.uuid,
         name: actor.name,
         img: actor.img,
+        canOpen: actor.testUserPermission(game.user, CONST.DOCUMENT_OWNERSHIP_LEVELS.LIMITED),
         isCharacter,
         actorTypeLabel: game.i18n.localize(`TYPES.Actor.${actor.type}`),
+        canRoll,
+        canRunFarmCircumstance,
+        canRunVadmal,
         xpChecks,
         augmentUses,
         wounds: wounds.length,
@@ -532,13 +576,13 @@ export class AoVPartySheet extends AoVActorSheet {
   /**
    *
    */
-  async #prepareSkillOverview () {
+  async #prepareSkillOverview (presentation) {
     /*
      * Skill overview is derived from linked character Items. NPC skills are
      * omitted because they use different sheet and advancement semantics.
      */
     const grouped = new Map()
-    for (const actor of await this.#getPartyCharacters()) {
+    for (const actor of await this.#getPartyCharacters(true, presentation)) {
       for (const item of actor.items.filter((i) => i.type === 'skill')) {
         if (!this.#isPartyOverviewSkill(item)) continue
         const label = item.system.label || item.name
@@ -680,32 +724,131 @@ export class AoVPartySheet extends AoVActorSheet {
   #invalidActorReference (uuid) {
     return {
       valid: false,
+      restricted: false,
+      showFullDetails: false,
+      showVitalValues: false,
+      canOpen: false,
       isCharacter: false,
       isNpc: false,
-      uuid,
+      uuid: game.user.isGM ? uuid : '',
       name: game.i18n.localize('AOV.invalid'),
       img: 'icons/svg/mystery-man.svg'
     }
   }
 
   /**
-   *
+   * Prepare only the fields which a LIMITED user may see when full member
+   * statistics are disabled.
+   * @param {Actor} actor
+   * @param {object} presentation
+   * @returns {object} Prepared Limited member card.
    */
-  async #getPartyRoster () {
+  #prepareLimitedMember (actor, presentation) {
+    return {
+      valid: true,
+      restricted: false,
+      showFullDetails: false,
+      showVitalValues: presentation.showVitalValues,
+      canOpen: actor.testUserPermission(game.user, CONST.DOCUMENT_OWNERSHIP_LEVELS.LIMITED),
+      isCharacter: actor.type === 'character',
+      isNpc: actor.type === 'npc',
+      actorType: actor.type,
+      uuid: actor.uuid,
+      id: actor.id,
+      name: actor.name,
+      img: actor.img,
+      hp: this.#prepareVital(actor.system.hp),
+      mp: this.#prepareVital(actor.system.mp)
+    }
+  }
+
+  /**
+   * Determine which party presentation the current user may receive.
+   * @param {Actor} actor
+   * @param {object} presentation
+   * @returns {'full'|'limited'}
+   */
+  #getMemberAccess (actor, presentation = this.#getPresentationSettings()) {
+    if (!presentation.wantsFullMemberStats) return 'limited'
+    if (
+      game.user.isGM ||
+      presentation.worldAllowsFullMemberStats ||
+      actor.testUserPermission(game.user, CONST.DOCUMENT_OWNERSHIP_LEVELS.OBSERVER)
+    ) {
+      return 'full'
+    }
+    return 'limited'
+  }
+
+  /**
+   * Combine world privacy policy with this user's Party-sheet preferences.
+   * User preferences may reduce presentation but cannot bypass world policy.
+   * @returns {object}
+   */
+  #getPresentationSettings () {
+    const isGM = game.user.isGM
+    const worldAllowsHPValues = game.settings.get('aov', 'partyHPVal')
+    const worldAllowsFullMemberStats = game.settings.get('aov', 'partyShowFullMemberStats')
+    const worldAllowsDowntime = game.settings.get('aov', 'partyShowDowntime')
+    return {
+      showVitalValues: game.settings.get('aov', 'partyUserHPVal') && (isGM || worldAllowsHPValues),
+      wantsFullMemberStats: game.settings.get('aov', 'partyUserShowFullMemberStats'),
+      worldAllowsFullMemberStats,
+      showDowntime: game.settings.get('aov', 'partyUserShowDowntime') && (isGM || worldAllowsDowntime)
+    }
+  }
+
+  /**
+   * Normalize a resource value for bar rendering.
+   * @param {object} vital
+   */
+  #prepareVital (vital = {}) {
+    const rawValue = Number(vital?.value ?? 0)
+    const rawMax = Number(vital?.max ?? 0)
+    const value = Number.isFinite(rawValue) ? rawValue : 0
+    const max = Number.isFinite(rawMax) ? rawMax : 0
+    const percent = max > 0 ? Math.min(100, Math.max(0, (value / max) * 100)) : 0
+    return { value, max, percent }
+  }
+
+  /**
+   * Read a UUID from either the current reference object shape or a legacy
+   * plain-string reference without mutating party data during rendering.
+   * @param {object|string|null} reference
+   * @returns {string|undefined}
+   */
+  #referenceUuid (reference) {
+    return typeof reference === 'string' ? reference : reference?.uuid
+  }
+
+  /**
+   * Resolve valid linked Characters and NPCs for Party workflows.
+   * @param {boolean} fullDetailsOnly Exclude members without effective full presentation.
+   * @param {object} presentation Effective Party presentation settings.
+   * @returns {Promise<Actor[]>} Resolved Party roster.
+   */
+  async #getPartyRoster (fullDetailsOnly = false, presentation = this.#getPresentationSettings()) {
     const actors = []
     for (const reference of this.actor.system.members ?? []) {
-      const actor = reference?.uuid ? await fromUuid(reference.uuid) : null
-      if (PARTY_MEMBER_TYPES.has(actor?.type)) actors.push(actor)
+      const uuid = this.#referenceUuid(reference)
+      const actor = uuid ? await fromUuid(uuid) : null
+      if (!PARTY_MEMBER_TYPES.has(actor?.type) || actor.inCompendium) continue
+      const access = this.#getMemberAccess(actor, presentation)
+      if (fullDetailsOnly && access !== 'full') continue
+      actors.push(actor)
     }
     return actors
   }
 
   /**
-   *
+   * Resolve linked Character Actors for Party workflows.
+   * @param {boolean} fullDetailsOnly Exclude Characters without effective full presentation.
+   * @param {object} presentation Effective Party presentation settings.
+   * @returns {Promise<Actor[]>} Resolved Party Characters.
    */
-  async #getPartyCharacters () {
+  async #getPartyCharacters (fullDetailsOnly = false, presentation = this.#getPresentationSettings()) {
     const actors = []
-    for (const actor of await this.#getPartyRoster()) {
+    for (const actor of await this.#getPartyRoster(fullDetailsOnly, presentation)) {
       if (actor?.type === 'character') actors.push(actor)
     }
     return actors
@@ -714,10 +857,20 @@ export class AoVPartySheet extends AoVActorSheet {
   /**
    *
    * @param target
+   * @param flag
    */
-  async #getCharacterFromTarget (target) {
+  async #getCharacterFromTarget (target, flag) {
     const actor = await fromUuid(target.dataset.uuid)
-    return actor?.type === 'character' ? actor : null
+    if (actor?.type !== 'character' || actor.inCompendium) return null
+    if (!game.user.isGM && !actor.isOwner) {
+      ui.notifications.warn(game.i18n.localize('AOV.Party.ActionNotAllowed'))
+      return null
+    }
+    if (!actor.system[flag]) {
+      ui.notifications.warn(game.i18n.localize('AOV.Party.ActionUnavailable'))
+      return null
+    }
+    return actor
   }
 
   /**
@@ -741,7 +894,11 @@ export class AoVPartySheet extends AoVActorSheet {
   static async _onViewPartyDocument (event, target) {
     const uuid = target.dataset.uuid || target.closest('[data-uuid]')?.dataset?.uuid
     const document = uuid ? await fromUuid(uuid) : null
-    if (document) document.sheet.render(true)
+    if (!document || document.inCompendium) return
+    if (document.documentName === 'Actor' && !document.testUserPermission(game.user, CONST.DOCUMENT_OWNERSHIP_LEVELS.LIMITED)) {
+      return
+    }
+    document.sheet.render(true)
   }
 
   /**
@@ -831,7 +988,7 @@ export class AoVPartySheet extends AoVActorSheet {
    * @param target
    */
   static async _onRunExperience (event, target) {
-    await AOVPartyDowntime.runExperience(await this.#getCharacterFromTarget(target))
+    await AOVPartyDowntime.runExperience(await this.#getCharacterFromTarget(target, 'expImprov'))
   }
 
   /**
@@ -840,7 +997,7 @@ export class AoVPartySheet extends AoVActorSheet {
    * @param target
    */
   static async _onRunTraining (event, target) {
-    await AOVPartyDowntime.runTraining(await this.#getCharacterFromTarget(target))
+    await AOVPartyDowntime.runTraining(await this.#getCharacterFromTarget(target, 'improv'))
   }
 
   /**
@@ -849,7 +1006,7 @@ export class AoVPartySheet extends AoVActorSheet {
    * @param target
    */
   static async _onRunResearch (event, target) {
-    await AOVPartyDowntime.runResearch(await this.#getCharacterFromTarget(target))
+    await AOVPartyDowntime.runResearch(await this.#getCharacterFromTarget(target, 'improv'))
   }
 
   /**
@@ -858,7 +1015,7 @@ export class AoVPartySheet extends AoVActorSheet {
    * @param target
    */
   static async _onRunWorship (event, target) {
-    await AOVPartyDowntime.runWorship(await this.#getCharacterFromTarget(target))
+    await AOVPartyDowntime.runWorship(await this.#getCharacterFromTarget(target, 'worship'))
   }
 
   /**
@@ -867,7 +1024,7 @@ export class AoVPartySheet extends AoVActorSheet {
    * @param target
    */
   static async _onRunFarmCircumstance (event, target) {
-    await AOVPartyDowntime.runFarmCircumstance(await this.#getCharacterFromTarget(target))
+    await AOVPartyDowntime.runFarmCircumstance(await this.#getCharacterFromTarget(target, 'farming'))
   }
 
   /**
@@ -876,7 +1033,7 @@ export class AoVPartySheet extends AoVActorSheet {
    * @param target
    */
   static async _onRunVadmalProduction (event, target) {
-    await AOVPartyDowntime.runVadmalProduction(await this.#getCharacterFromTarget(target))
+    await AOVPartyDowntime.runVadmalProduction(await this.#getCharacterFromTarget(target, 'vadprod'))
   }
 
   /**
@@ -885,7 +1042,7 @@ export class AoVPartySheet extends AoVActorSheet {
    * @param target
    */
   static async _onRunAging (event, target) {
-    await AOVPartyDowntime.runAging(await this.#getCharacterFromTarget(target))
+    await AOVPartyDowntime.runAging(await this.#getCharacterFromTarget(target, 'aging'))
   }
 
   /**
@@ -894,7 +1051,7 @@ export class AoVPartySheet extends AoVActorSheet {
    * @param target
    */
   static async _onRunFamily (event, target) {
-    await AOVPartyDowntime.runFamily(await this.#getCharacterFromTarget(target))
+    await AOVPartyDowntime.runFamily(await this.#getCharacterFromTarget(target, 'family'))
   }
 
   /**
@@ -904,6 +1061,10 @@ export class AoVPartySheet extends AoVActorSheet {
   async DropActor (data) {
     const actor = await fromUuid(data.uuid)
     if (!actor) return
+    if (actor.inCompendium) {
+      ui.notifications.warn(game.i18n.localize('AOV.Party.OnlyWorldActors'))
+      return false
+    }
     switch (actor.type) {
       case 'character':
       case 'npc':
@@ -928,6 +1089,11 @@ export class AoVPartySheet extends AoVActorSheet {
   async _onDropItem (event, data) {
     if (!this.actor.isOwner) return false
     const item = await Item.implementation.fromDropData(data)
+    if (!item) return false
+    if (item.inCompendium) {
+      ui.notifications.warn(game.i18n.localize('AOV.Party.OnlyWorldItems'))
+      return false
+    }
     if (this.actor.uuid === item.parent?.uuid) return false
     if (!PARTY_ITEM_TYPES.has(item.type)) {
       ui.notifications.warn(game.i18n.format('AOV.ErrorMsg.cantDropItem', {
@@ -937,14 +1103,38 @@ export class AoVPartySheet extends AoVActorSheet {
       return false
     }
 
-    /*
-     * Party inventory is shared cargo. Bypass character-only drop rules such as
-     * CID and linked-skill checks, then copy only supported inventory Items.
-     */
+    // Directory Items are copied; embedded Actor Items use the shared exact-state
+    // transaction path and are normalized to Stored by the Party destination.
+    const sourceActor = item.parent?.documentName === 'Actor' ? item.parent : null
+    const transferItem = Boolean(sourceActor)
+
+    if (transferItem) {
+      const itemData = AOVActorItemDrop.prepareEmbeddedTransfer(item, this.actor)
+      if (!itemData) return false
+      return this._transferEmbeddedItem(
+        item,
+        () => this.actor.createEmbeddedDocuments('Item', [itemData]),
+        {
+          isTransferredItem: (createdItem) => createdItem.type === item.type && createdItem.name === item.name
+        }
+      )
+    }
+
     const itemData = item.toObject()
     delete itemData._id
+    itemData.system.equipStatus = 3
     if (itemData.type === 'weapon') itemData.system.currHP = itemData.system.maxHP
-    return this.actor.createEmbeddedDocuments('Item', [itemData])
+
+    let created
+    try {
+      created = await this.actor.createEmbeddedDocuments('Item', [itemData])
+      if (created.length !== 1) throw new Error(`Expected one created Item, received ${created.length}.`)
+    } catch (err) {
+      console.error('AOV | Party Item creation failed.', err)
+      ui.notifications.error(game.i18n.localize('AOV.Party.TransferCreateFailed'))
+      return false
+    }
+    return created
   }
 
   /**

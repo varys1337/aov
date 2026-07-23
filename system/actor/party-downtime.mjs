@@ -1,6 +1,7 @@
 import { AOVDamage } from '../apps/damage.mjs'
 import { AOVCharCreate } from './charCreate.mjs'
 import { AOVCharDevelop } from './charDevelop.mjs'
+import { notifyFarmReferenceErrors, resolveWorldFarms } from './farm-references.mjs'
 
 const CHARACTER_DOWNTIME_FLAGS = {
   'system.expImprov': true,
@@ -209,7 +210,10 @@ export class AOVPartyDowntime {
    * @param actor
    */
   static async runFarmCircumstance (actor) {
-    if (AOVPartyDowntime.#canRun(actor, 'farming')) await AOVCharDevelop.farmCircRoll(actor)
+    if (!AOVPartyDowntime.#canRun(actor, 'farming')) return
+    const resolution = await resolveWorldFarms(actor, { requireOwner: true })
+    if (!resolution.ok) return notifyFarmReferenceErrors(resolution)
+    await AOVCharDevelop.farmCircRoll(actor, { farms: resolution.farms })
   }
 
   /**
@@ -217,7 +221,10 @@ export class AOVPartyDowntime {
    * @param actor
    */
   static async runVadmalProduction (actor) {
-    if (AOVPartyDowntime.#canRun(actor, 'vadprod')) await AOVCharDevelop.vadprod(actor)
+    if (!AOVPartyDowntime.#canRun(actor, 'vadprod')) return
+    const resolution = await resolveWorldFarms(actor, { requireObserver: true })
+    if (!resolution.ok) return notifyFarmReferenceErrors(resolution)
+    await AOVCharDevelop.vadprod(actor, { farms: resolution.farms })
   }
 
   /**
@@ -258,7 +265,7 @@ export class AOVPartyDowntime {
    * @param flag
    */
   static #canRun (actor, flag) {
-    return actor?.type === 'character' && actor.system[flag]
+    return actor?.type === 'character' && actor.system[flag] && (game.user.isGM || actor.isOwner)
   }
 
   /**
